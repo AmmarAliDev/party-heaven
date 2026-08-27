@@ -90,18 +90,18 @@ export function buildHomepageFallbackSections(): HomepageSection[] {
         },
       ],
     },
-    {
-      id: "fallback-deal-spotlight",
-      kind: "deal-spotlight",
-      title: "Deal spotlight",
-      description: "Campaign-ready banner block for short-term promotions managed from admin.",
-      dealLabel: "48-hour flash deal",
-      price: 1599,
-      compareAt: 1999,
-      ctaLabel: "View deal",
-      ctaHref: routes.storefront.preview,
-      displayOrder: 40,
-    },
+    // {
+    //   id: "fallback-deal-spotlight",
+    //   kind: "deal-spotlight",
+    //   title: "Deal spotlight",
+    //   description: "Campaign-ready banner block for short-term promotions managed from admin.",
+    //   dealLabel: "48-hour flash deal",
+    //   price: 1599,
+    //   compareAt: 1999,
+    //   ctaLabel: "View deal",
+    //   ctaHref: routes.storefront.preview,
+    //   displayOrder: 40,
+    // },
   ];
 }
 

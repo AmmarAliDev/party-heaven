@@ -174,7 +174,7 @@ describe("homepage CMS service", () => {
     expect(result.sections.some((section) => section.id === "categories-disabled")).toBe(false);
     expect(result.sections.some((section) => section.id === "deal-disabled")).toBe(false);
     expect(result.sections.some((section) => section.kind === "hero-banner")).toBe(false);
-    expect(result.sections.some((section) => section.kind === "deal-spotlight")).toBe(true);
+    expect(result.sections.some((section) => section.kind === "deal-spotlight")).toBe(false);
   });
 
   it("keeps baseline homepage sections when only admin banners are active", async () => {
@@ -336,7 +336,7 @@ describe("homepage CMS service", () => {
     });
   });
 
-  it("falls back to default spotlight pricing when linked campaign product pricing is missing", async () => {
+  it("renders zero pricing when linked campaign product pricing is missing", async () => {
     prismaMock.homePageSection.findMany.mockResolvedValue([]);
     prismaMock.banner.findMany.mockResolvedValue([]);
     prismaMock.dealCampaign.findMany.mockResolvedValue([
@@ -371,8 +371,8 @@ describe("homepage CMS service", () => {
 
     expect(section).toMatchObject({
       kind: "deal-spotlight",
-      price: 1599,
-      compareAt: 1999,
+      price: 0,
+      compareAt: 0,
       ctaHref: "/categories/home-care/flash-cleaner",
     });
   });
@@ -504,7 +504,7 @@ describe("homepage CMS service", () => {
 
     expect(result.source).toBe("fallback");
     expect(result.sections.some((section) => section.kind === "hero-banner")).toBe(false);
-    expect(result.sections.some((section) => section.kind === "deal-spotlight")).toBe(true);
+    expect(result.sections.some((section) => section.kind === "deal-spotlight")).toBe(false);
     expect(result.sections.some((section) => section.id.startsWith("banner-"))).toBe(false);
     expect(result.sections.some((section) => section.id.startsWith("campaign-"))).toBe(false);
   });

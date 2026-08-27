@@ -17,7 +17,6 @@ describe("homepage section rendering", () => {
       "one-dollar",
       "featured-categories",
       "featured-products",
-      "deal-spotlight",
     ]);
     expect(result.sections.some((section) => section.kind === "hero-banner")).toBe(false);
     expect(result.sections.some((section) => section.kind === "blog-highlights")).toBe(false);
@@ -131,7 +130,6 @@ describe("homepage section rendering", () => {
       "fallback-one-dollar",
       "cms-categories",
       "cms-products",
-      "fallback-deal-spotlight",
     ]);
     expect(result.sections.some((section) => section.kind === "hero-banner")).toBe(false);
   });

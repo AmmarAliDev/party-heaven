@@ -22,7 +22,6 @@ describe("homepage fallback content", () => {
       "featured-categories",
       "one-dollar",
       "featured-products",
-      "deal-spotlight",
     ]);
   });
 });

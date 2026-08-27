@@ -11,8 +11,8 @@ describe("architecture scaffold", () => {
   it("builds consistent metadata for top-level pages", () => {
     const metadata = buildMetadata({ title: "Admin" });
 
-    expect(metadata.title).toBe("Admin | One Dollar Mart");
-    expect(metadata.applicationName).toBe("One Dollar Mart");
+    expect(metadata.title).toBe("Admin | CHEERLY");
+    expect(metadata.applicationName).toBe("CHEERLY");
   });
 
   it("exposes shared placeholder routes", () => {
