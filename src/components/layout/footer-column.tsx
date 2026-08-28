@@ -37,7 +37,7 @@ export function FooterColumn({ heading, links, action, children }: FooterColumnP
   const contentId = toContentId(heading);
 
   return (
-    <section className="border-border/70 border-b md:border-0">
+    <section className="md:ml-12 border-border/70 border-b md:border-0">
       <h2 className="flex items-center justify-between gap-2 py-4 md:py-0 md:pb-4">
         <span className="text-sm md:text-xl font-medium tracking-tight">{heading}</span>
         <button
