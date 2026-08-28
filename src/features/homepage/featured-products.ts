@@ -40,7 +40,6 @@ function extractPricing(product: StorefrontProductRecord): {
 
 function toFeaturedProductItem(
   product: StorefrontProductRecord,
-  variantImage?: { url: string; alt: string | null } | null,
 ): FeaturedProductItem {
   const pricing = extractPricing(product);
   const categorySlug = product.category?.slug;
@@ -50,15 +49,11 @@ function toFeaturedProductItem(
     0,
   );
 
-  // Variant products may store images per variant. When the product has no
-  // product-level image, fall back to the first (default) variant's image so
-  // homepage cards keep showing a real thumbnail.
-  const images =
-    product.images.length > 0
-      ? product.images
-      : variantImage
-        ? [variantImage]
-        : [];
+  // `product.images` already includes variant-level media: the catalog query
+  // layer merges each variant's images into the product record, so the first
+  // image (product-level primary, else the default variant's primary) is the
+  // real cover for both simple and variant products.
+  const images = product.images;
 
   return {
     id: product.id,
@@ -80,53 +75,6 @@ function toFeaturedProductItem(
         }
       : {}),
   };
-}
-
-/**
- * Fetches the primary image of the default (first) variant for products that
- * have no product-level images. Variant products store their media per variant,
- * so this keeps homepage cards thumbnailed without bloating the shared
- * catalog select with nested variant images on every listing query.
- */
-async function backfillVariantPrimaryImages(
-  products: StorefrontProductRecord[],
-): Promise<Map<string, { url: string; alt: string | null } | null>> {
-  const productsWithoutImages = products.filter((product) => product.images.length === 0);
-
-  if (productsWithoutImages.length === 0) {
-    return new Map();
-  }
-
-  const db = getPrismaClient();
-  const variantRows = await db.productVariant.findMany({
-    where: {
-      productId: {
-        in: productsWithoutImages.map((product) => product.id),
-      },
-    },
-    orderBy: [{ isDefault: "desc" }, { createdAt: "asc" }],
-    select: {
-      productId: true,
-      images: {
-        orderBy: { position: "asc" },
-        take: 1,
-        select: {
-          url: true,
-          alt: true,
-        },
-      },
-    },
-  });
-
-  const imageByProduct = new Map<string, { url: string; alt: string | null } | null>();
-
-  for (const row of variantRows) {
-    if (!imageByProduct.has(row.productId) && row.images[0]) {
-      imageByProduct.set(row.productId, row.images[0]);
-    }
-  }
-
-  return imageByProduct;
 }
 
 function appendUniqueProducts(
@@ -205,18 +153,16 @@ async function getMostSoldPublishedProducts(): Promise<FeaturedProductItem[]> {
 
   const publishedProducts = await listPublishedProductsByIds(rankedProductIds);
   const publishedProductsById = new Map(publishedProducts.map((product) => [product.id, product]));
-  const variantImages = await backfillVariantPrimaryImages(publishedProducts);
 
   return rankedProductIds
     .map((productId) => publishedProductsById.get(productId))
     .filter((product): product is StorefrontProductRecord => Boolean(product))
-    .map((product) => toFeaturedProductItem(product, variantImages.get(product.id)));
+    .map((product) => toFeaturedProductItem(product));
 }
 
 async function getRecentPublishedProducts(): Promise<FeaturedProductItem[]> {
   const products = await listAllPublishedProducts();
-  const variantImages = await backfillVariantPrimaryImages(products);
-  return products.map((product) => toFeaturedProductItem(product, variantImages.get(product.id)));
+  return products.map((product) => toFeaturedProductItem(product));
 }
 
 export async function resolveHomepageFeaturedProducts(

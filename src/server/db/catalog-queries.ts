@@ -167,6 +167,83 @@ export type StorefrontProductRecord = Prisma.ProductGetPayload<{
 }>;
 
 // ---------------------------------------------------------------------------
+// Variant image merge helper
+// ---------------------------------------------------------------------------
+
+/**
+ * Merges variant-level images into a batch of storefront product records.
+ *
+ * Prisma's `Product.images` relation only returns product-level rows
+ * (`productId` set). Variant products store their media on the variant rows
+ * (`productVariantId` set, `productId` null), so those images are invisible to
+ * `product.images` and must be fetched separately. This helper performs ONE
+ * batched query for the whole product set and appends each product's variant
+ * images (ordered by `position`) after its product-level images.
+ *
+ * This is what lets listing cards, search results, related products, and
+ * homepage sections show the real cover image for variant-only media instead
+ * of the placeholder gradient — without an N+1 fetch per product.
+ */
+async function mergeVariantImagesIntoProducts(
+  products: StorefrontProductRecord[],
+): Promise<StorefrontProductRecord[]> {
+  const productIds = products.map((product) => product.id);
+
+  if (productIds.length === 0) {
+    return products;
+  }
+
+  const db = getPrismaClient();
+  const variantImages = await db.productImage.findMany({
+    where: {
+      productVariant: {
+        productId: { in: productIds },
+      },
+    },
+    orderBy: { position: "asc" },
+    select: {
+      id: true,
+      url: true,
+      alt: true,
+      position: true,
+      productVariantId: true,
+      // Used only to group the fetched rows back to their owning product.
+      productVariant: {
+        select: { productId: true },
+      },
+    },
+  });
+
+  if (variantImages.length === 0) {
+    return products;
+  }
+
+  const imagesByProductId = new Map<string, StorefrontProductRecord["images"]>();
+  for (const image of variantImages) {
+    const productId = image.productVariant?.productId;
+    if (!productId) {
+      continue;
+    }
+    const group = imagesByProductId.get(productId) ?? [];
+    group.push({
+      id: image.id,
+      url: image.url,
+      alt: image.alt,
+      position: image.position,
+      productVariantId: image.productVariantId,
+    });
+    imagesByProductId.set(productId, group);
+  }
+
+  return products.map((product) => {
+    const extraImages = imagesByProductId.get(product.id);
+    return extraImages && extraImages.length > 0
+      ? { ...product, images: [...product.images, ...extraImages] }
+      : product;
+  });
+}
+
+// ---------------------------------------------------------------------------
 // Category queries
 // ---------------------------------------------------------------------------
 
@@ -281,7 +358,7 @@ export async function getPublishedCategoryBySlug(slug: string) {
  */
 export async function listPublishedProductsByCategory(categorySlug: string) {
   const db = getPrismaClient();
-  return db.product.findMany({
+  const products = await db.product.findMany({
     where: {
       status: "PUBLISHED",
       category: { slug: categorySlug, status: "PUBLISHED" },
@@ -289,6 +366,8 @@ export async function listPublishedProductsByCategory(categorySlug: string) {
     orderBy: { createdAt: "desc" },
     select: storefrontProductSelect,
   });
+
+  return mergeVariantImagesIntoProducts(products);
 }
 
 /**
@@ -296,7 +375,7 @@ export async function listPublishedProductsByCategory(categorySlug: string) {
  */
 async function _listAllPublishedProductsImpl() {
   const db = getPrismaClient();
-  return db.product.findMany({
+  const products = await db.product.findMany({
     where: {
       status: "PUBLISHED",
       category: { status: "PUBLISHED" },
@@ -304,6 +383,8 @@ async function _listAllPublishedProductsImpl() {
     orderBy: { createdAt: "desc" },
     select: storefrontProductSelect,
   });
+
+  return mergeVariantImagesIntoProducts(products);
 }
 
 /**
@@ -562,7 +643,7 @@ export async function getRelatedPublishedProducts(
   limit: number = 4,
 ) {
   const db = getPrismaClient();
-  return db.product.findMany({
+  const products = await db.product.findMany({
     where: {
       status: "PUBLISHED",
       category: { slug: categorySlug, status: "PUBLISHED" },
@@ -572,6 +653,8 @@ export async function getRelatedPublishedProducts(
     orderBy: { createdAt: "desc" },
     select: storefrontProductSelect,
   });
+
+  return mergeVariantImagesIntoProducts(products);
 }
 
 /**
@@ -586,7 +669,7 @@ export async function listPublishedProductsByIds(productIds: string[]) {
   }
 
   const db = getPrismaClient();
-  return db.product.findMany({
+  const products = await db.product.findMany({
     where: {
       id: {
         in: productIds,
@@ -598,6 +681,8 @@ export async function listPublishedProductsByIds(productIds: string[]) {
     },
     select: storefrontProductSelect,
   });
+
+  return mergeVariantImagesIntoProducts(products);
 }
 
 /**
@@ -665,7 +750,7 @@ export async function searchPublishedProducts(query: string, limit: number = 12)
     SEARCH_CANDIDATE_POOL_CAP,
   );
 
-  return db.product.findMany({
+  const products = await db.product.findMany({
     where: {
       status: "PUBLISHED",
       category: { status: "PUBLISHED" },
@@ -675,4 +760,6 @@ export async function searchPublishedProducts(query: string, limit: number = 12)
     orderBy: { createdAt: "desc" },
     select: storefrontProductSelect,
   });
+
+  return mergeVariantImagesIntoProducts(products);
 }

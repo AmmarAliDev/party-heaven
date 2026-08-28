@@ -22,6 +22,7 @@ const prismaMock = vi.hoisted(() => ({
   productImage: {
     createMany: vi.fn(),
     deleteMany: vi.fn(),
+    findMany: vi.fn(),
   },
   productSpecification: {
     createMany: vi.fn(),
@@ -56,6 +57,7 @@ vi.mock("@/server/db", () => ({
 import {
   createAdminProduct,
   deleteAdminProduct,
+  getAdminProductById,
   listAdminProducts,
   listAdminRelatedProducts,
   updateAdminProduct,
@@ -64,6 +66,82 @@ import {
 describe("admin product service", () => {
   beforeEach(() => {
     vi.clearAllMocks();
+  });
+
+  it("loads variant-specific images into the admin edit form record", async () => {
+    prismaMock.product.findUnique.mockResolvedValue({
+      id: "product-1",
+      name: "Classic Tee",
+      slug: "classic-tee",
+      shortDescription: "Soft tee",
+      description: "Soft tee with multiple sizes",
+      status: "PUBLISHED",
+      masterSku: "TEE-CLASSIC",
+      seoTitle: null,
+      seoDescription: null,
+      seoCanonicalUrl: null,
+      seoOgTitle: null,
+      seoOgDescription: null,
+      seoImageUrl: null,
+      seoNoIndex: false,
+      seoSchemaNotes: null,
+      metadata: { variantsEnabled: true, relatedProductIds: [] },
+      category: { id: "category-1", name: "Apparel", slug: "apparel" },
+      // No product-level images — all media lives on the variants below.
+      images: [],
+      specifications: [],
+      variants: [
+        {
+          id: "variant-1",
+          title: "Small / Blue",
+          sku: "TEE-S-BLU",
+          options: { Size: "Small", Color: "Blue" },
+          price: 799,
+          compareAtPrice: null,
+          isDefault: true,
+          inventory: { quantity: 5 },
+        },
+        {
+          id: "variant-2",
+          title: "Medium / Blue",
+          sku: "TEE-M-BLU",
+          options: { Size: "Medium", Color: "Blue" },
+          price: 799,
+          compareAtPrice: null,
+          isDefault: false,
+          inventory: { quantity: 8 },
+        },
+      ],
+      createdAt: new Date("2026-04-17T10:00:00.000Z"),
+      updatedAt: new Date("2026-04-17T10:00:00.000Z"),
+    });
+    prismaMock.productImage.findMany.mockResolvedValue([
+      { url: "https://example.com/small-blue.jpg", alt: "Small blue tee", position: 0, productVariantId: "variant-1" },
+      { url: "https://example.com/medium-blue.jpg", alt: "Medium blue tee", position: 1, productVariantId: "variant-2" },
+    ]);
+
+    const record = await getAdminProductById("product-1");
+
+    expect(record).not.toBeNull();
+    // Variant images must surface in the edit form with the correct variant index.
+    expect(record?.images).toEqual([
+      { url: "https://example.com/small-blue.jpg", alt: "Small blue tee", variantIndex: 0 },
+      { url: "https://example.com/medium-blue.jpg", alt: "Medium blue tee", variantIndex: 1 },
+    ]);
+    expect(prismaMock.productImage.findMany).toHaveBeenCalledWith(
+      expect.objectContaining({
+        where: { productVariant: { productId: "product-1" } },
+      }),
+    );
+  });
+
+  it("returns null when the product does not exist", async () => {
+    prismaMock.product.findUnique.mockResolvedValue(null);
+
+    const record = await getAdminProductById("missing");
+
+    expect(record).toBeNull();
+    expect(prismaMock.productImage.findMany).not.toHaveBeenCalled();
   });
 
   it("applies query, type, and pagination filters when listing products", async () => {

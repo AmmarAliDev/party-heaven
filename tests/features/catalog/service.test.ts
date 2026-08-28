@@ -33,6 +33,13 @@ function makeProductRecord(
     inventoryQty: number;
     rating: number;
     reviewCount: number;
+    images: Array<{
+      id: string;
+      url: string;
+      alt: string | null;
+      position: number;
+      productVariantId: string | null;
+    }>;
   }> = {},
 ) {
   const {
@@ -43,6 +50,7 @@ function makeProductRecord(
     inventoryQty = 10,
     rating = 4,
     reviewCount = 5,
+    images = [],
   } = overrides;
 
   return {
@@ -56,7 +64,7 @@ function makeProductRecord(
     createdAt: new Date("2025-01-01"),
     updatedAt: new Date("2025-01-01"),
     category: { id: "cat-home-care", name: "Home Care", slug: "home-care" },
-    images: [],
+    images,
     specifications: [
       { id: "spec-1", key: "Type", value: "Liquid" },
       { id: "spec-2", key: "Size", value: "500ml" },
@@ -261,6 +269,62 @@ describe("catalog listing service", () => {
       "eligible-100",
       "eligible-280",
     ]);
+  });
+
+  it("uses the first variant image as the card cover when no product-level image exists", async () => {
+    mockGetPublishedCategoryBySlug.mockResolvedValue(makeCategoryRecord());
+    // The query layer merges variant-level images into `record.images` before
+    // the service maps cards, so a variant-only product still gets a real cover.
+    mockListPublishedProductsByCategory.mockResolvedValue([
+      makeProductRecord({
+        id: "p1",
+        slug: "variant-product",
+        images: [
+          {
+            id: "img-var-1",
+            url: "https://picsum.photos/seed/tee/400",
+            alt: "Blue variant",
+            position: 0,
+            productVariantId: "var-p1",
+          },
+        ],
+      }),
+    ]);
+
+    const listing = await getCatalogCategoryListing({ slug: "home-care" });
+
+    expect(listing?.products[0]?.imageUrl).toBe("https://picsum.photos/seed/tee/400");
+    expect(listing?.products[0]?.imageLabel).toBe("Blue variant");
+  });
+
+  it("prefers the product-level image over variant images for the card cover", async () => {
+    mockGetPublishedCategoryBySlug.mockResolvedValue(makeCategoryRecord());
+    mockListPublishedProductsByCategory.mockResolvedValue([
+      makeProductRecord({
+        id: "p1",
+        slug: "shared-product",
+        images: [
+          {
+            id: "img-shared",
+            url: "https://picsum.photos/seed/shared/400",
+            alt: "Shared cover",
+            position: 0,
+            productVariantId: null,
+          },
+          {
+            id: "img-var-1",
+            url: "https://picsum.photos/seed/blue/400",
+            alt: "Blue variant",
+            position: 1,
+            productVariantId: "var-p1",
+          },
+        ],
+      }),
+    ]);
+
+    const listing = await getCatalogCategoryListing({ slug: "home-care" });
+
+    expect(listing?.products[0]?.imageUrl).toBe("https://picsum.photos/seed/shared/400");
   });
 });
 
