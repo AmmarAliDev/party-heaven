@@ -2,9 +2,9 @@ import { OrderStatus } from "@prisma/client";
 
 import { routes } from "@/config/routes";
 import { createLogger } from "@/lib/logger";
+import { getPrismaClient } from "@/server/db";
 import type { StorefrontProductRecord } from "@/server/db/catalog-queries";
 import { listAllPublishedProducts, listPublishedProductsByIds } from "@/server/db/catalog-queries";
-import { getPrismaClient } from "@/server/db";
 
 import type { FeaturedProductItem } from "./types";
 
@@ -38,7 +38,10 @@ function extractPricing(product: StorefrontProductRecord): {
   };
 }
 
-function toFeaturedProductItem(product: StorefrontProductRecord): FeaturedProductItem {
+function toFeaturedProductItem(
+  product: StorefrontProductRecord,
+  variantImage?: { url: string; alt: string | null } | null,
+): FeaturedProductItem {
   const pricing = extractPricing(product);
   const categorySlug = product.category?.slug;
   const description = product.shortDescription ?? product.description;
@@ -46,6 +49,16 @@ function toFeaturedProductItem(product: StorefrontProductRecord): FeaturedProduc
     (total, variant) => total + (variant.inventory?.quantity ?? 0),
     0,
   );
+
+  // Variant products may store images per variant. When the product has no
+  // product-level image, fall back to the first (default) variant's image so
+  // homepage cards keep showing a real thumbnail.
+  const images =
+    product.images.length > 0
+      ? product.images
+      : variantImage
+        ? [variantImage]
+        : [];
 
   return {
     id: product.id,
@@ -57,9 +70,9 @@ function toFeaturedProductItem(product: StorefrontProductRecord): FeaturedProduc
     ...(typeof pricing.compareAt === "number" ? { compareAt: pricing.compareAt } : {}),
     badge: "Best seller",
     inventoryQuantity,
-    ...(product.images.length > 0
+    ...(images.length > 0
       ? {
-          images: product.images.map((image, index) => ({
+          images: images.map((image, index) => ({
             url: image.url,
             ...(image.alt ? { alt: image.alt } : {}),
             isPrimary: index === 0,
@@ -67,6 +80,53 @@ function toFeaturedProductItem(product: StorefrontProductRecord): FeaturedProduc
         }
       : {}),
   };
+}
+
+/**
+ * Fetches the primary image of the default (first) variant for products that
+ * have no product-level images. Variant products store their media per variant,
+ * so this keeps homepage cards thumbnailed without bloating the shared
+ * catalog select with nested variant images on every listing query.
+ */
+async function backfillVariantPrimaryImages(
+  products: StorefrontProductRecord[],
+): Promise<Map<string, { url: string; alt: string | null } | null>> {
+  const productsWithoutImages = products.filter((product) => product.images.length === 0);
+
+  if (productsWithoutImages.length === 0) {
+    return new Map();
+  }
+
+  const db = getPrismaClient();
+  const variantRows = await db.productVariant.findMany({
+    where: {
+      productId: {
+        in: productsWithoutImages.map((product) => product.id),
+      },
+    },
+    orderBy: [{ isDefault: "desc" }, { createdAt: "asc" }],
+    select: {
+      productId: true,
+      images: {
+        orderBy: { position: "asc" },
+        take: 1,
+        select: {
+          url: true,
+          alt: true,
+        },
+      },
+    },
+  });
+
+  const imageByProduct = new Map<string, { url: string; alt: string | null } | null>();
+
+  for (const row of variantRows) {
+    if (!imageByProduct.has(row.productId) && row.images[0]) {
+      imageByProduct.set(row.productId, row.images[0]);
+    }
+  }
+
+  return imageByProduct;
 }
 
 function appendUniqueProducts(
@@ -145,16 +205,18 @@ async function getMostSoldPublishedProducts(): Promise<FeaturedProductItem[]> {
 
   const publishedProducts = await listPublishedProductsByIds(rankedProductIds);
   const publishedProductsById = new Map(publishedProducts.map((product) => [product.id, product]));
+  const variantImages = await backfillVariantPrimaryImages(publishedProducts);
 
   return rankedProductIds
     .map((productId) => publishedProductsById.get(productId))
     .filter((product): product is StorefrontProductRecord => Boolean(product))
-    .map(toFeaturedProductItem);
+    .map((product) => toFeaturedProductItem(product, variantImages.get(product.id)));
 }
 
 async function getRecentPublishedProducts(): Promise<FeaturedProductItem[]> {
   const products = await listAllPublishedProducts();
-  return products.map(toFeaturedProductItem);
+  const variantImages = await backfillVariantPrimaryImages(products);
+  return products.map((product) => toFeaturedProductItem(product, variantImages.get(product.id)));
 }
 
 export async function resolveHomepageFeaturedProducts(

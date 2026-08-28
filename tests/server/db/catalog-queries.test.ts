@@ -2,6 +2,8 @@ import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 const mockQueryRaw = vi.fn();
 const mockProductFindMany = vi.fn();
+const mockProductFindFirst = vi.fn();
+const mockProductImageFindMany = vi.fn();
 
 vi.mock('next/cache', () => ({
   unstable_cache: (fn: (...args: unknown[]) => unknown) => fn,
@@ -12,6 +14,10 @@ vi.mock('@/server/db', () => ({
     $queryRaw: (...args: unknown[]) => mockQueryRaw(...args),
     product: {
       findMany: (...args: unknown[]) => mockProductFindMany(...args),
+      findFirst: (...args: unknown[]) => mockProductFindFirst(...args),
+    },
+    productImage: {
+      findMany: (...args: unknown[]) => mockProductImageFindMany(...args),
     },
   }),
 }));
@@ -132,5 +138,59 @@ describe('catalog searchPublishedProducts query widening', () => {
 
     expect(result).toEqual([]);
     expect(mockProductFindMany).not.toHaveBeenCalled();
+  });
+});
+
+describe('getPublishedProductBySlug variant images', () => {
+  beforeEach(() => {
+    vi.resetModules();
+    mockProductFindFirst.mockReset();
+    mockProductImageFindMany.mockReset();
+  });
+
+  it('merges product-level and variant-level images for the detail page', async () => {
+    mockProductFindFirst.mockResolvedValue({
+      id: 'prod-1',
+      name: 'Balloons',
+      slug: 'balloons',
+      shortDescription: null,
+      description: null,
+      masterSku: null,
+      metadata: { variantsEnabled: true },
+      createdAt: new Date(),
+      updatedAt: new Date(),
+      category: { id: 'cat-1', name: 'Balloons', slug: 'balloons' },
+      images: [
+        { id: 'img-shared', url: '/shared.jpg', alt: 'shared', position: 0, productVariantId: null },
+      ],
+      specifications: [],
+      variants: [],
+      reviews: [],
+    });
+    mockProductImageFindMany.mockResolvedValue([
+      { id: 'img-var-1', url: '/var-1.jpg', alt: 'variant', position: 0, productVariantId: 'var-1' },
+    ]);
+
+    const { getPublishedProductBySlug } = await import('@/server/db/catalog-queries');
+    const result = await getPublishedProductBySlug('balloons');
+
+    expect(result).not.toBeNull();
+    expect(result?.images.map((img) => img.id)).toEqual(['img-shared', 'img-var-1']);
+    // Variant images are fetched scoped to the product's variants.
+    expect(mockProductImageFindMany).toHaveBeenCalledWith(
+      expect.objectContaining({
+        where: { productVariant: { productId: 'prod-1' } },
+      }),
+    );
+  });
+
+  it('returns null for an unknown product without querying variant images', async () => {
+    mockProductFindFirst.mockResolvedValue(null);
+
+    const { getPublishedProductBySlug } = await import('@/server/db/catalog-queries');
+    const result = await getPublishedProductBySlug('missing');
+
+    expect(result).toBeNull();
+    expect(mockProductImageFindMany).not.toHaveBeenCalled();
   });
 });

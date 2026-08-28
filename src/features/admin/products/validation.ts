@@ -30,6 +30,40 @@ function parseBooleanish(value: unknown) {
   return normalized === "true" || normalized === "1" || normalized === "on" || normalized === "yes";
 }
 
+/**
+ * Parses an optional image → variant index coming from the admin form.
+ *
+ * The admin form submits `imageVariantIndex` rows as strings. An empty value
+ * means the image is product-level (shared across all variants) and is
+ * coerced to `null` (the inner schema is `nullable`). The client-side variant
+ * select also writes `null` directly into the form state when the admin picks
+ * "All variants (shared)", so `null` must round-trip as `null` — returning
+ * `undefined` here would make the inner `z.number().nullable()` schema reject
+ * it and fail the whole product save. Any non-negative integer is the index
+ * into the product's `variants` array.
+ */
+function parseVariantIndexish(value: unknown) {
+  if (value === null) {
+    return null;
+  }
+
+  if (typeof value === "number") {
+    return Number.isInteger(value) && value >= 0 ? value : undefined;
+  }
+
+  if (typeof value !== "string") {
+    return undefined;
+  }
+
+  const normalized = value.trim();
+  if (normalized.length === 0) {
+    return null;
+  }
+
+  const parsed = Number(normalized);
+  return Number.isInteger(parsed) && parsed >= 0 ? parsed : undefined;
+}
+
 function parseVariantOptions(value: unknown) {
   if (value && typeof value === "object" && !Array.isArray(value)) {
     return value;
@@ -107,6 +141,10 @@ const adminProductImageSchema = z.object({
     .max(160, "Image alt text must be 160 characters or fewer.")
     .optional()
     .transform((value) => (value && value.length > 0 ? value : undefined)),
+  // Index into the product's `variants` array. When set, the image is attached
+  // to that specific variant. When absent/null, the image is product-level
+  // (shared across all variants). Only meaningful when `variantsEnabled` is true.
+  variantIndex: z.preprocess(parseVariantIndexish, z.number().int().min(0).nullable()).optional(),
 });
 
 const adminProductSpecificationSchema = z.object({
@@ -184,6 +222,17 @@ export const adminProductMutationSchema = z
           });
         }
         seenSkus.add(normalizedSku);
+      }
+
+      // Every image assigned to a variant must point to an existing variant row.
+      for (const [imageIndex, image] of input.images.entries()) {
+        if (typeof image.variantIndex === "number" && image.variantIndex >= input.variants.length) {
+          ctx.addIssue({
+            code: "custom",
+            message: `Image ${imageIndex + 1} references a variant that does not exist.`,
+            path: ["images", imageIndex, "variantIndex"],
+          });
+        }
       }
     }
   });

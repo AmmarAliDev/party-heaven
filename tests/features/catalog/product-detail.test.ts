@@ -46,7 +46,7 @@ function makeDetailRecord(overrides: Partial<{
     updatedAt: new Date("2025-01-01"),
     category: { id: "cat-pc", name: "Personal Care", slug: categorySlug },
     images: [
-      { id: "img-1", url: "https://example.com/face-wash.jpg", alt: "Face wash bottle", position: 0 },
+      { id: "img-1", url: "https://picsum.photos/seed/face-wash/600", alt: "Face wash bottle", position: 0 },
     ],
     specifications: [
       { id: "spec-1", key: "Volume", value: "100ml" },
@@ -197,6 +197,33 @@ describe("product detail service", () => {
     expect(product?.variantGroups[0]?.options.length).toBe(3);
   });
 
+  it("builds a variant group from titles when variants have no options", async () => {
+    const record = makeVariantProductRecord();
+    // Variants without option values still need a storefront picker so
+    // variant-specific images can be switched.
+    record.variants = record.variants.map((variant) => ({
+      ...variant,
+      options: null,
+      title: variant.title ?? variant.sku ?? "Variant",
+    }));
+    mockGetPublishedProductBySlug.mockResolvedValue(record);
+
+    const product = await getProductBySlug("ultra-wash-detergent-1kg");
+
+    expect(product?.variantGroups.length).toBe(1);
+    expect(product?.variantGroups[0]?.name).toBe("Variant");
+    expect(product?.variantGroups[0]?.options.map((option) => option.label)).toEqual([
+      "500g",
+      "1kg",
+      "2kg",
+    ]);
+    expect(product?.variantGroups[0]?.options.map((option) => option.id)).toEqual([
+      "var-500g",
+      "var-1kg",
+      "var-2kg",
+    ]);
+  });
+
   it("resolves the detail sku from the default variant before the master SKU", async () => {
     mockGetPublishedProductBySlug.mockResolvedValue(makeVariantProductRecord());
 
@@ -286,7 +313,7 @@ describe("product detail service", () => {
 
     const product = await getProductBySlug("hydra-care-face-wash");
 
-    expect(product?.images[0]?.url).toBe("https://example.com/face-wash.jpg");
+    expect(product?.images[0]?.url).toBe("https://picsum.photos/seed/face-wash/600");
   });
 
   it("returns related products from the same category excluding self", async () => {
@@ -584,6 +611,63 @@ describe("product detail service", () => {
       name: "Hydra Care Face Wash",
       shortDescription: "Gentle daily cleanser.",
       categorySlug: "personal-care",
+    });
+  });
+
+  it("maps variant-specific images with variantId and variantLabel", async () => {
+    const record = makeVariantProductRecord();
+    record.images = [
+      { id: "img-1kg", url: "https://picsum.photos/seed/1kg/600", alt: "1kg pack", position: 0, productVariantId: "var-1kg" },
+      { id: "img-500g", url: "https://picsum.photos/seed/500g/600", alt: "500g pack", position: 1, productVariantId: "var-500g" },
+      { id: "img-shared", url: "https://picsum.photos/seed/shared/600", alt: "Shared", position: 2 },
+    ];
+    mockGetPublishedProductBySlug.mockResolvedValue(record);
+
+    const product = await getProductBySlug("ultra-wash-detergent-1kg");
+
+    // Product-level (shared) image comes first, then variant images grouped by variant order.
+    expect(product?.images.map((img) => img.id)).toEqual(["img-shared", "img-500g", "img-1kg"]);
+    expect(product?.images.find((img) => img.id === "img-1kg")).toMatchObject({
+      variantId: "var-1kg",
+      variantLabel: "1kg",
+      isPrimary: true,
+    });
+    expect(product?.images.find((img) => img.id === "img-500g")).toMatchObject({
+      variantId: "var-500g",
+      variantLabel: "500g",
+      isPrimary: true,
+    });
+    // Shared/product-level image carries no variant association.
+    expect(product?.images.find((img) => img.id === "img-shared")).not.toHaveProperty("variantId");
+  });
+
+  it("marks only the first image of each variant as primary", async () => {
+    const record = makeVariantProductRecord();
+    record.images = [
+      { id: "img-1kg-a", url: "https://picsum.photos/seed/1kg-a/600", alt: "1kg front", position: 0, productVariantId: "var-1kg" },
+      { id: "img-1kg-b", url: "https://picsum.photos/seed/1kg-b/600", alt: "1kg back", position: 1, productVariantId: "var-1kg" },
+    ];
+    mockGetPublishedProductBySlug.mockResolvedValue(record);
+
+    const product = await getProductBySlug("ultra-wash-detergent-1kg");
+
+    const variantImages = product?.images.filter((img) => img.variantId === "var-1kg");
+    expect(variantImages?.map((img) => img.isPrimary)).toEqual([true, false]);
+  });
+
+  it("falls back to variant labels derived from variant titles when options are missing", async () => {
+    const record = makeVariantProductRecord();
+    record.variants = record.variants.map((variant) => ({ ...variant, options: null }));
+    record.images = [
+      { id: "img-1kg", url: "https://picsum.photos/seed/1kg/600", alt: null, position: 0, productVariantId: "var-1kg" },
+    ];
+    mockGetPublishedProductBySlug.mockResolvedValue(record);
+
+    const product = await getProductBySlug("ultra-wash-detergent-1kg");
+
+    expect(product?.images[0]).toMatchObject({
+      variantId: "var-1kg",
+      variantLabel: "1kg",
     });
   });
 });

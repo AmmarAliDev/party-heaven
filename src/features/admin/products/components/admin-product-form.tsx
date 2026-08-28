@@ -118,6 +118,7 @@ function buildDefaultValues(categories: AdminProductCategoryOption[], product?: 
     images: product.images.map((image) => ({
       url: image.url,
       alt: image.alt,
+      ...(image.variantIndex != null ? { variantIndex: image.variantIndex } : {}),
     })),
     specifications: product.specifications.map((specification) => ({
       key: specification.key,
@@ -173,6 +174,8 @@ function buildProductFormData(values: AdminProductFormValues, input: { returnTo:
   values.images.forEach((image) => {
     formData.append("imageUrl", image.url);
     formData.append("imageAlt", image.alt ?? "");
+    // Empty string = product-level image (shared across variants).
+    formData.append("imageVariantIndex", image.variantIndex == null ? "" : `${image.variantIndex}`);
   });
 
   values.specifications.forEach((specification) => {
@@ -582,18 +585,39 @@ export function AdminProductForm({ mode, action, returnTo, submitLabel, categori
                   variant="outline"
                   size="sm"
                   disabled={isPending}
-                  onClick={() => images.append({ url: "", alt: "" })}
+                  onClick={() =>
+                    images.append({
+                      url: "",
+                      alt: "",
+                      // For variant products default new images to the first
+                      // variant so admins explicitly assign per-variant media.
+                      ...(watchedValues.variantsEnabled && watchedVariants.length > 0
+                        ? { variantIndex: 0 }
+                        : {}),
+                    })
+                  }
                 >
                   <Plus className="size-4" />
                   Add image
                 </Button>
               </div>
 
+              {watchedValues.variantsEnabled && watchedVariants.length > 0 ? (
+                <p className="text-sm text-muted-foreground">
+                  For variant products, attach each image to the variant it shows, or choose
+                  &ldquo;All variants&rdquo; for a shared image. Shoppers can switch variants by
+                  tapping an image on the product page.
+                </p>
+              ) : null}
+
               {images.fields.length === 0 ? (
                 <p className="text-sm text-muted-foreground">No images added yet.</p>
               ) : (
                 images.fields.map((image, index) => (
-                  <div key={image.id} className="grid gap-3 md:grid-cols-[1fr_1fr_auto]">
+                  <div
+                    key={image.id}
+                    className="grid gap-3 md:grid-cols-[1fr_1fr_auto] lg:grid-cols-[1fr_1fr_1fr_auto]"
+                  >
                     <DynamicFormField
                       control={form.control}
                       disabled={isPending}
@@ -629,6 +653,39 @@ export function AdminProductForm({ mode, action, returnTo, submitLabel, categori
                         placeholder: "Plain-language image description",
                       }}
                     />
+                    {watchedValues.variantsEnabled && watchedVariants.length > 0 ? (
+                      <DynamicFormField
+                        control={form.control}
+                        disabled={isPending}
+                        fieldConfig={{
+                          name: fieldPath(`images.${index}.variantIndex`),
+                          type: "custom",
+                          label: index === 0 ? "Variant" : undefined,
+                          render: ({ field, fieldState, inputId, describedBy, disabled }) => (
+                            <select
+                              id={inputId}
+                              value={field.value == null ? "" : String(field.value)}
+                              onChange={(event) => {
+                                const raw = event.target.value;
+                                field.onChange(raw === "" ? null : Number(raw));
+                              }}
+                              onBlur={field.onBlur}
+                              aria-describedby={describedBy}
+                              aria-invalid={Boolean(fieldState.error)}
+                              disabled={disabled}
+                              className="border-input bg-background ring-offset-background placeholder:text-muted-foreground focus-visible:ring-ring flex h-10 w-full rounded-md border px-3 py-2 text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
+                            >
+                              <option value="">All variants (shared)</option>
+                              {watchedVariants.map((variant, variantIndex) => (
+                                <option key={`${image.id}-${variantIndex}`} value={variantIndex}>
+                                  {variant.title?.trim() || `Variant ${variantIndex + 1}`}
+                                </option>
+                              ))}
+                            </select>
+                          ),
+                        }}
+                      />
+                    ) : null}
                     <div className="flex items-end">
                       <Button type="button" variant="ghost" size="icon" disabled={isPending} onClick={() => images.remove(index)}>
                         <Trash2 className="size-4" />

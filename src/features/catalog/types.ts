@@ -16,6 +16,14 @@ export type ProductImage = {
   label: string;
   tone: CatalogProductImageTone;
   isPrimary: boolean;
+  /**
+   * When the image is attached to a specific variant (variant products), this
+   * holds the variant id. Tapping such an image on the PDP also selects that
+   * variant. Product-level (shared) images omit this field.
+   */
+  variantId?: string;
+  /** Human-readable label for the owning variant (e.g. "Small / Blue"). */
+  variantLabel?: string;
 };
 
 // ---------------------------------------------------------------------------

@@ -10,6 +10,7 @@ export { CategoryOverviewCard } from "./components/category-overview-card";
 export { ProductDetailSkeleton } from "./components/product-detail-skeleton";
 export { ProductGridCard } from "./components/product-grid-card";
 export { ProductImageGallery } from "./components/product-image-gallery";
+export { ProductOverview } from "./components/product-overview";
 export { ProductPanel } from "./components/product-panel";
 export { ProductRelatedGrid } from "./components/product-related-grid";
 export { ProductReviews } from "./components/product-reviews";

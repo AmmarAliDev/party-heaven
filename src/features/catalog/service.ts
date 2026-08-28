@@ -22,7 +22,6 @@ import type { Prisma } from "@prisma/client";
 
 import { routes } from "@/config/routes";
 import { createLogger } from "@/lib/logger";
-import { createPaginatedResult } from "@/server/db/pagination";
 import type {
   StorefrontCategoryRecord,
   StorefrontProductDetailRecord,
@@ -32,14 +31,17 @@ import {
   countPublishedOneDollarProducts,
   getAllPublishedProductSlugsWithCategories,
   getPublishedCategoryBySlug,
-  getPublishedProductContextBySlug,
   getPublishedProductBySlug as dbGetPublishedProductBySlug,
+  getPublishedProductContextBySlug,
   getRelatedPublishedProducts,
   listAllPublishedProducts,
-  listPublishedProductsByIds,
   listPublishedCategories,
   listPublishedProductsByCategory,
+  listPublishedProductsByIds,
 } from "@/server/db/catalog-queries";
+import { createPaginatedResult } from "@/server/db/pagination";
+
+import { normalizeCatalogImageUrl } from "./lib/product-image-url";
 import type { CatalogSearchParams } from "./filters";
 import { parseCatalogSearchParams } from "./filters";
 import {
@@ -48,7 +50,6 @@ import {
   ONE_DOLLAR_CATEGORY_SLUG,
   ONE_DOLLAR_MAX_PRICE_PKR,
 } from "./one-dollar";
-import { normalizeCatalogImageUrl } from "./lib/product-image-url";
 import { getCatalogSearchAdapter } from "./search-adapter";
 import type {
   CatalogCategory,
@@ -94,15 +95,64 @@ function deriveTone(categorySlug: string, productSlug: string): CatalogProductIm
 }
 
 /**
+ * Human-readable label for a variant used on image thumbnails.
+ * Prefers option values ("Small / Blue") over the variant title, falling back
+ * to a generic "Variant" label when neither is meaningful.
+ */
+function variantDisplayLabel(variant: StorefrontProductRecord["variants"][number]): string {
+  if (variant.options && typeof variant.options === "object") {
+    const values = Object.values(variant.options as Record<string, unknown>)
+      .map((value) => `${value ?? ""}`.trim())
+      .filter(Boolean);
+
+    if (values.length > 0) {
+      return values.join(" / ");
+    }
+  }
+
+  return variant.title ?? "Variant";
+}
+
+function mapImageToStorefront(
+  image: StorefrontProductRecord["images"][number],
+  productName: string,
+  tone: CatalogProductImageTone,
+  isPrimary: boolean,
+  variantId: string | undefined,
+  variantLabels: Map<string, string> | undefined,
+): ProductImage {
+  const normalizedUrl = normalizeCatalogImageUrl(image.url);
+
+  return {
+    id: image.id,
+    ...(normalizedUrl ? { url: normalizedUrl } : {}),
+    label: image.alt?.trim() || productName,
+    tone,
+    isPrimary,
+    ...(variantId
+      ? { variantId, variantLabel: variantLabels?.get(variantId) ?? "Variant" }
+      : {}),
+  };
+}
+
+/**
  * Maps DB images to the storefront ProductImage shape.
- * Keeps `url` for future real-image rendering while populating
- * legacy `label`/`tone` fields for the placeholder gradient UI.
+ *
+ * For variant products each image may be attached to a specific variant
+ * (`productVariantId`). This mapper:
+ *  - orders product-level (shared) images first, then variant images grouped
+ *    by the product's variant order so thumbnails stay grouped per variant,
+ *  - marks the first image of each variant group as `isPrimary` so the gallery
+ *    can show the correct image when a variant is selected,
+ *  - keeps `url` for real-image rendering and `label`/`tone` for the legacy
+ *    placeholder gradient UI.
  */
 function mapProductImages(
   images: StorefrontProductRecord["images"],
   productName: string,
   categorySlug: string,
   productSlug: string,
+  variantLabels?: Map<string, string>,
 ): ProductImage[] {
   if (images.length === 0) {
     // Provide a single placeholder image so the gallery always renders
@@ -118,17 +168,39 @@ function mapProductImages(
 
   const tone = deriveTone(categorySlug, productSlug);
 
-  return images.map((image, index) => {
-    const normalizedUrl = normalizeCatalogImageUrl(image.url);
+  const variantOrder = new Map<string, number>();
+  if (variantLabels) {
+    let order = 0;
+    for (const variantId of variantLabels.keys()) {
+      variantOrder.set(variantId, order);
+      order += 1;
+    }
+  }
 
-    return {
-      id: image.id,
-      ...(normalizedUrl ? { url: normalizedUrl } : {}),
-      label: image.alt?.trim() || productName,
-      tone,
-      isPrimary: index === 0,
-    };
+  const productImages = images.filter((image) => !image.productVariantId);
+  const variantImages = images
+    .filter((image) => image.productVariantId != null)
+    .sort((left, right) => {
+      const leftOrder = variantOrder.get(left.productVariantId!) ?? Number.MAX_SAFE_INTEGER;
+      const rightOrder = variantOrder.get(right.productVariantId!) ?? Number.MAX_SAFE_INTEGER;
+      return leftOrder - rightOrder || left.position - right.position;
+    });
+
+  const mapped: ProductImage[] = [];
+
+  productImages.forEach((image, index) => {
+    mapped.push(mapImageToStorefront(image, productName, tone, index === 0, undefined, variantLabels));
   });
+
+  const seenVariantIds = new Set<string>();
+  for (const image of variantImages) {
+    const variantId = image.productVariantId!;
+    const isPrimary = !seenVariantIds.has(variantId);
+    seenVariantIds.add(variantId);
+    mapped.push(mapImageToStorefront(image, productName, tone, isPrimary, variantId, variantLabels));
+  }
+
+  return mapped;
 }
 
 /**
@@ -255,6 +327,11 @@ function parseRelatedProductIds(metadata: Prisma.JsonValue | null | undefined): 
  * Builds ProductVariantGroup[] from the DB variant records.
  * Groups variants by their option keys and deduplicates option values.
  *
+ * Variants that carry no `options` JSON (e.g. legacy records where the admin
+ * left the options field blank) are grouped under a generic "Variant" group
+ * using their human-friendly `title` as the option label, so the storefront
+ * picker — and therefore variant-specific images — still work for them.
+ *
  * For SIMPLE products (one variant, no options), returns an empty array.
  */
 function buildVariantGroups(
@@ -268,32 +345,48 @@ function buildVariantGroups(
   // Collect unique option keys and map each unique value to the first variant
   // that has it, so we can derive the per-option sku/price/inventory.
   const groupMap = new Map<string, Map<string, (typeof variants)[number]>>();
+  const FALLBACK_GROUP = "Variant";
 
-  for (const variant of variants) {
-    if (!variant.options || typeof variant.options !== "object") {
-      continue;
+  variants.forEach((variant, variantIndex) => {
+    const opts =
+      variant.options && typeof variant.options === "object"
+        ? (variant.options as Record<string, string>)
+        : null;
+    const hasUsableOptions =
+      opts !== null &&
+      Object.keys(opts).some((key) => key.trim().length > 0 && `${opts[key] ?? ""}`.trim().length > 0);
+
+    if (hasUsableOptions) {
+      for (const [key, value] of Object.entries(opts)) {
+        const normalizedKey = key.trim();
+        const normalizedValue = `${value}`.trim();
+
+        if (!normalizedKey || !normalizedValue) {
+          continue;
+        }
+
+        if (!groupMap.has(normalizedKey)) {
+          groupMap.set(normalizedKey, new Map());
+        }
+
+        // First variant wins if multiple share the same option value
+        if (!groupMap.get(normalizedKey)!.has(normalizedValue)) {
+          groupMap.get(normalizedKey)!.set(normalizedValue, variant);
+        }
+      }
+      return;
     }
 
-    const opts = variant.options as Record<string, string>;
-
-    for (const [key, value] of Object.entries(opts)) {
-      const normalizedKey = key.trim();
-      const normalizedValue = `${value}`.trim();
-
-      if (!normalizedKey || !normalizedValue) {
-        continue;
-      }
-
-      if (!groupMap.has(normalizedKey)) {
-        groupMap.set(normalizedKey, new Map());
-      }
-
-      // First variant wins if multiple share the same option value
-      if (!groupMap.get(normalizedKey)!.has(normalizedValue)) {
-        groupMap.get(normalizedKey)!.set(normalizedValue, variant);
-      }
+    // Variant without options: fall back to the variant title so the picker
+    // still renders and variant-specific media can be selected.
+    const label = variant.title?.trim() || `Variant ${variantIndex + 1}`;
+    if (!groupMap.has(FALLBACK_GROUP)) {
+      groupMap.set(FALLBACK_GROUP, new Map());
     }
-  }
+    if (!groupMap.get(FALLBACK_GROUP)!.has(label)) {
+      groupMap.get(FALLBACK_GROUP)!.set(label, variant);
+    }
+  });
 
   return Array.from(groupMap.entries()).map(([groupName, valueMap]) => {
     const options: ProductVariantOption[] = Array.from(valueMap.entries()).map(
@@ -693,12 +786,16 @@ export async function getProductBySlug(
     record.variants.find((v) => v.isDefault) ?? record.variants[0] ?? null;
   const sku = defaultVariant?.sku ?? record.masterSku ?? "";
 
+  // Variant id → display label, used to tag variant-specific images so the
+  // gallery can show which variant each thumbnail belongs to.
+  const variantLabels = new Map(record.variants.map((variant) => [variant.id, variantDisplayLabel(variant)]));
+
   return {
     ...card,
     sku,
     shortDescription: record.shortDescription ?? "",
     longDescription: record.description ?? "",
-    images: mapProductImages(record.images, record.name, categorySlug, record.slug),
+    images: mapProductImages(record.images, record.name, categorySlug, record.slug, variantLabels),
     specifications: record.specifications.map((spec) => ({
       label: spec.key,
       value: spec.value,

@@ -401,6 +401,152 @@ describe("admin product service", () => {
     expect(created.seoImageUrl).toBe("https://example.com/tee-seo.jpg");
   });
 
+  it("creates a variant product with images attached to specific variants", async () => {
+    prismaMock.category.findUnique.mockResolvedValue({ id: "category-1", name: "Apparel" });
+    prismaMock.product.findMany.mockResolvedValue([]);
+    prismaMock.product.create.mockResolvedValue({ id: "product-2" });
+    prismaMock.product.findUnique.mockResolvedValue({
+      id: "product-2",
+      name: "Classic Tee",
+      slug: "classic-tee",
+      shortDescription: "Soft tee",
+      description: "Soft tee with multiple sizes",
+      status: "PUBLISHED",
+      masterSku: "TEE-CLASSIC",
+      seoTitle: null,
+      seoDescription: null,
+      seoImageUrl: null,
+      metadata: { variantsEnabled: true, relatedProductIds: [] },
+      category: { id: "category-1", name: "Apparel", slug: "apparel" },
+      variants: [
+        {
+          id: "variant-1",
+          title: "Small / Blue",
+          sku: "TEE-S-BLU",
+          options: { Size: "Small", Color: "Blue" },
+          price: 799,
+          compareAtPrice: null,
+          isDefault: true,
+          inventory: { quantity: 5 },
+        },
+        {
+          id: "variant-2",
+          title: "Medium / Blue",
+          sku: "TEE-M-BLU",
+          options: { Size: "Medium", Color: "Blue" },
+          price: 799,
+          compareAtPrice: null,
+          isDefault: false,
+          inventory: { quantity: 8 },
+        },
+      ],
+      images: [
+        {
+          url: "https://example.com/small-blue.jpg",
+          alt: "Small blue tee",
+          position: 0,
+          productVariantId: "variant-1",
+        },
+        {
+          url: "https://example.com/shared.jpg",
+          alt: "Shared tee image",
+          position: 1,
+        },
+      ],
+      specifications: [],
+      createdAt: new Date("2026-04-17T10:00:00.000Z"),
+      updatedAt: new Date("2026-04-17T10:00:00.000Z"),
+    });
+    prismaMock.productVariant.create
+      .mockResolvedValueOnce({ id: "variant-1" })
+      .mockResolvedValueOnce({ id: "variant-2" });
+    prismaMock.inventory.create
+      .mockResolvedValueOnce({ id: "inventory-1" })
+      .mockResolvedValueOnce({ id: "inventory-2" });
+    prismaMock.productImage.createMany.mockResolvedValue({ count: 2 });
+    prismaMock.auditLog.create.mockResolvedValue({ id: "audit-variant-images" });
+
+    const created = await createAdminProduct({
+      data: {
+        title: "Classic Tee",
+        slug: "classic-tee",
+        shortDescription: "Soft tee",
+        description: "Soft tee with multiple sizes",
+        categoryId: "category-1",
+        status: "PUBLISHED",
+        sku: "TEE-CLASSIC",
+        price: 0,
+        comparePrice: undefined,
+        stock: 0,
+        variantsEnabled: true,
+        variants: [
+          {
+            title: "Small / Blue",
+            sku: "TEE-S-BLU",
+            price: 799,
+            comparePrice: undefined,
+            stock: 5,
+            options: { Size: "Small", Color: "Blue" },
+            isDefault: true,
+          },
+          {
+            title: "Medium / Blue",
+            sku: "TEE-M-BLU",
+            price: 799,
+            comparePrice: undefined,
+            stock: 8,
+            options: { Size: "Medium", Color: "Blue" },
+            isDefault: false,
+          },
+        ],
+        // First image → variant index 0 (small), second image → shared/product-level
+        images: [
+          { url: "https://example.com/small-blue.jpg", alt: "Small blue tee", variantIndex: 0 },
+          { url: "https://example.com/shared.jpg", alt: "Shared tee image" },
+        ],
+        specifications: [],
+        relatedProductIds: [],
+        seoTitle: undefined,
+        seoDescription: undefined,
+        seoCanonicalUrl: undefined,
+        seoOgTitle: undefined,
+        seoOgDescription: undefined,
+        seoImageUrl: undefined,
+        seoNoIndex: false,
+        seoSchemaNotes: undefined,
+      },
+      actor: {
+        actorId: "admin-2",
+        actorRole: "SUPER_ADMIN",
+      },
+    });
+
+    expect(prismaMock.productVariant.create).toHaveBeenCalledTimes(2);
+    expect(prismaMock.productImage.createMany).toHaveBeenCalledWith({
+      data: [
+        expect.objectContaining({
+          productVariantId: "variant-1",
+          url: "https://example.com/small-blue.jpg",
+          position: 0,
+        }),
+        expect.objectContaining({
+          productId: "product-2",
+          url: "https://example.com/shared.jpg",
+          position: 1,
+        }),
+      ],
+    });
+    // The service round-trips the image back with the resolved variant index.
+    expect(created.images[0]).toMatchObject({
+      url: "https://example.com/small-blue.jpg",
+      variantIndex: 0,
+    });
+    expect(created.images[1]).toMatchObject({
+      url: "https://example.com/shared.jpg",
+      variantIndex: null,
+    });
+  });
+
   it("updates a variant product and writes before/after audit data", async () => {
     prismaMock.category.findUnique.mockResolvedValue({ id: "category-1", name: "Apparel" });
     prismaMock.product.findMany.mockResolvedValue([{ id: "product-9" }]);
@@ -633,6 +779,133 @@ describe("admin product service", () => {
           in: ["variant-removed"],
         },
       },
+    });
+  });
+
+  it("clears variant images and recreates them with the new assignment on update", async () => {
+    prismaMock.category.findUnique.mockResolvedValue({ id: "category-1", name: "Apparel" });
+    prismaMock.product.findMany.mockResolvedValue([]);
+    prismaMock.product.findUnique
+      .mockResolvedValueOnce({
+        id: "product-4",
+        name: "Classic Tee",
+        slug: "classic-tee",
+        status: "DRAFT",
+        masterSku: "TEE-CLASSIC",
+        metadata: { variantsEnabled: true, relatedProductIds: [] },
+      })
+      .mockResolvedValueOnce({
+        id: "product-4",
+        name: "Classic Tee",
+        slug: "classic-tee",
+        shortDescription: "Soft tee",
+        description: "Soft tee with multiple sizes",
+        status: "PUBLISHED",
+        masterSku: "TEE-CLASSIC",
+        seoTitle: null,
+        seoDescription: null,
+        seoImageUrl: null,
+        metadata: { variantsEnabled: true, relatedProductIds: [] },
+        category: { id: "category-1", name: "Apparel", slug: "apparel" },
+        variants: [
+          {
+            id: "variant-1",
+            title: "Small / Blue",
+            sku: "TEE-S-BLU",
+            options: { Size: "Small", Color: "Blue" },
+            price: 799,
+            compareAtPrice: null,
+            isDefault: true,
+            inventory: { quantity: 5 },
+          },
+        ],
+        images: [
+          {
+            url: "https://example.com/small-blue.jpg",
+            alt: "Small blue tee",
+            position: 0,
+            productVariantId: "variant-1",
+          },
+        ],
+        specifications: [],
+        createdAt: new Date("2026-04-17T10:00:00.000Z"),
+        updatedAt: new Date("2026-04-17T12:00:00.000Z"),
+      });
+
+    prismaMock.product.update.mockResolvedValue({ id: "product-4" });
+    prismaMock.productVariant.findMany.mockResolvedValue([{ id: "variant-1", sku: "TEE-S-BLU" }]);
+    prismaMock.productVariant.update.mockResolvedValue({ id: "variant-1" });
+    prismaMock.inventory.upsert.mockResolvedValue({ id: "inventory-1" });
+    prismaMock.productImage.deleteMany.mockResolvedValue({ count: 1 });
+    prismaMock.productImage.createMany.mockResolvedValue({ count: 1 });
+    prismaMock.productSpecification.deleteMany.mockResolvedValue({ count: 0 });
+    prismaMock.auditLog.create.mockResolvedValue({ id: "audit-update-images" });
+
+    await updateAdminProduct({
+      data: {
+        id: "product-4",
+        title: "Classic Tee",
+        slug: "classic-tee",
+        shortDescription: "Soft tee",
+        description: "Soft tee with multiple sizes",
+        categoryId: "category-1",
+        status: "PUBLISHED",
+        sku: "TEE-CLASSIC",
+        price: 0,
+        comparePrice: undefined,
+        stock: 0,
+        variantsEnabled: true,
+        variants: [
+          {
+            title: "Small / Blue",
+            sku: "TEE-S-BLU",
+            price: 799,
+            comparePrice: undefined,
+            stock: 5,
+            options: { Size: "Small", Color: "Blue" },
+            isDefault: true,
+          },
+        ],
+        images: [
+          { url: "https://example.com/small-blue.jpg", alt: "Small blue tee", variantIndex: 0 },
+        ],
+        specifications: [],
+        relatedProductIds: [],
+        seoTitle: undefined,
+        seoDescription: undefined,
+        seoCanonicalUrl: undefined,
+        seoOgTitle: undefined,
+        seoOgDescription: undefined,
+        seoImageUrl: undefined,
+        seoNoIndex: false,
+        seoSchemaNotes: undefined,
+      },
+      actor: {
+        actorId: "admin-4",
+        actorRole: "SUPER_ADMIN",
+      },
+    });
+
+    // Product-level images are cleared, then any variant-linked images are cleared.
+    expect(prismaMock.productImage.deleteMany).toHaveBeenCalledWith({
+      where: { productId: "product-4" },
+    });
+    expect(prismaMock.productImage.deleteMany).toHaveBeenCalledWith({
+      where: {
+        productVariantId: {
+          in: ["variant-1"],
+        },
+      },
+    });
+    // The image is recreated attached to the resolved variant id.
+    expect(prismaMock.productImage.createMany).toHaveBeenCalledWith({
+      data: [
+        expect.objectContaining({
+          productVariantId: "variant-1",
+          url: "https://example.com/small-blue.jpg",
+          position: 0,
+        }),
+      ],
     });
   });
 

@@ -21,12 +21,11 @@
  */
 
 import { unstable_cache } from "next/cache";
-
 import type { Prisma } from "@prisma/client";
 
+import { expandSearchQuery } from "@/features/catalog/lib/search-text";
 import { createLogger } from "@/lib/logger";
 import { getPrismaClient } from "@/server/db";
-import { expandSearchQuery } from "@/features/catalog/lib/search-text";
 
 const CATALOG_CACHE_REVALIDATE_SECONDS = 900;
 const PRISMA_POOL_TIMEOUT_ERROR_CODE = "P2024";
@@ -122,6 +121,9 @@ const storefrontProductSelect = {
       url: true,
       alt: true,
       position: true,
+      // Lets the storefront know which variant an image belongs to so the
+      // gallery can switch variants when a thumbnail is tapped.
+      productVariantId: true,
     },
   },
   specifications: {
@@ -468,8 +470,8 @@ export type StorefrontPublishedProductContextRecord = Awaited<
  */
 async function _getPublishedProductBySlugImpl(slug: string) {
   const db = getPrismaClient();
-  return withPrismaPoolTimeoutRetry(() =>
-    db.product.findFirst({
+  return withPrismaPoolTimeoutRetry(async () => {
+    const product = await db.product.findFirst({
       where: {
         slug,
         status: "PUBLISHED",
@@ -494,8 +496,34 @@ async function _getPublishedProductBySlugImpl(slug: string) {
           },
         },
       },
-    }),
-  );
+    });
+
+    if (!product) {
+      return null;
+    }
+
+    // `Product.images` only returns product-level rows (productId set).
+    // Variant-level images (productVariantId set, productId null) are attached
+    // to the product's variants, so they are fetched separately and merged —
+    // otherwise the PDP gallery would never see variant-specific media.
+    const variantImages = await db.productImage.findMany({
+      where: {
+        productVariant: {
+          productId: product.id,
+        },
+      },
+      orderBy: { position: "asc" },
+      select: {
+        id: true,
+        url: true,
+        alt: true,
+        position: true,
+        productVariantId: true,
+      },
+    });
+
+    return { ...product, images: [...product.images, ...variantImages] };
+  });
 }
 
 const _getPublishedProductBySlugCached = unstable_cache(
