@@ -1055,7 +1055,11 @@ function mapCampaignToStorefrontSection(
         slug: string;
         category: { slug: string } | null;
         images: Array<{ url: string; alt: string | null }>;
-        variants: Array<{ price: number; compareAtPrice: number | null }>;
+        variants: Array<{
+          price: number;
+          compareAtPrice: number | null;
+          images: Array<{ url: string; alt: string | null }>;
+        }>;
       };
     }>;
   },
@@ -1067,7 +1071,10 @@ function mapCampaignToStorefrontSection(
   }
 
   const featuredProduct = record.products?.[0]?.product;
-  const featuredProductImage = featuredProduct?.images?.[0];
+  // Variant products may store images per variant, so fall back to the first
+  // variant's image when no product-level image exists.
+  const featuredProductImage =
+    featuredProduct?.images?.[0] ?? featuredProduct?.variants?.[0]?.images?.[0];
   const featuredVariant = featuredProduct?.variants?.[0];
   const pricing = resolveCampaignSpotlightPricing(record, featuredVariant);
   const ctaHref = resolveCampaignSpotlightHref(record, featuredProduct);
@@ -1130,6 +1137,14 @@ export async function loadHomepageContentForStorefront(referenceTime = new Date(
                     select: {
                       price: true,
                       compareAtPrice: true,
+                      images: {
+                        take: 1,
+                        orderBy: [{ position: "asc" }, { createdAt: "asc" }],
+                        select: {
+                          url: true,
+                          alt: true,
+                        },
+                      },
                     },
                   },
                 },

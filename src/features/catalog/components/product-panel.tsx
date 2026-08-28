@@ -1,55 +1,27 @@
 "use client";
 
-import { useState } from "react";
-
 import { WishlistToggleButton } from "@/features/wishlist/components/wishlist-toggle-button";
 
-import type { CatalogProductDetail, ProductVariantOption } from "../types";
+import { resolveActiveOption } from "../lib/variant-selection";
+import type { CatalogProductDetail } from "../types";
 import { ProductAddToCart } from "./product-add-to-cart";
 import { ProductInfoBlock } from "./product-info-block";
 import { ProductVariantPicker } from "./product-variant-picker";
 
 type ProductPanelProps = {
   product: CatalogProductDetail;
+  /** Per-group variant selections — owned by `ProductOverview`. */
+  selectedOptionIds: Record<string, string>;
+  onSelect: (groupId: string, optionId: string) => void;
   initialWishlistedSkus?: readonly string[];
 };
 
-function resolveActiveOption(
-  product: CatalogProductDetail,
-  selectedOptionIds: Record<string, string>,
-): ProductVariantOption | null {
-  if (product.variantGroups.length === 0) return null;
-
-  const firstGroup = product.variantGroups[0];
-  if (!firstGroup) return null;
-
-  const selectedId = selectedOptionIds[firstGroup.id];
-
-  return firstGroup.options.find((o) => o.id === selectedId) ?? null;
-}
-
-function buildDefaultSelections(product: CatalogProductDetail): Record<string, string> {
-  const defaults: Record<string, string> = {};
-
-  for (const group of product.variantGroups) {
-    // Pre-select first in-stock option, otherwise first option
-    const inStock = group.options.find((o) => o.inventoryQuantity > 0);
-    const first = group.options[0];
-    const chosen = inStock ?? first;
-
-    if (chosen) {
-      defaults[group.id] = chosen.id;
-    }
-  }
-
-  return defaults;
-}
-
-export function ProductPanel({ product, initialWishlistedSkus = [] }: ProductPanelProps) {
-  const [selectedOptionIds, setSelectedOptionIds] = useState<Record<string, string>>(
-    buildDefaultSelections(product),
-  );
-
+export function ProductPanel({
+  product,
+  selectedOptionIds,
+  onSelect,
+  initialWishlistedSkus = [],
+}: ProductPanelProps) {
   const activeOption = resolveActiveOption(product, selectedOptionIds);
 
   const effectivePrice = activeOption?.price ?? product.price;
@@ -58,10 +30,6 @@ export function ProductPanel({ product, initialWishlistedSkus = [] }: ProductPan
   const effectiveInventory = activeOption?.inventoryQuantity ?? product.inventoryQuantity;
   const effectiveOptionId = activeOption?.id;
   const isInitiallyWishlisted = Boolean(effectiveSku && initialWishlistedSkus.includes(effectiveSku));
-
-  function handleSelect(groupId: string, optionId: string) {
-    setSelectedOptionIds((prev) => ({ ...prev, [groupId]: optionId }));
-  }
 
   return (
     <div className="space-y-6">
@@ -78,7 +46,7 @@ export function ProductPanel({ product, initialWishlistedSkus = [] }: ProductPan
           <ProductVariantPicker
             variantGroups={product.variantGroups}
             selectedOptionIds={selectedOptionIds}
-            onSelect={handleSelect}
+            onSelect={onSelect}
           />
         </div>
       ) : null}

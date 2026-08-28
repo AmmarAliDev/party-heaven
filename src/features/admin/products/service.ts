@@ -10,7 +10,6 @@ import type {
   AdminProductImageInput,
   AdminProductSpecificationInput,
   AdminProductUpdateInput,
-  AdminProductVariantInput,
 } from "./validation";
 
 type AuditActorInput = {
@@ -72,7 +71,11 @@ export type AdminProductFormRecord = {
   stock: number;
   variantsEnabled: boolean;
   variants: AdminProductVariantRecord[];
-  images: Array<{ url: string; alt: string }>;
+  /**
+   * Product images. `variantIndex` is the index into `variants` when the image
+   * belongs to a specific variant, or `null` when it is product-level (shared).
+   */
+  images: Array<{ url: string; alt: string; variantIndex: number | null }>;
   specifications: Array<{ key: string; value: string }>;
   relatedProductIds: string[];
   seoTitle: string;
@@ -141,6 +144,7 @@ const adminProductSelect = {
       url: true,
       alt: true,
       position: true,
+      productVariantId: true,
     },
   },
   specifications: {
@@ -304,6 +308,7 @@ function getInventoryTotal(variants: Array<{ inventory?: { quantity: number } | 
 function mapAdminProduct(record: SelectedAdminProduct): AdminProductFormRecord {
   const metadata = parseProductMetadata(record.metadata);
   const defaultVariant = record.variants.find((variant) => variant.isDefault) ?? record.variants[0] ?? null;
+  const variantIndexById = new Map(record.variants.map((variant, index) => [variant.id, index]));
 
   return {
     id: record.id,
@@ -332,6 +337,7 @@ function mapAdminProduct(record: SelectedAdminProduct): AdminProductFormRecord {
     images: record.images.map((image) => ({
       url: image.url,
       alt: image.alt ?? "",
+      variantIndex: image.productVariantId ? (variantIndexById.get(image.productVariantId) ?? null) : null,
     })),
     specifications: record.specifications.map((specification) => ({
       key: specification.key,
@@ -462,18 +468,41 @@ async function writeProductAuditLog(tx: any, input: {
   });
 }
 
-async function createImages(tx: any, productId: string, images: AdminProductImageInput[]) {
+/**
+ * Persists product images.
+ *
+ * Each image can be attached to:
+ *  - the product itself (`productId`) — shared across all variants, or
+ *  - a specific variant (`productVariantId`) via `image.variantIndex`.
+ *
+ * `variantRecords` must be ordered exactly like the product's `variants` input
+ * array so `variantIndex` maps to the correct created/updated variant id.
+ * When `variantIndex` is out of range the image safely falls back to
+ * product-level, and the DB CHECK constraint
+ * (`product_id IS NOT NULL OR product_variant_id IS NOT NULL`) keeps the row valid.
+ */
+async function createImages(
+  tx: any,
+  productId: string,
+  images: AdminProductImageInput[],
+  variantRecords: Array<{ id: string }> = [],
+) {
   if (images.length === 0) {
     return;
   }
 
   await tx.productImage.createMany({
-    data: images.map((image, index) => ({
-      productId,
-      url: image.url,
-      alt: image.alt ?? null,
-      position: index,
-    })),
+    data: images.map((image, index) => {
+      const variantId =
+        typeof image.variantIndex === "number" ? variantRecords[image.variantIndex]?.id : undefined;
+
+      return {
+        ...(variantId ? { productVariantId: variantId } : { productId }),
+        url: image.url,
+        alt: image.alt ?? null,
+        position: index,
+      };
+    }),
   });
 }
 
@@ -519,23 +548,40 @@ async function createVariantRecord(tx: any, productId: string, variant: AdminPro
       quantity: variant.stock,
     },
   });
+
+  return { id: createdVariant.id };
 }
 
+/**
+ * Creates all variants and returns their ids in input order.
+ * The returned array is used by `createImages` to attach images to variants.
+ */
 async function createVariants(
   tx: any,
   productId: string,
   variants: AdminProductVariantRecord[],
-) {
+): Promise<Array<{ id: string }>> {
+  const created: Array<{ id: string }> = [];
+
   for (const variant of variants) {
-    await createVariantRecord(tx, productId, variant);
+    created.push(await createVariantRecord(tx, productId, variant));
   }
+
+  return created;
 }
 
+/**
+ * Upserts variants by SKU and returns their ids in input order.
+ * Removed variants (present in DB but not in the incoming list) have their
+ * dependent rows (wishlist, cart, images, inventory) cleared before deletion.
+ *
+ * The returned array is used by `createImages` to attach images to variants.
+ */
 async function upsertVariants(
   tx: any,
   productId: string,
   variants: AdminProductVariantRecord[],
-) {
+): Promise<Array<{ id: string }>> {
   const existingVariants: Array<{ id: string; sku: string | null }> = await tx.productVariant.findMany({
     where: { productId },
     select: {
@@ -592,11 +638,13 @@ async function upsertVariants(
     });
   }
 
+  const resolved: Array<{ id: string }> = [];
+
   for (const variant of variants) {
     const existing = existingBySku.get(variant.sku);
 
     if (!existing) {
-      await createVariantRecord(tx, productId, variant);
+      resolved.push(await createVariantRecord(tx, productId, variant));
       continue;
     }
 
@@ -625,7 +673,11 @@ async function upsertVariants(
         quantity: variant.stock,
       },
     });
+
+    resolved.push({ id: existing.id });
   }
+
+  return resolved;
 }
 
 export async function listAdminProducts(filters: AdminProductListFilters = {}): Promise<AdminProductListItem[]> {
@@ -897,9 +949,11 @@ export async function createAdminProduct(input: {
         },
       });
 
-      await createImages(tx, created.id, input.data.images);
+      // Variants must be created before images so variant-linked images can
+      // reference the newly created variant ids.
+      const variantRecords = await createVariants(tx, created.id, variants);
+      await createImages(tx, created.id, input.data.images, variantRecords);
       await createSpecifications(tx, created.id, input.data.specifications);
-      await createVariants(tx, created.id, variants);
 
       await writeProductAuditLog(tx, {
         action: "product.created",
@@ -940,6 +994,7 @@ export async function createAdminProduct(input: {
           images: input.data.images.map((image) => ({
             url: image.url,
             alt: image.alt ?? "",
+            variantIndex: image.variantIndex ?? null,
           })),
           specifications: input.data.specifications.map((specification) => ({
             key: specification.key,
@@ -1022,16 +1077,36 @@ export async function updateAdminProduct(input: {
         },
       });
 
+      // Clear all product images — both product-level and any previously
+      // attached to this product's variants — so the incoming image list fully
+      // replaces the stored one (including variant reassignments).
       await tx.productImage.deleteMany({
         where: { productId: input.data.id },
       });
+
+      const existingVariantIds: Array<{ id: string }> = await tx.productVariant.findMany({
+        where: { productId: input.data.id },
+        select: { id: true },
+      });
+      if (existingVariantIds.length > 0) {
+        await tx.productImage.deleteMany({
+          where: {
+            productVariantId: {
+              in: existingVariantIds.map((variant) => variant.id),
+            },
+          },
+        });
+      }
+
       await tx.productSpecification.deleteMany({
         where: { productId: input.data.id },
       });
 
-      await createImages(tx, input.data.id, input.data.images);
+      // Variants must be upserted before images so variant-linked images can
+      // reference the resolved (existing or newly created) variant ids.
+      const variantRecords = await upsertVariants(tx, input.data.id, variants);
+      await createImages(tx, input.data.id, input.data.images, variantRecords);
       await createSpecifications(tx, input.data.id, input.data.specifications);
-      await upsertVariants(tx, input.data.id, variants);
 
       const updated = await tx.product.findUnique({
         where: { id: input.data.id },

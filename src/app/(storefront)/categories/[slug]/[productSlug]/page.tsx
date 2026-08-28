@@ -8,21 +8,19 @@ import { buildMetadata } from "@/config/metadata";
 import { routes } from "@/config/routes";
 import {
   getCatalogCategory,
-  getProductMetadataBySlug,
   getProductBySlug,
+  getProductMetadataBySlug,
   getProductSlugsWithCategory,
   getRelatedProducts,
 } from "@/features/catalog";
-import {
-  toProductStaticParams,
-} from "@/features/rendering/seo-content-rendering";
-import { ProductImageGallery } from "@/features/catalog/components/product-image-gallery";
-import { ProductPanel } from "@/features/catalog/components/product-panel";
+import { ProductOverview } from "@/features/catalog/components/product-overview";
 import { ProductRelatedGrid } from "@/features/catalog/components/product-related-grid";
 import { ProductReviews } from "@/features/catalog/components/product-reviews";
 import { ProductSpecifications } from "@/features/catalog/components/product-specifications";
+import {
+  toProductStaticParams,
+} from "@/features/rendering/seo-content-rendering";
 import { ProductReviewComposer } from "@/features/reviews/components/product-review-composer";
-import { testIds } from "@/lib/test-selectors";
 
 export const revalidate = 900;
 export const dynamicParams = true;
@@ -121,15 +119,8 @@ export default async function ProductPage({ params }: ProductPageProps) {
         </ol>
       </nav>
 
-      {/* Hero: gallery + product panel */}
-      <section
-        aria-label="Product overview"
-        className="grid gap-10 lg:grid-cols-2"
-        data-testid={testIds.storefront.productOverview}
-      >
-        <ProductImageGallery images={product.images} productName={product.name} />
-        <ProductPanel product={product} />
-      </section>
+      {/* Hero: gallery + product panel (kept in sync for variant products) */}
+      <ProductOverview product={product} />
 
       {/* Specifications */}
       {product.specifications.length > 0 ? (

@@ -1,7 +1,7 @@
 "use client";
 
-import Image from "next/image";
 import { useState } from "react";
+import Image from "next/image";
 
 import { cn } from "@/lib/utils";
 
@@ -18,7 +18,40 @@ const toneBg: Record<CatalogProductImageTone, string> = {
 type ProductImageGalleryProps = {
   images: ProductImage[];
   productName: string;
+  /**
+   * Active variant id (variant products only). The gallery shows the selected
+   * variant's primary image and reacts when the picker changes the variant.
+   */
+  selectedVariantId?: string;
+  /**
+   * Called when a thumbnail belonging to a different variant is tapped so the
+   * parent can sync the variant picker to that variant.
+   */
+  onSelectVariant?: (variantId: string) => void;
 };
+
+/**
+ * Picks the image to show on first render.
+ *
+ * For variant products this prefers the selected variant's primary image
+ * (falling back to the first image of that variant, then the global primary).
+ * For simple products it uses the global primary image.
+ */
+function resolveInitialActive(
+  images: ProductImage[],
+  selectedVariantId: string | undefined,
+): ProductImage | undefined {
+  if (selectedVariantId) {
+    return (
+      images.find((img) => img.variantId === selectedVariantId && img.isPrimary) ??
+      images.find((img) => img.variantId === selectedVariantId) ??
+      images.find((img) => img.isPrimary) ??
+      images[0]
+    );
+  }
+
+  return images.find((img) => img.isPrimary) ?? images[0];
+}
 
 /**
  * Renders the main image and thumbnail strip for a product detail page.
@@ -26,15 +59,67 @@ type ProductImageGalleryProps = {
  * When an image has a `url`, a real `<img>` is displayed.
  * When `url` is absent (legacy placeholder mode), the coloured gradient
  * with `label` text is rendered instead.
+ *
+ * For variant products every thumbnail carries the variant it belongs to.
+ * Tapping a thumbnail for a different variant switches the active image AND
+ * notifies the parent (`onSelectVariant`) so the picker stays in sync.
  */
-export function ProductImageGallery({ images, productName }: ProductImageGalleryProps) {
-  const primary = images.find((img) => img.isPrimary) ?? images[0];
-  const [activeId, setActiveId] = useState<string>(primary?.id ?? "");
-  const active = images.find((img) => img.id === activeId) ?? primary;
-  const isInitialAboveFoldImage = Boolean(primary && active?.id === primary.id);
+export function ProductImageGallery({
+  images,
+  productName,
+  selectedVariantId,
+  onSelectVariant,
+}: ProductImageGalleryProps) {
+  // `initialActive` is captured once at mount: it drives the above-the-fold
+  // eager/high loading decision and acts as the fallback when `activeId` is
+  // cleared. It must NOT be recomputed from the current `activeId` on later
+  // renders or every thumbnail click would look like the initial image.
+  const [initialActive] = useState<ProductImage | undefined>(() =>
+    resolveInitialActive(images, selectedVariantId),
+  );
+  const [activeId, setActiveId] = useState<string>(initialActive?.id ?? "");
+  const active = images.find((img) => img.id === activeId) ?? initialActive;
+  const isInitialAboveFoldImage = Boolean(initialActive && active?.id === initialActive.id);
+
+  // React-recommended "adjust state during render" pattern: when the selected
+  // variant changes (via the picker) we show that variant's image. We skip the
+  // adjustment when the active image already belongs to the new variant so a
+  // thumbnail tap that selected the variant keeps showing the tapped image.
+  const [lastSelectedVariantId, setLastSelectedVariantId] = useState<string | undefined>(
+    selectedVariantId,
+  );
+
+  if (selectedVariantId !== lastSelectedVariantId) {
+    setLastSelectedVariantId(selectedVariantId);
+
+    const activeImage = images.find((img) => img.id === activeId);
+    const alreadyShowsSelectedVariant = activeImage?.variantId === selectedVariantId;
+
+    if (selectedVariantId && !alreadyShowsSelectedVariant) {
+      const variantImage =
+        images.find((img) => img.variantId === selectedVariantId && img.isPrimary) ??
+        images.find((img) => img.variantId === selectedVariantId);
+
+      if (variantImage) {
+        setActiveId(variantImage.id);
+      }
+    }
+  }
+
+  const hasVariantImages = images.some((img) => img.variantId != null);
 
   if (!active) {
     return null;
+  }
+
+  function handleThumbnailSelect(image: ProductImage) {
+    setActiveId(image.id);
+
+    // Tapping a variant-specific image also selects its variant so the price,
+    // SKU, and stock shown match the image on screen.
+    if (image.variantId && image.variantId !== selectedVariantId && onSelectVariant) {
+      onSelectVariant(image.variantId);
+    }
   }
 
   return (
@@ -75,11 +160,12 @@ export function ProductImageGallery({ images, productName }: ProductImageGallery
             <button
               key={img.id}
               type="button"
-              onClick={() => setActiveId(img.id)}
-              aria-label={`View ${img.label}`}
+              onClick={() => handleThumbnailSelect(img)}
+              aria-label={`View ${img.label}${img.variantLabel ? ` (${img.variantLabel})` : ""}`}
               aria-pressed={img.id === activeId}
+              title={img.variantLabel}
               className={cn(
-                "aspect-square flex-1 overflow-hidden sm:flex-none sm:w-20 sm:h-20 rounded-lg border-2 transition-all",
+                "relative aspect-square flex-1 overflow-hidden sm:flex-none sm:w-20 sm:h-20 rounded-lg border-2 transition-all",
                 img.url ? "bg-muted" : cn("bg-gradient-to-br", toneBg[img.tone]),
                 img.id === activeId
                   ? "border-primary ring-2 ring-primary/30"
@@ -95,6 +181,11 @@ export function ProductImageGallery({ images, productName }: ProductImageGallery
                   sizes="80px"
                   className="h-full w-full object-cover"
                 />
+              ) : null}
+              {hasVariantImages && img.variantLabel ? (
+                <span className="absolute inset-x-0 bottom-0 truncate bg-black/60 px-1 py-0.5 text-center text-[9px] font-medium leading-tight text-white">
+                  {img.variantLabel}
+                </span>
               ) : null}
             </button>
           ))}

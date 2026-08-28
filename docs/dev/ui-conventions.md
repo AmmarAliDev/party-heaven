@@ -282,9 +282,10 @@ Intentional no-reset exceptions:
 - Slugs must stay lowercase with single hyphens only. Keep them stable after publishing for SEO consistency.
 - Short descriptions should answer "What is this and why should someone buy it?" in one or two lines.
 - Use the full description for benefits, usage instructions, size details, or care notes.
-- For simple products, fill the standard SKU, price, and stock fields and leave the variant rows empty.
+- For simple products, fill the standard SKU, price, and stock fields and leave the variant rows empty. All images are product-level and appear in the storefront gallery as before.
 - For variant-based products, turn on the variant toggle and enter one row per sellable option combination with its own SKU, price, and stock.
 - Variant titles should be human-friendly, such as "Small / Blue" or "500ml / Lemon".
+- For variant products, attach each image to the variant it shows using the per-image "Variant" selector, or choose "All variants (shared)" for an image that applies to every variant. The storefront gallery shows the selected variant's images, and shoppers can switch variants by tapping a thumbnail.
 - Specifications should use plain labels customers recognize, such as Material, Size, or Fragrance.
 - Product, banner, blog cover, and SEO image URL fields should use the shared `AdminImageUploadInput` so admins can upload directly while still retaining manual URL entry.
 - Keep image form payload contracts stable by persisting final uploaded values back into the same string URL fields already used by server actions.

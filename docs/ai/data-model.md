@@ -15,6 +15,7 @@ Models (summary)
 -- `Inventory`: { id, productVariantId, quantity, reserved, location }
 -- `ProductImage`: { id, productId?, productVariantId?, url, alt, position }
 	- Rule: A `ProductImage` must reference at least one of `productId` or `productVariantId`. This is enforced by a DB CHECK constraint (`product_id IS NOT NULL OR product_variant_id IS NOT NULL`).
+	- Usage: simple products use product-level images (`productId`); variant products attach each image to a specific variant (`productVariantId`) or keep it product-level as a shared image. The admin product form submits `variantIndex` (index into the product's `variants` array) and the service resolves it to the variant id. The storefront PDP shows the selected variant's images and switches variants when a variant-specific thumbnail is tapped.
 - `ProductSpecification`: { id, productId, key, value }
 - `Review`: { id, productId, userId?, rating, title?, body?, approved (deprecated compatibility mirror), status (canonical, default `PENDING`), moderationReason?, moderatedAt?, moderatedById? }
   - Canonical source of truth: `status` is authoritative for moderation and storefront visibility. Keep the legacy `approved` boolean synced as `status = 'APPROVED'` for backward compatibility until all consumers migrate.

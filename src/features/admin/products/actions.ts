@@ -52,6 +52,7 @@ function readRows(formData: FormData, key: string) {
 function readProductPayload(formData: FormData) {
   const imageUrls = readRows(formData, "imageUrl");
   const imageAlts = readRows(formData, "imageAlt");
+  const imageVariantIndexes = readRows(formData, "imageVariantIndex");
   const specKeys = readRows(formData, "specKey");
   const specValues = readRows(formData, "specValue");
   const variantTitles = readRows(formData, "variantTitle");
@@ -93,6 +94,9 @@ function readProductPayload(formData: FormData) {
       .map((url, index) => ({
         url,
         alt: imageAlts[index] ?? "",
+        // Empty string means the image is product-level (shared across variants).
+        // The zod layer coerces this to `undefined` via `parseVariantIndexish`.
+        variantIndex: (imageVariantIndexes[index] ?? "").trim() || undefined,
       }))
       .filter((image) => image.url.trim().length > 0),
     specifications: specKeys

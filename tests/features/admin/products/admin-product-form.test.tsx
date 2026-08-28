@@ -1,6 +1,6 @@
 // @vitest-environment jsdom
 
-import { cleanup, render, screen, waitFor } from "@testing-library/react";
+import { cleanup, fireEvent, render, screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { afterEach, beforeAll, describe, expect, it, vi } from "vitest";
 
@@ -131,7 +131,10 @@ describe("AdminProductForm", () => {
       "https://store.public.blob.vercel-storage.com/admin/product/product-123.png",
     ]);
     expect(payload.getAll("imageAlt")).toEqual([""]);
-  }, 15_000);
+    // `useAppForm` validates the whole schema on every change (mode: "onChange"),
+    // so interaction-heavy form tests need headroom under the full-suite
+    // parallel worker pool (the repo's established pattern for form tests).
+  }, 45_000);
 
   it("keeps backward compatibility for manually pasted image URLs", async () => {
     const user = userEvent.setup();
@@ -167,7 +170,8 @@ describe("AdminProductForm", () => {
     const payload = getSubmittedFormData(actionMock);
     expect(payload.getAll("imageUrl")).toEqual(["https://cdn.example.com/catalog/face-wash.jpg"]);
     expect(fetchMock).not.toHaveBeenCalledWith("/api/admin/uploads/images", expect.anything());
-  }, 15_000);
+    // Same headroom as other tests in this file (form validates on every change).
+  }, 45_000);
 
   it("related products picker searches by query and category", async () => {
     const user = userEvent.setup();
@@ -227,5 +231,77 @@ describe("AdminProductForm", () => {
 
     const payload = getSubmittedFormData(actionMock);
     expect(payload.getAll("relatedProductIds")).toEqual(["product-2"]);
-  }, 15_000);
+    // Same headroom as other tests in this file (form validates on every change).
+  }, 45_000);
+
+  it("submits a variant index with each image when variant mode is enabled", async () => {
+    const actionMock = vi.fn().mockResolvedValue(undefined);
+    vi.spyOn(globalThis, "fetch").mockImplementation(async (input) => {
+      if (isRelatedSearchUrl(input)) {
+        return relatedSearchResponse([]);
+      }
+
+      return new Response(JSON.stringify({ error: "Not found" }), { status: 404 });
+    });
+
+    render(
+      <AdminProductForm
+        mode="create"
+        action={actionMock}
+        returnTo="/admin/products"
+        submitLabel="Create product"
+        categories={[{ id: "category-1", name: "Apparel", slug: "apparel", status: "PUBLISHED" }]}
+      />,
+    );
+
+    // Fill required basic fields synchronously (faster + more load-tolerant than
+    // userEvent typing under the full-suite parallel worker pool).
+    fireEvent.change(document.getElementById("product-title") as HTMLInputElement, {
+      target: { value: "Classic Tee" },
+    });
+    fireEvent.change(document.getElementById("product-slug") as HTMLInputElement, {
+      target: { value: "classic-tee" },
+    });
+    fireEvent.change(document.getElementById("product-sku") as HTMLInputElement, {
+      target: { value: "TEE-CLASSIC" },
+    });
+
+    // Enable variant mode and add one variant row.
+    fireEvent.click(screen.getByRole("button", { name: /add variant/i }));
+    fireEvent.change(document.getElementById("variant-title-0") as HTMLInputElement, {
+      target: { value: "Small / Blue" },
+    });
+    fireEvent.change(document.getElementById("variant-sku-0") as HTMLInputElement, {
+      target: { value: "TEE-S-BLU" },
+    });
+    fireEvent.change(document.getElementById("variant-price-0") as HTMLInputElement, {
+      target: { value: "799" },
+    });
+    fireEvent.change(document.getElementById("variant-stock-0") as HTMLInputElement, {
+      target: { value: "5" },
+    });
+
+    // Add an image — with a variant present it should default to the first variant.
+    fireEvent.click(screen.getByRole("button", { name: /add image/i }));
+    fireEvent.change(screen.getByLabelText(/Image URL/i), {
+      target: { value: "https://cdn.example.com/catalog/tee-blue.jpg" },
+    });
+
+    // The variant selector should be visible with the variant as an option.
+    expect(screen.getByRole("combobox", { name: /variant/i })).toBeInTheDocument();
+
+    fireEvent.click(screen.getByRole("button", { name: /create product/i }));
+
+    await waitFor(() => {
+      expect(actionMock).toHaveBeenCalledTimes(1);
+    });
+
+    const payload = getSubmittedFormData(actionMock);
+    expect(payload.getAll("imageUrl")).toEqual(["https://cdn.example.com/catalog/tee-blue.jpg"]);
+    expect(payload.getAll("imageVariantIndex")).toEqual(["0"]);
+    expect(payload.getAll("variantSku")).toEqual(["TEE-S-BLU"]);
+    // `useAppForm` validates the whole schema on every change (mode: "onChange"),
+    // so this interaction-heavy form test needs headroom under the full-suite
+    // parallel worker pool (the repo's established pattern for form tests).
+  }, 45_000);
 });

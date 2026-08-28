@@ -173,7 +173,12 @@ Slugs must be unique and URL-safe (`lowercase-with-hyphens`). The admin form val
 
 ### Images
 
-Images are stored as `ProductImage` records linked to the product. The primary image (lowest `sortOrder` or `isPrimary = true`) is shown in listings.
+Images are stored as `ProductImage` records. How they are linked depends on the product type:
+
+- **Simple products** — every image is linked to the product itself. All images appear in the storefront gallery exactly as before.
+- **Variant products** — each image can be linked to a specific variant (the default), or left as **All variants (shared)**. When a shopper views a variant product on the storefront, the gallery shows the selected variant's images; tapping a thumbnail that belongs to another variant also selects that variant, so the price/SKU/stock stay in sync.
+
+The primary image (the first image of the product, or of the selected variant) is used in listings and cart thumbnails. Cart thumbnails prefer the variant image when one exists.
 
 > **Note:** image upload is currently handled by storing a URL. A media upload integration is deferred.
 
