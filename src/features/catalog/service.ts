@@ -418,7 +418,12 @@ function mapProductToCard(record: StorefrontProductRecord): CatalogProductCard {
   const categorySlug = record.category?.slug ?? "";
   const { price, compareAt } = extractPricing(record.variants);
   const { averageRating, reviewCount } = computeReviewStats(record.reviews);
-  const allImages = mapProductImages(record.images, record.name, categorySlug, record.slug);
+  // Variant order map (default variant first, matching the query layer's
+  // `isDefault DESC, createdAt ASC` sort). Passing it lets `mapProductImages`
+  // group variant images by that order, so the DEFAULT variant's image is the
+  // card cover when the product has no product-level image.
+  const variantLabels = new Map(record.variants.map((variant) => [variant.id, variantDisplayLabel(variant)]));
+  const allImages = mapProductImages(record.images, record.name, categorySlug, record.slug, variantLabels);
   const primaryImage = allImages[0] ?? {
     id: `placeholder-${record.slug}`,
     label: record.name,

@@ -182,7 +182,10 @@ export type StorefrontProductRecord = Prisma.ProductGetPayload<{
  *
  * This is what lets listing cards, search results, related products, and
  * homepage sections show the real cover image for variant-only media instead
- * of the placeholder gradient — without an N+1 fetch per product.
+ * of the placeholder gradient — without an N+1 fetch per product. Variant
+ * images are ordered by the product's variant order (default variant first)
+ * so the default variant's image is used as the cover when no product-level
+ * image exists.
  */
 async function mergeVariantImagesIntoProducts(
   products: StorefrontProductRecord[],
@@ -237,9 +240,24 @@ async function mergeVariantImagesIntoProducts(
 
   return products.map((product) => {
     const extraImages = imagesByProductId.get(product.id);
-    return extraImages && extraImages.length > 0
-      ? { ...product, images: [...product.images, ...extraImages] }
-      : product;
+    if (!extraImages || extraImages.length === 0) {
+      return product;
+    }
+
+    // Order the merged variant images by the product's variant order (default
+    // variant first — `storefrontProductSelect.variants` already sorts by
+    // `isDefault DESC, createdAt ASC`) and then by position, so the first
+    // merged image is the DEFAULT variant's primary. Consumers that pick
+    // `images[0]` as a cover (cards, search rows, homepage items) then show
+    // the default variant instead of an arbitrary low-positioned image.
+    const variantRank = new Map(product.variants.map((variant, index) => [variant.id, index]));
+    const orderedExtra = [...extraImages].sort((left, right) => {
+      const leftRank = variantRank.get(left.productVariantId ?? "") ?? Number.MAX_SAFE_INTEGER;
+      const rightRank = variantRank.get(right.productVariantId ?? "") ?? Number.MAX_SAFE_INTEGER;
+      return leftRank - rightRank || left.position - right.position;
+    });
+
+    return { ...product, images: [...product.images, ...orderedExtra] };
   });
 }
 
