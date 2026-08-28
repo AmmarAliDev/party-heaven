@@ -40,6 +40,16 @@ function makeProductRecord(
       position: number;
       productVariantId: string | null;
     }>;
+    variants: Array<{
+      id: string;
+      title: string | null;
+      sku: string;
+      options: Record<string, string> | null;
+      price: number;
+      compareAtPrice: number | null;
+      isDefault: boolean;
+      inventory: { quantity: number };
+    }>;
   }> = {},
 ) {
   const {
@@ -51,6 +61,7 @@ function makeProductRecord(
     rating = 4,
     reviewCount = 5,
     images = [],
+    variants,
   } = overrides;
 
   return {
@@ -69,18 +80,19 @@ function makeProductRecord(
       { id: "spec-1", key: "Type", value: "Liquid" },
       { id: "spec-2", key: "Size", value: "500ml" },
     ],
-    variants: [
-      {
-        id: `var-${id}`,
-        title: "Default",
-        sku: `SKU-${id}`,
-        options: null,
-        price,
-        compareAtPrice,
-        isDefault: true,
-        inventory: { quantity: inventoryQty },
-      },
-    ],
+    variants:
+      variants ?? [
+        {
+          id: `var-${id}`,
+          title: "Default",
+          sku: `SKU-${id}`,
+          options: null,
+          price,
+          compareAtPrice,
+          isDefault: true,
+          inventory: { quantity: inventoryQty },
+        },
+      ],
     reviews: Array.from({ length: reviewCount }, () => ({ rating })),
   };
 }
@@ -325,6 +337,61 @@ describe("catalog listing service", () => {
     const listing = await getCatalogCategoryListing({ slug: "home-care" });
 
     expect(listing?.products[0]?.imageUrl).toBe("https://picsum.photos/seed/shared/400");
+  });
+
+  it("uses the default variant's image as the card cover over a lower-positioned non-default image", async () => {
+    mockGetPublishedCategoryBySlug.mockResolvedValue(makeCategoryRecord());
+    mockListPublishedProductsByCategory.mockResolvedValue([
+      makeProductRecord({
+        id: "p1",
+        slug: "variant-product",
+        images: [
+          {
+            id: "img-other",
+            url: "https://picsum.photos/seed/other/400",
+            alt: "Other variant",
+            position: 0,
+            productVariantId: "var-other",
+          },
+          {
+            id: "img-default",
+            url: "https://picsum.photos/seed/default/400",
+            alt: "Default variant",
+            position: 1,
+            productVariantId: "var-default",
+          },
+        ],
+        variants: [
+          {
+            id: "var-default",
+            title: "Default",
+            sku: "SKU-D",
+            options: null,
+            price: 500,
+            compareAtPrice: null,
+            isDefault: true,
+            inventory: { quantity: 5 },
+          },
+          {
+            id: "var-other",
+            title: "Other",
+            sku: "SKU-O",
+            options: null,
+            price: 500,
+            compareAtPrice: null,
+            isDefault: false,
+            inventory: { quantity: 3 },
+          },
+        ],
+      }),
+    ]);
+
+    const listing = await getCatalogCategoryListing({ slug: "home-care" });
+
+    // Even though the non-default variant's image has the lower position, the
+    // default variant's image must be the cover.
+    expect(listing?.products[0]?.imageUrl).toBe("https://picsum.photos/seed/default/400");
+    expect(listing?.products[0]?.imageLabel).toBe("Default variant");
   });
 });
 

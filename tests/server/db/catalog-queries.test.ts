@@ -195,6 +195,106 @@ describe('getPublishedProductBySlug variant images', () => {
   });
 });
 
+describe('storefront listing variant image merge', () => {
+  beforeEach(() => {
+    vi.resetModules();
+    mockProductFindMany.mockReset();
+    mockProductImageFindMany.mockReset();
+  });
+
+  it('orders merged variant images by variant order so the default variant image comes first', async () => {
+    mockProductFindMany.mockResolvedValue([
+      {
+        id: 'prod-1',
+        name: 'Tee',
+        slug: 'tee',
+        shortDescription: null,
+        description: null,
+        masterSku: null,
+        metadata: { variantsEnabled: true },
+        createdAt: new Date(),
+        updatedAt: new Date(),
+        category: { id: 'cat-1', name: 'Apparel', slug: 'apparel' },
+        images: [],
+        specifications: [],
+        variants: [
+          { id: 'var-default', isDefault: true, createdAt: new Date() },
+          { id: 'var-other', isDefault: false, createdAt: new Date() },
+        ],
+        reviews: [],
+      },
+    ]);
+    // The non-default variant's image has the LOWER position, so a position-only
+    // merge would surface it first; the merge must prefer the default variant.
+    mockProductImageFindMany.mockResolvedValue([
+      {
+        id: 'img-other',
+        url: '/other.jpg',
+        alt: 'other',
+        position: 0,
+        productVariantId: 'var-other',
+        productVariant: { productId: 'prod-1' },
+      },
+      {
+        id: 'img-default',
+        url: '/default.jpg',
+        alt: 'default',
+        position: 1,
+        productVariantId: 'var-default',
+        productVariant: { productId: 'prod-1' },
+      },
+    ]);
+
+    const { listPublishedProductsByCategory } = await import('@/server/db/catalog-queries');
+    const result = await listPublishedProductsByCategory('apparel');
+
+    expect(result).toHaveLength(1);
+    expect(result[0]?.images.map((img) => img.id)).toEqual(['img-default', 'img-other']);
+    expect(mockProductImageFindMany).toHaveBeenCalledWith(
+      expect.objectContaining({
+        where: { productVariant: { productId: { in: ['prod-1'] } } },
+      }),
+    );
+  });
+
+  it('returns products unchanged when no variant images exist', async () => {
+    mockProductFindMany.mockResolvedValue([
+      {
+        id: 'prod-1',
+        name: 'Tee',
+        slug: 'tee',
+        shortDescription: null,
+        description: null,
+        masterSku: null,
+        metadata: null,
+        createdAt: new Date(),
+        updatedAt: new Date(),
+        category: { id: 'cat-1', name: 'Apparel', slug: 'apparel' },
+        images: [{ id: 'img-shared', url: '/shared.jpg', alt: 'shared', position: 0, productVariantId: null }],
+        specifications: [],
+        variants: [{ id: 'var-default', isDefault: true, createdAt: new Date() }],
+        reviews: [],
+      },
+    ]);
+    mockProductImageFindMany.mockResolvedValue([]);
+
+    const { listPublishedProductsByCategory } = await import('@/server/db/catalog-queries');
+    const result = await listPublishedProductsByCategory('apparel');
+
+    expect(result[0]?.images.map((img) => img.id)).toEqual(['img-shared']);
+  });
+
+  it('skips the variant-image query when no products are returned', async () => {
+    mockProductFindMany.mockResolvedValue([]);
+
+    const { listPublishedProductsByCategory } = await import('@/server/db/catalog-queries');
+    const result = await listPublishedProductsByCategory('apparel');
+
+    expect(result).toEqual([]);
+    expect(mockProductImageFindMany).not.toHaveBeenCalled();
+  });
+});
+
 describe('storefront listing variant images', () => {
   beforeEach(() => {
     vi.resetModules();
