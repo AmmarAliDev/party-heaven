@@ -15,8 +15,7 @@ export default function ContactPage() {
         <div className="text-center mb-12">
           <h1 className="text-3xl font-bold tracking-tight mb-4">Contact Us</h1>
           <p className="text-muted-foreground text-lg">
-            Have a question or need assistance? Send us a message and we'll get back to you within
-            1-2 business days.
+            Have a question or need assistance? Send us a message.
           </p>
         </div>
 

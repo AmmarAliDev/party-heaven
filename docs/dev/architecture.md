@@ -156,7 +156,7 @@ Create a scalable foundation for a single-vendor e-commerce app using one shared
 - Guard behavior is intentionally conservative:
 	- `production`: guarded surfaces are hidden from customers.
 	- `development` and `test`: guarded surfaces stay visible for staging/debug workflows.
-- Current guarded surfaces include: homepage fallback indicator, `/preview` route, footer preview/newsletter placeholder artifacts, return-policy placeholder route, interim about-page note, and not-found admin placeholder action.
+- Current guarded surfaces include: homepage fallback indicator, `/preview` route, return-policy placeholder route, interim about-page note, and not-found admin placeholder action. (The `footerPreviewLink` / `footerNewsletterPlaceholder` surface flags remain in the config but are no longer rendered — the redesigned four-column footer dropped those artifacts.)
 - Storefront homepage `featured-categories` is rendered through the shared shadcn-compatible carousel primitives and is now hydrated from live Prisma-backed catalog categories while preserving the existing section registry architecture (`renderHomepageSection` + typed section contracts).
 - `getRequiredServerEnv()` should be used when a future integration needs a non-public secret at runtime.
 - `DATABASE_URL` must be available anywhere Prisma queries or CLI workflows run.
