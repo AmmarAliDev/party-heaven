@@ -60,8 +60,7 @@ export function CategoryOverviewCard({ category, eagerImage = false }: CategoryO
               <p className="text-muted-foreground text-sm line-clamp-2">{category.description}</p>
             </div>
 
-            <div className="mt-auto flex items-center justify-between gap-3 text-sm">
-              <span className="text-muted-foreground">Slug: /categories/{category.slug}</span>
+            <div className="mt-auto flex items-center justify-end gap-3 text-sm">
               <span className="font-medium">
                 {category.productCount} {category.productCount === 1 ? "product" : "products"}
               </span>

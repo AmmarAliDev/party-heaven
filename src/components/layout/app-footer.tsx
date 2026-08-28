@@ -1,114 +1,83 @@
 import Link from "next/link";
-import Image from "next/image";
 
-import { shouldRenderGuardedSurface } from "@/config/production-visibility";
 import { routes } from "@/config/routes";
-import { siteConfig } from "@/config/site";
+import { getCatalogCategories } from "@/features/catalog";
+import { logger } from "@/lib/logger";
 
-import { Badge } from "../ui/badge";
+import { buttonVariants } from "../ui/button";
 import { PageContainer } from "../ui/page-container";
+import { FooterColumn } from "./footer-column";
+import { buildStorefrontNavbarCategoryMenu } from "./storefront-category-menu";
 
-const companyLinks = [
-  { title: "About", href: routes.storefront.about },
-  { title: "Contact", href: routes.storefront.contact },
-  ...(shouldRenderGuardedSurface("footerPreviewLink")
-    ? [{ title: "Storefront Preview", href: routes.storefront.preview }]
-    : []),
-];
+const helpLinks = [
+  { title: "About us", href: routes.storefront.about },
+  { title: "Contact us", href: routes.storefront.contact },
+  { title: "Your Orders", href: routes.storefront.accountOrders },
+] as const;
 
 const policyLinks = [
-  { title: "Privacy", href: routes.storefront.privacy },
-  { title: "Terms", href: routes.storefront.terms },
+  { title: "Privacy Policy", href: routes.storefront.privacy },
+  { title: "Refund Policy", href: routes.storefront.returnPolicy },
   { title: "Shipping Policy", href: routes.storefront.shippingPolicy },
-  { title: "Return Policy", href: routes.storefront.returnPolicy },
-];
+  { title: "Terms of Service", href: routes.storefront.terms },
+] as const;
 
-export function AppFooter() {
-  const showNewsletterPlaceholder = shouldRenderGuardedSurface("footerNewsletterPlaceholder");
+export async function AppFooter() {
+  let categories = [] as Awaited<ReturnType<typeof getCatalogCategories>>;
+
+  try {
+    categories = await getCatalogCategories();
+  } catch (error) {
+    logger.error("Failed to load footer categories", {
+      code: "FOOTER_CATEGORY_NAV_LOAD_FAILED",
+      error,
+    });
+  }
+
+  const quickLinks = buildStorefrontNavbarCategoryMenu(
+    categories.map((category) => ({
+      name: category.name,
+      href: category.href,
+    })),
+  );
 
   return (
     <footer className="border-border/70 bg-background-header-footer border-t pb-24 text-footer-text md:pb-0">
-      <PageContainer className="grid gap-6 py-8 md:grid-cols-3">
-        <section className="space-y-3" aria-labelledby="footer-brand-heading">
-          {/* <Badge variant="outline">{siteConfig.defaultCity} launch focus</Badge> */}
-          <div>
-            <div className="flex items-center gap-2">
-              <Image
-                src={siteConfig.appIcon}
-                alt={`${siteConfig.name} logo`}
-                width={32}
-                height={32}
-                className="h-12 w-24 rounded-md object-contain"
-                sizes="32px"
-              />
-              {/* <h2 id="footer-brand-heading" className="text-background font-semibold tracking-tight">
-                {siteConfig.name}
-              </h2> */}
-            </div>
-            <p className="text-muted max-w-xl text-sm">
-              Karachi-first storefront shell for a single-vendor commerce experience in Pakistan.
-              Product catalog and checkout workflows are intentionally deferred to upcoming prompts.
-            </p>
-          </div>
-        </section>
+      <PageContainer>
+        <div className="grid gap-0 py-8 md:grid-cols-4 md:gap-8">
+          <FooterColumn
+            heading="Quick Links"
+            links={quickLinks.directCategories.map((item) => ({
+              title: item.title,
+              href: item.href,
+            }))}
+            action={
+              <Link
+                href={quickLinks.allCategories.href}
+                className={buttonVariants({ variant: "ghost", size: "sm", className: "mt-2 hover:bg-transparent p-0!" })}
+              >
+                View All
+              </Link>
+            }
+          />
 
-        <section className="space-y-3 text-sm" aria-labelledby="footer-company-heading">
-          <h2 id="footer-company-heading" className="font-medium">Company</h2>
-          <nav aria-label="Company links">
-            <ul className="flex flex-wrap gap-2">
-            {companyLinks.map((item) => (
-              <li key={item.href} className="list-none mb-4!">
-                <Link
-                  href={item.href}
-                  className="text-muted hover:text-foreground hover:bg-background rounded-full border border-border/70 px-3 py-1.5 transition-colors"
-                >
-                  {item.title}
-                </Link>
+          <FooterColumn heading="Help" links={helpLinks} />
+
+          <FooterColumn heading="Policies" links={policyLinks} />
+
+          <FooterColumn heading="Contact">
+            <ul className="space-y-2.5">
+              <li>
+                <span className="font-medium">Email:</span>{" "}
+                <span className="text-muted-foreground">—</span>
               </li>
-            ))}
-            </ul>
-          </nav>
-
-          <h2 className="mt-4 font-medium" id="footer-policies-heading">Policies</h2>
-          <nav aria-label="Policy links">
-            <ul className="flex flex-wrap gap-2">
-            {policyLinks.map((item) => (
-              <li key={item.href} className="list-none mb-4!">
-                <Link
-                  href={item.href}
-                  className="text-muted hover:text-foreground hover:bg-background rounded-full border border-border/70 px-3 py-1.5 transition-colors"
-                >
-                  {item.title}
-                </Link>
+              <li>
+                <span className="font-medium">Phone:</span>{" "}
+                <span className="text-muted-foreground">—</span>
               </li>
-            ))}
             </ul>
-          </nav>
-        </section>
-
-        <section className="space-y-3 text-sm" aria-labelledby="footer-newsletter-heading">
-          <h2 id="footer-newsletter-heading" className="font-medium">Newsletter</h2>
-          {showNewsletterPlaceholder ? (
-            <>
-              <p className="text-muted">
-                Newsletter signup will be connected in a later content and marketing prompt.
-              </p>
-              <div className="bg-muted/40 rounded-[var(--radius)] border border-dashed border-border px-3 py-4">
-                <p className="text-xs text-background font-medium">Placeholder</p>
-                <p className="text-muted text-xs">
-                  Email capture form and consent copy are intentionally deferred.
-                </p>
-              </div>
-              <p className="text-muted text-xs">
-                For now, customer inquiries can use the contact page placeholder.
-              </p>
-            </>
-          ) : (
-            <p className="text-muted">
-              Contact support for updates on newsletter availability.
-            </p>
-          )}
-        </section>
+          </FooterColumn>
+        </div>
       </PageContainer>
     </footer>
   );
