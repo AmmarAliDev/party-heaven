@@ -907,7 +907,34 @@ export async function getAdminProductById(productId: string): Promise<AdminProdu
     select: adminProductSelect,
   });
 
-  return record ? mapAdminProduct(record) : null;
+  if (!record) {
+    return null;
+  }
+
+  // `Product.images` only returns product-level rows (productId set). Variant
+  // products store their media per variant (productVariantId set, productId
+  // null), so those images are fetched separately and merged into the form
+  // record — otherwise the admin edit form would show an empty image list for
+  // products whose images are all variant-specific.
+  const variantImages = await db.productImage.findMany({
+    where: {
+      productVariant: {
+        productId,
+      },
+    },
+    orderBy: { position: "asc" },
+    select: {
+      url: true,
+      alt: true,
+      position: true,
+      productVariantId: true,
+    },
+  });
+
+  return mapAdminProduct({
+    ...record,
+    images: [...record.images, ...variantImages],
+  });
 }
 
 export async function createAdminProduct(input: {

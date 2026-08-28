@@ -194,3 +194,134 @@ describe('getPublishedProductBySlug variant images', () => {
     expect(mockProductImageFindMany).not.toHaveBeenCalled();
   });
 });
+
+describe('storefront listing variant images', () => {
+  beforeEach(() => {
+    vi.resetModules();
+    mockProductFindMany.mockReset();
+    mockProductImageFindMany.mockReset();
+  });
+
+  function makeListingProduct(overrides: { id: string; images?: unknown[] }) {
+    return {
+      id: overrides.id,
+      name: `Product ${overrides.id}`,
+      slug: `product-${overrides.id}`,
+      shortDescription: null,
+      description: null,
+      masterSku: null,
+      metadata: { variantsEnabled: true },
+      createdAt: new Date(),
+      updatedAt: new Date(),
+      category: { id: 'cat-1', name: 'Apparel', slug: 'apparel' },
+      images: overrides.images ?? [],
+      specifications: [],
+      variants: [{ id: `var-${overrides.id}` }],
+      reviews: [],
+    };
+  }
+
+  it('merges variant images into category listing cards', async () => {
+    mockProductFindMany.mockResolvedValue([makeListingProduct({ id: 'prod-1' })]);
+    mockProductImageFindMany.mockResolvedValue([
+      {
+        id: 'img-var-1',
+        url: '/blue.jpg',
+        alt: 'Blue variant',
+        position: 0,
+        productVariantId: 'var-prod-1',
+        productVariant: { productId: 'prod-1' },
+      },
+    ]);
+
+    const { listPublishedProductsByCategory } = await import('@/server/db/catalog-queries');
+    const result = await listPublishedProductsByCategory('apparel');
+
+    expect(result).toHaveLength(1);
+    expect(result[0]?.images.map((img) => img.id)).toEqual(['img-var-1']);
+    // Variant images are fetched batched by owning product ids.
+    expect(mockProductImageFindMany).toHaveBeenCalledWith(
+      expect.objectContaining({
+        where: { productVariant: { productId: { in: ['prod-1'] } } },
+      }),
+    );
+  });
+
+  it('groups each variant image back to its owning product in a batch', async () => {
+    mockProductFindMany.mockResolvedValue([
+      makeListingProduct({ id: 'prod-1' }),
+      makeListingProduct({ id: 'prod-2' }),
+    ]);
+    mockProductImageFindMany.mockResolvedValue([
+      {
+        id: 'img-2a',
+        url: '/a.jpg',
+        alt: null,
+        position: 0,
+        productVariantId: 'var-prod-2',
+        productVariant: { productId: 'prod-2' },
+      },
+      {
+        id: 'img-1a',
+        url: '/b.jpg',
+        alt: null,
+        position: 0,
+        productVariantId: 'var-prod-1',
+        productVariant: { productId: 'prod-1' },
+      },
+    ]);
+
+    const { listPublishedProductsByCategory } = await import('@/server/db/catalog-queries');
+    const result = await listPublishedProductsByCategory('apparel');
+
+    expect(result[0]?.images.map((img) => img.id)).toEqual(['img-1a']);
+    expect(result[1]?.images.map((img) => img.id)).toEqual(['img-2a']);
+  });
+
+  it('keeps product-level images first when variant images also exist', async () => {
+    mockProductFindMany.mockResolvedValue([
+      makeListingProduct({
+        id: 'prod-1',
+        images: [
+          { id: 'img-shared', url: '/shared.jpg', alt: null, position: 0, productVariantId: null },
+        ],
+      }),
+    ]);
+    mockProductImageFindMany.mockResolvedValue([
+      {
+        id: 'img-var-1',
+        url: '/blue.jpg',
+        alt: null,
+        position: 1,
+        productVariantId: 'var-prod-1',
+        productVariant: { productId: 'prod-1' },
+      },
+    ]);
+
+    const { listPublishedProductsByCategory } = await import('@/server/db/catalog-queries');
+    const result = await listPublishedProductsByCategory('apparel');
+
+    expect(result[0]?.images.map((img) => img.id)).toEqual(['img-shared', 'img-var-1']);
+  });
+
+  it('returns products unchanged when no variant images exist', async () => {
+    mockProductFindMany.mockResolvedValue([makeListingProduct({ id: 'prod-1' })]);
+    mockProductImageFindMany.mockResolvedValue([]);
+
+    const { listPublishedProductsByCategory } = await import('@/server/db/catalog-queries');
+    const result = await listPublishedProductsByCategory('apparel');
+
+    expect(result).toHaveLength(1);
+    expect(result[0]?.images).toEqual([]);
+  });
+
+  it('skips the variant-image query entirely when there are no products', async () => {
+    mockProductFindMany.mockResolvedValue([]);
+
+    const { listPublishedProductsByCategory } = await import('@/server/db/catalog-queries');
+    const result = await listPublishedProductsByCategory('apparel');
+
+    expect(result).toEqual([]);
+    expect(mockProductImageFindMany).not.toHaveBeenCalled();
+  });
+});
