@@ -4,6 +4,7 @@ import { PrismaClientKnownRequestError } from "@prisma/client/runtime/library";
 import { routes } from "@/config/routes";
 import { catalogCategorySeeds, catalogProductDetailSeeds, catalogProductSeeds } from "@/features/catalog/data";
 import { AppError } from "@/lib/errors/app-error";
+import type { DatabaseExecutor } from "@/server/db";
 import { getPrismaClient } from "@/server/db";
 
 type ResolveWishlistSelectionInput = {
@@ -24,6 +25,11 @@ type WishlistSeedSelection = {
   price: number;
   compareAt: number | null;
   inventoryQuantity: number;
+};
+
+type ResolvedWishlistSelection = {
+  selection: WishlistSeedSelection;
+  variantId: string;
 };
 
 export type WishlistItemView = {
@@ -194,20 +200,121 @@ async function ensureSeedCatalogVariant(selection: WishlistSeedSelection) {
   });
 }
 
+/**
+ * Resolves a wishlist selection against the live catalog first, so the
+ * `optionId` sent from the PDP (a real product-variant id from the database)
+ * maps to the correct variant. Falls back to seed data only when the product
+ * has not been created in the database yet.
+ */
+async function resolveWishlistSelection(
+  input: ResolveWishlistSelectionInput,
+  db: DatabaseExecutor,
+): Promise<ResolvedWishlistSelection> {
+  const product = await db.product.findFirst({
+    where: {
+      slug: input.productSlug,
+      status: ProductStatus.PUBLISHED,
+      category: {
+        status: "PUBLISHED",
+      },
+    },
+    select: {
+      name: true,
+      slug: true,
+      shortDescription: true,
+      description: true,
+      masterSku: true,
+      category: {
+        select: {
+          name: true,
+          slug: true,
+        },
+      },
+      variants: {
+        orderBy: [{ isDefault: "desc" }, { createdAt: "asc" }],
+        select: {
+          id: true,
+          title: true,
+          sku: true,
+          price: true,
+          compareAtPrice: true,
+          isDefault: true,
+          inventory: {
+            select: {
+              quantity: true,
+              reserved: true,
+              safetyStock: true,
+            },
+          },
+        },
+      },
+    },
+  });
+
+  if (!product) {
+    const selection = resolveWishlistSeedSelection(input);
+    const variant = await ensureSeedCatalogVariant(selection);
+
+    return {
+      selection,
+      variantId: variant.id,
+    };
+  }
+
+  if (product.variants.length === 0) {
+    throw toMissingProductError(input.productSlug);
+  }
+
+  const selectedVariant = input.optionId
+    ? product.variants.find((variant) => variant.id === input.optionId)
+    : product.variants.find((variant) => variant.isDefault) ?? product.variants[0];
+
+  if (!selectedVariant) {
+    if (input.optionId) {
+      throw toMissingVariantError(input.optionId);
+    }
+
+    throw toMissingProductError(input.productSlug);
+  }
+
+  const resolvedSku = selectedVariant.sku ?? product.masterSku ?? "";
+  if (!resolvedSku) {
+    throw new AppError(`Wishlist SKU missing for product: ${input.productSlug}`, "WISHLIST_SKU_MISSING", {
+      statusCode: 500,
+      userMessage: "This product cannot be wishlisted right now. Please try again.",
+    });
+  }
+
+  return {
+    variantId: selectedVariant.id,
+    selection: {
+      categorySlug: product.category?.slug ?? "",
+      categoryName: product.category?.name ?? "",
+      productSlug: product.slug,
+      productName: product.name,
+      shortDescription: product.shortDescription ?? "",
+      longDescription: product.description ?? "",
+      optionId: selectedVariant.id,
+      optionLabel: selectedVariant.title,
+      sku: resolvedSku,
+      price: selectedVariant.price,
+      compareAt: selectedVariant.compareAtPrice,
+      inventoryQuantity: Math.max(0, selectedVariant.inventory?.quantity ?? 0),
+    },
+  };
+}
+
 export async function addWishlistItemForUser(userId: string, input: ResolveWishlistSelectionInput) {
   const db = getPrismaClient();
-  const selection = resolveWishlistSeedSelection(input);
+  const { variantId } = await resolveWishlistSelection(input, db);
 
-  const [wishlist, variant] = await Promise.all([
-    getOrCreateWishlistForUser(userId),
-    ensureSeedCatalogVariant(selection),
-  ]);
+  const wishlist = await getOrCreateWishlistForUser(userId);
 
   return db.wishlistItem.upsert({
     where: {
       wishlistId_productVariantId: {
         wishlistId: wishlist.id,
-        productVariantId: variant.id,
+        productVariantId: variantId,
       },
     },
     update: {
@@ -215,7 +322,7 @@ export async function addWishlistItemForUser(userId: string, input: ResolveWishl
     },
     create: {
       wishlistId: wishlist.id,
-      productVariantId: variant.id,
+      productVariantId: variantId,
       quantity: 1,
     },
     include: {
@@ -234,9 +341,11 @@ export async function addWishlistItemForUser(userId: string, input: ResolveWishl
 
 export async function removeWishlistSelectionForUser(userId: string, input: ResolveWishlistSelectionInput) {
   const db = getPrismaClient();
-  let selection;
+
+  let variantId: string;
   try {
-    selection = resolveWishlistSeedSelection(input);
+    const resolved = await resolveWishlistSelection(input, db);
+    variantId = resolved.variantId;
   } catch (err) {
     if (err instanceof AppError && err.statusCode === 404) {
       return false;
@@ -244,18 +353,9 @@ export async function removeWishlistSelectionForUser(userId: string, input: Reso
     throw err;
   }
 
-  const variant = await db.productVariant.findUnique({
-    where: { sku: selection.sku },
-    select: { id: true },
-  });
-
-  if (!variant) {
-    return false;
-  }
-
   const deleted = await db.wishlistItem.deleteMany({
     where: {
-      productVariantId: variant.id,
+      productVariantId: variantId,
       wishlist: {
         userId,
       },

@@ -12,6 +12,7 @@ import { buildMetadata } from "@/config/metadata";
 import { routes } from "@/config/routes";
 import { getWishlistItemsForUser } from "@/features/wishlist";
 import { WishlistRemoveButton } from "@/features/wishlist/components/wishlist-remove-button";
+import { getDisplayVariantLabel } from "@/lib/variant-label";
 
 export const metadata = buildMetadata({
   title: "Wishlist",
@@ -78,31 +79,35 @@ export default async function WishlistPage() {
         />
       ) : (
         <div className="grid gap-4">
-          {items.map((item) => (
-            <Card key={item.id}>
-              <CardContent className="flex flex-col gap-4 p-5 sm:flex-row sm:items-center sm:justify-between">
-                <div className="space-y-1.5">
-                  <p className="text-xs uppercase tracking-[0.18em] text-muted-foreground">{item.categoryName}</p>
-                  <Link href={item.href} className="text-lg font-semibold tracking-tight hover:text-primary">
-                    {item.productName}
-                  </Link>
-                  <p className="text-sm text-muted-foreground">
-                    SKU: {item.sku}
-                    {item.optionLabel ? ` | ${item.optionLabel}` : ""}
-                  </p>
-                </div>
+          {items.map((item) => {
+            const variantLabel = getDisplayVariantLabel(item.optionLabel);
 
-                <div className="flex items-center gap-2 sm:flex-col sm:items-end">
-                  <PriceDisplay
-                    amount={item.price}
-                    {...(typeof item.compareAt === "number" ? { compareAt: item.compareAt } : {})}
-                    size="sm"
-                  />
-                  <WishlistRemoveButton sku={item.sku} productName={item.productName} />
-                </div>
-              </CardContent>
-            </Card>
-          ))}
+            return (
+              <Card key={item.id}>
+                <CardContent className="flex flex-col gap-4 p-5 sm:flex-row sm:items-center sm:justify-between">
+                  <div className="space-y-1.5">
+                    <p className="text-xs uppercase tracking-[0.18em] text-muted-foreground">{item.categoryName}</p>
+                    <Link href={item.href} className="text-lg font-semibold tracking-tight hover:text-primary">
+                      {item.productName}
+                    </Link>
+                    <p className="text-sm text-muted-foreground">
+                      SKU: {item.sku}
+                      {variantLabel ? ` | ${variantLabel}` : ""}
+                    </p>
+                  </div>
+
+                  <div className="flex items-center gap-2 sm:flex-col sm:items-end">
+                    <PriceDisplay
+                      amount={item.price}
+                      {...(typeof item.compareAt === "number" ? { compareAt: item.compareAt } : {})}
+                      size="sm"
+                    />
+                    <WishlistRemoveButton sku={item.sku} productName={item.productName} />
+                  </div>
+                </CardContent>
+              </Card>
+            );
+          })}
         </div>
       )}
     </PageShell>

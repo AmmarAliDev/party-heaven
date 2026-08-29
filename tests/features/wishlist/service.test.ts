@@ -9,6 +9,7 @@ const prismaMock = vi.hoisted(() => ({
     upsert: vi.fn(),
   },
   product: {
+    findFirst: vi.fn(),
     upsert: vi.fn(),
   },
   productVariant: {
@@ -45,6 +46,7 @@ describe("wishlist service", () => {
       slug: "olive-blend-cooking-oil-1l",
       name: "Olive Blend Cooking Oil 1L",
     });
+    prismaMock.product.findFirst.mockReset().mockResolvedValue(null);
     prismaMock.productVariant.upsert.mockReset().mockResolvedValue({
       id: "variant-1",
       sku: "OBO-1L-001",
@@ -62,6 +64,54 @@ describe("wishlist service", () => {
     expect(prismaMock.wishlist.create).toHaveBeenCalledWith({
       data: { userId: "user-1" },
     });
+  });
+
+  it("resolves a live DB variant by option id (PDP passes the DB variant id)", async () => {
+    prismaMock.product.findFirst.mockResolvedValue({
+      id: "product-1",
+      name: "Ultra Wash Detergent 1kg",
+      slug: "ultra-wash-detergent-1kg",
+      shortDescription: "Strong stain removal for everyday laundry loads.",
+      description: "Long description.",
+      masterSku: "UWD-1KG-001",
+      category: { name: "Home Care", slug: "home-care" },
+      variants: [
+        {
+          id: "variant-1kg",
+          title: "1 kg",
+          sku: "UWD-1KG-001",
+          price: 899,
+          compareAtPrice: 1099,
+          isDefault: true,
+          inventory: { quantity: 18, reserved: 0, safetyStock: 0 },
+        },
+        {
+          id: "variant-2kg",
+          title: "2 kg",
+          sku: "UWD-2KG-001",
+          price: 1599,
+          compareAtPrice: 1999,
+          isDefault: false,
+          inventory: { quantity: 7, reserved: 0, safetyStock: 0 },
+        },
+      ],
+    });
+
+    await addWishlistItemForUser("user-1", {
+      productSlug: "ultra-wash-detergent-1kg",
+      optionId: "variant-2kg",
+    });
+
+    expect(prismaMock.wishlistItem.upsert).toHaveBeenCalledWith(
+      expect.objectContaining({
+        where: {
+          wishlistId_productVariantId: {
+            wishlistId: "wishlist-1",
+            productVariantId: "variant-2kg",
+          },
+        },
+      }),
+    );
   });
 });
 

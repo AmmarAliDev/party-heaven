@@ -11,6 +11,7 @@ import { PriceDisplay } from "@/components/ui/price-display";
 import { SectionErrorState } from "@/components/ui/section-error-state";
 import { routes } from "@/config/routes";
 import { testIds } from "@/lib/test-selectors";
+import { getDisplayVariantLabel } from "@/lib/variant-label";
 import type { CartSummary } from "@/features/cart/types";
 import { validateCartStock } from "@/features/cart/validation";
 
@@ -79,6 +80,7 @@ export function CartPageContent({ initialCart }: CartPageContentProps) {
         <div className="space-y-3">
           {cart.items.map((item) => {
             const hasStockIssue = item.quantity > item.availableQuantity;
+            const variantLabel = getDisplayVariantLabel(item.optionLabel);
 
             return (
               <Card key={item.id}>
@@ -100,6 +102,9 @@ export function CartPageContent({ initialCart }: CartPageContentProps) {
                         >
                           {item.productName}
                         </Link>
+                        {variantLabel ? (
+                          <p className="text-muted-foreground text-sm">{variantLabel}</p>
+                        ) : null}
                         <p className="text-muted-foreground text-sm">SKU: {item.sku}</p>
                         <p className="text-muted-foreground text-xs">
                           In stock: {item.availableQuantity}

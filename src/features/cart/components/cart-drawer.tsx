@@ -24,6 +24,7 @@ import { addCartChangedListener } from "@/features/cart/client-events";
 import type { CartSummary } from "@/features/cart/types";
 import { AppError } from "@/lib/errors/app-error";
 import { toUserMessage } from "@/lib/errors/error-messages";
+import { getDisplayVariantLabel } from "@/lib/variant-label";
 
 import { CartItemQuantityControls } from "./cart-item-quantity-controls";
 import { CartItemThumbnail } from "./cart-item-thumbnail";
@@ -161,6 +162,7 @@ export function CartDrawer() {
             <ul className="space-y-3">
               {cart!.items.map((item) => {
                 const hasStockIssue = item.quantity > item.availableQuantity;
+                const variantLabel = getDisplayVariantLabel(item.optionLabel);
 
                 return (
                   <li key={item.id} className="border-border/70 rounded-lg border p-3">
@@ -182,6 +184,9 @@ export function CartDrawer() {
                           >
                             {item.productName}
                           </Link>
+                          {variantLabel ? (
+                            <p className="text-muted-foreground text-xs">{variantLabel}</p>
+                          ) : null}
                           <PriceDisplay amount={item.unitPrice} size="sm" className="shrink-0" />
                         </div>
 
