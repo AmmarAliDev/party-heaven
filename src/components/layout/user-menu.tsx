@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { BookOpenText, BookUser, House, Info, LayoutDashboard, User } from "lucide-react";
+import { BookOpenText, BookUser, House, Info, LayoutDashboard, Package, User } from "lucide-react";
 
 import { routes } from "@/config/routes";
 import { SignOutButton } from "@/features/auth/components/sign-out-button";
@@ -79,6 +79,17 @@ const UserMenu = ({
             {isSignedIn ? "Account" : "Sign in"}
           </Link>
         </DropdownMenuItem>
+        {isSignedIn && (
+          <DropdownMenuItem asChild>
+            <Link
+              href={routes.storefront.accountOrders}
+              className={buttonVariants({ variant: "ghost", size: "sm", className: "cursor-pointer justify-start pl-8" })}
+            >
+              <Package className="size-4" aria-hidden="true" />
+              Your Orders
+            </Link>
+          </DropdownMenuItem>
+        )}
         {isSignedIn && (
           <div className="pb-1 w-full">
             <SignOutButton

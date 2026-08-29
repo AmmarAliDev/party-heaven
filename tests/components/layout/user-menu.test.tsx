@@ -103,4 +103,25 @@ describe("UserMenu", () => {
 
     expect(screen.queryByRole("menuitem", { name: /admin panel/i })).not.toBeInTheDocument();
   });
+
+  it("shows Your Orders before sign-out for authenticated users", async () => {
+    render(<UserMenu isSignedIn={true} isAdmin={false} navItems={pageNavItems} />);
+
+    await openMenu();
+
+    const menu = screen.getByRole("menu");
+    expect(within(menu).getByRole("menuitem", { name: /your orders/i })).toHaveAttribute(
+      "href",
+      routes.storefront.accountOrders,
+    );
+    expect(within(menu).getByRole("button", { name: /sign out/i })).toBeInTheDocument();
+  });
+
+  it("hides Your Orders for signed-out users", async () => {
+    render(<UserMenu isSignedIn={false} isAdmin={false} navItems={pageNavItems} />);
+
+    await openMenu();
+
+    expect(screen.queryByRole("menuitem", { name: /your orders/i })).not.toBeInTheDocument();
+  });
 });

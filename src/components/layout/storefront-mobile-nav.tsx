@@ -1,35 +1,30 @@
 "use client";
 
-import { Heart, Menu, ShoppingCart, User, X } from "lucide-react";
-import Link from "next/link";
 import { useState } from "react";
+import Link from "next/link";
+import { Heart, Menu, User, X } from "lucide-react";
 
+import { routes } from "@/config/routes";
 import { SignOutButton } from "@/features/auth/components/sign-out-button";
 import { cn } from "@/lib/utils";
 import type { NavItem } from "@/types/app";
 
-import { ThemeToggle } from "../theme-toggle";
 import { Button, buttonVariants } from "../ui/button";
-import type { StorefrontCategoryMenuItem } from "./storefront-category-menu";
 
 type StorefrontMobileNavProps = {
   navItems: NavItem[];
-  categoryMenuItems: StorefrontCategoryMenuItem[];
-  categoryMenuError: string | null;
   accountHref: string;
   wishlistHref: string;
-  cartHref: string;
   isSignedIn: boolean;
+  isAdmin: boolean;
 };
 
 export function StorefrontMobileNav({
   navItems,
-  categoryMenuItems,
-  categoryMenuError,
   accountHref,
   wishlistHref,
-  cartHref,
   isSignedIn,
+  isAdmin,
 }: StorefrontMobileNavProps) {
   const [isOpen, setIsOpen] = useState(false);
 
@@ -85,7 +80,6 @@ export function StorefrontMobileNav({
               )}
             </div>
             <nav aria-label="Mobile storefront" className="grid gap-2">
-              <div className="flex justify-end w-full"></div>
               {navItems.map((item) => (
                 <Link
                   key={item.href}
@@ -97,26 +91,29 @@ export function StorefrontMobileNav({
                 </Link>
               ))}
 
-              <div className="border-border/80 mt-2 grid gap-1 border-t pt-2">
-                <p className="text-muted-foreground px-3 py-1 text-xs font-semibold uppercase tracking-wide">
-                  One Dollar
-                </p>
-                {categoryMenuItems.map((item) => (
-                  <Link
-                    key={`${item.kind}-${item.href}-${item.title}`}
-                    href={item.href}
-                    onClick={() => setIsOpen(false)}
-                    className="text-foreground hover:bg-accent hover:text-accent-foreground rounded-md px-3 py-2 text-sm font-medium transition-colors"
-                  >
-                    {item.title}
-                  </Link>
-                ))}
-                {categoryMenuError ? (
-                  <p className="text-muted-foreground px-3 py-2 text-sm" role="status" aria-live="polite">
-                    {categoryMenuError}
-                  </p>
-                ) : null}
-              </div>
+              {/* Account menu options — mirror the desktop user menu */}
+              {(isSignedIn || isAdmin) && (
+                <div className="border-border/80 mt-2 grid gap-1 border-t pt-2">
+                  {isAdmin && (
+                    <Link
+                      href={routes.admin.dashboard}
+                      onClick={() => setIsOpen(false)}
+                      className="text-foreground hover:bg-accent hover:text-accent-foreground rounded-md px-3 py-2 text-sm font-medium transition-colors"
+                    >
+                      Admin Panel
+                    </Link>
+                  )}
+                  {isSignedIn && (
+                    <Link
+                      href={routes.storefront.accountOrders}
+                      onClick={() => setIsOpen(false)}
+                      className="text-foreground hover:bg-accent hover:text-accent-foreground rounded-md px-3 py-2 text-sm font-medium transition-colors"
+                    >
+                      Your Orders
+                    </Link>
+                  )}
+                </div>
+              )}
             </nav>
           </div>
           <Button

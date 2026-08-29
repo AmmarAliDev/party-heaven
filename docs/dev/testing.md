@@ -111,6 +111,13 @@ Lightweight import-level checks that verify public API contracts without mocking
 `sign-out-ui.test.ts` — `StorefrontMobileNav` signed-in vs. signed-out states (SSR).  
 `forms.test.tsx` — `SignInForm`, `SignUpForm` validation and `FormData` payload shape (jsdom).
 
+#### Layout components
+
+`app-header.test.tsx` — `AppHeader` storefront navbar (direct categories, `More` dropdown, `All Categories`, no duplicate links).  
+`user-menu.test.tsx` — shared `<UserMenu />` page links, account/admin/sign-out controls, and `Your Orders` visibility (signed-in vs signed-out).  
+`storefront-mobile-nav.test.tsx` — mobile drawer page links, wishlist/account actions, `Your Orders` (signed-in) and `Admin Panel` (admin) options; catalog categories absent.  
+`mobile-bottom-nav.test.tsx` — five primary mobile actions, hrefs, shared overlays, active-route highlighting.
+
 #### Blog
 
 `helpers.test.ts` — `getBlogPosts`, `getBlogPostBySlug`, `getRelatedBlogPosts`, `toBlogMetadataInput`, all JSON-LD builders.
