@@ -80,7 +80,7 @@ export async function AppHeader() {
                 width={450}
                 height={70}
                 sizes="(min-width: 1024px) 200px, (min-width: 768px) 160px, 120px"
-                className="h-8 w-40 md:h-10 md:w-60 lg:h-20 lg:w-70 rounded-md object-contain"
+                className="h-10 w-60 lg:h-20 lg:w-70 rounded-md object-contain"
                 loading="eager"
               />
 
