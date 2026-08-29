@@ -765,7 +765,7 @@ describe("homepage CMS service", () => {
     });
   });
 
-  it("hydrates featured products from the top 4 most-sold published products", async () => {
+  it("hydrates featured products from the top 5 most-sold published products", async () => {
     prismaMock.homePageSection.findMany.mockResolvedValue([
       {
         id: "section-featured-products",
@@ -845,10 +845,18 @@ describe("homepage CMS service", () => {
           compareAt: 1200,
           badge: "Best seller",
         },
+        {
+          id: "product-3",
+          name: "Product product-3",
+          href: "/categories/category/product-product-3",
+          price: 1000,
+          compareAt: 1200,
+          badge: "Best seller",
+        },
       ],
     });
 
-    expect(featuredProductsSection?.products).toHaveLength(4);
+    expect(featuredProductsSection?.products).toHaveLength(5);
   });
 
   it("filters non-published sold products and fills remaining slots from published catalog products", async () => {
@@ -961,10 +969,11 @@ describe("homepage CMS service", () => {
         { id: "fallback-1" },
         { id: "fallback-2" },
         { id: "fallback-3" },
+        { id: "fallback-4" },
       ],
     });
 
-    expect(featuredProductsSection?.products).toHaveLength(4);
+    expect(featuredProductsSection?.products).toHaveLength(5);
   });
 
   it("prefers recent published catalog products over stored fallback content when sales are sparse", async () => {
@@ -1035,9 +1044,10 @@ describe("homepage CMS service", () => {
         { id: "product-10", slug: "product-product-10" },
         { id: "product-11", slug: "product-product-11" },
         { id: "product-12", slug: "product-product-12" },
+        { id: "fallback-1" },
       ],
     });
 
-    expect(featuredProductsSection?.products).toHaveLength(4);
+    expect(featuredProductsSection?.products).toHaveLength(5);
   });
 });

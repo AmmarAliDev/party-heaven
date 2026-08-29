@@ -135,7 +135,7 @@ Config lives in `src/features/homepage/components/homepage-carousel-config.ts`.
 | Constant | Value | Purpose |
 |---|---|---|
 | `HOMEPAGE_CAROUSEL_MAX_ITEMS` | `8` | Hard cap on items shown in the carousel |
-| `HOMEPAGE_CAROUSEL_ITEM_CLASS` | responsive basis classes | 1–6 visible cards across breakpoints |
+| `HOMEPAGE_CAROUSEL_ITEM_CLASS` | responsive basis classes | 1–5 visible cards across breakpoints (1 default / 2 sm / 3 md / 4 xl / 5 2xl) |
 | `HOMEPAGE_CAROUSEL_OPTIONS` | `{ align: "start" }` | Shared Embla options |
 
 **View All button logic**
@@ -170,6 +170,7 @@ Config lives in `src/features/homepage/components/homepage-carousel-config.ts`.
 Some section kinds carry live data that is never stored in CMS:
 
 - **`featured-categories`** — `categories[]` is now hydrated from the live Prisma-backed catalog via `getCatalogCategories()` and then normalized into the shared homepage/category card shape before render. The virtual `one-dollar` category is intentionally excluded here because it already has a dedicated homepage section. If the catalog read fails or returns no publishable categories, the storefront keeps the section shell and falls back to the stored/manual category array instead of rendering a broken homepage.
+- **`featured-products`** — `products[]` is hydrated at runtime from live catalog data by `resolveHomepageFeaturedProducts()`: it ranks published products by summed order quantity across `CONFIRMED`/`PACKED`/`SHIPPED`/`DELIVERED` orders (most-sold first), backfills from recent published catalog products, then fills any remaining slots from the stored fallback array — resolving up to `HOMEPAGE_FEATURED_PRODUCTS_LIMIT = 5` cards so the carousel fills its widest 5-up `2xl` row (the extra item simply scrolls into view on smaller viewports).
 - **`one-dollar`** — `products[]` is always `[]` when stored. `hydrateOneDollarSections()` in `service.ts` calls `getCatalogCategoryListing({ slug: "one-dollar", ... })` and populates up to 8 product cards before the final payload is passed to the page. Hydration now also maps optional `slug` and `images[]` for image-first card rendering. The section is **hidden entirely when no qualifying products (active deals) are available** — `OneDollarSectionBlock` renders `null` when its product list is empty, so the homepage never shows a deals section (or its placeholder copy) with nothing to offer. If the catalog fetch fails, the section is likewise hidden and the rest of the page renders normally.
 
 Implementation notes:

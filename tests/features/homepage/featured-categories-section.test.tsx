@@ -187,7 +187,8 @@ describe("homepage carousel config (shared)", () => {
     expect(HOMEPAGE_CAROUSEL_ITEM_CLASS).toContain("basis-[85%]");
     expect(HOMEPAGE_CAROUSEL_ITEM_CLASS).toContain("sm:basis-1/2");
     expect(HOMEPAGE_CAROUSEL_ITEM_CLASS).toContain("md:basis-1/3");
-    expect(HOMEPAGE_CAROUSEL_ITEM_CLASS).toContain("lg:basis-1/4");
+    expect(HOMEPAGE_CAROUSEL_ITEM_CLASS).toContain("xl:basis-1/4");
+    expect(HOMEPAGE_CAROUSEL_ITEM_CLASS).toContain("2xl:basis-1/5!");
   });
 
   it("sets max items to 8", () => {
@@ -201,9 +202,8 @@ describe("featured categories carousel config (legacy re-exports)", () => {
     expect(FEATURED_CATEGORIES_CAROUSEL_ITEM_CLASS).toContain("basis-[85%]");
     expect(FEATURED_CATEGORIES_CAROUSEL_ITEM_CLASS).toContain("sm:basis-1/2");
     expect(FEATURED_CATEGORIES_CAROUSEL_ITEM_CLASS).toContain("md:basis-1/3");
-    expect(FEATURED_CATEGORIES_CAROUSEL_ITEM_CLASS).toContain("lg:basis-1/4");
-    expect(FEATURED_CATEGORIES_CAROUSEL_ITEM_CLASS).toContain("xl:!basis-1/4");
-    expect(FEATURED_CATEGORIES_CAROUSEL_ITEM_CLASS).toContain("2xl:!basis-1/4");
+    expect(FEATURED_CATEGORIES_CAROUSEL_ITEM_CLASS).toContain("xl:basis-1/4!");
+    expect(FEATURED_CATEGORIES_CAROUSEL_ITEM_CLASS).toContain("2xl:basis-1/5!");
     expect(FEATURED_CATEGORIES_CAROUSEL_ITEM_CLASS).not.toBe(HOMEPAGE_CAROUSEL_ITEM_CLASS);
   });
 });

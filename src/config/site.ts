@@ -82,8 +82,8 @@ export const adminNav: NavItem[] = [
 
 export function loadSiteConfig(runtimeEnv: RuntimeEnv = env) {
   return {
-    name: "CHEERLY",
-    shortName: "CHEERLY",
+    name: "PARTY HEAVEN",
+    shortName: "PARTY HEAVEN",
     logoPath: "/app-logo.svg",
     appIcon: "/app-logo.svg",
     description:
