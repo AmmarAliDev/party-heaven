@@ -39,16 +39,10 @@ describe("sign-out surfaces", () => {
     const html = renderToStaticMarkup(
       React.createElement(StorefrontMobileNav, {
         navItems: [{ title: "Shop", href: "/shop" }],
-        categoryMenuItems: [
-          { title: "One Dollar", href: "/", kind: "one-dollar" },
-          { title: "All Categories", href: "/categories", kind: "all-categories" },
-        ],
-        categoryMenuError: null,
-        searchHref: "/search",
         accountHref: "/account",
         wishlistHref: "/wishlist",
-        cartHref: "/cart",
         isSignedIn: true,
+        isAdmin: false,
       }),
     );
 
@@ -62,16 +56,10 @@ describe("sign-out surfaces", () => {
     const html = renderToStaticMarkup(
       React.createElement(StorefrontMobileNav, {
         navItems: [{ title: "Shop", href: "/shop" }],
-        categoryMenuItems: [
-          { title: "One Dollar", href: "/", kind: "one-dollar" },
-          { title: "All Categories", href: "/categories", kind: "all-categories" },
-        ],
-        categoryMenuError: null,
-        searchHref: "/search",
         accountHref: "/account",
         wishlistHref: "/wishlist",
-        cartHref: "/cart",
         isSignedIn: false,
+        isAdmin: false,
       }),
     );
 

@@ -20,10 +20,7 @@ import {
 } from "../ui/dropdown-menu";
 import { PageContainer } from "../ui/page-container";
 import { HeaderScrollHide } from "./header-scroll-hide";
-import {
-  buildStorefrontCategoryMenu,
-  buildStorefrontNavbarCategoryMenu,
-} from "./storefront-category-menu";
+import { buildStorefrontNavbarCategoryMenu } from "./storefront-category-menu";
 import { StorefrontHeaderAuthControls } from "./storefront-header-auth-controls";
 
 export async function AppHeader() {
@@ -39,13 +36,6 @@ export async function AppHeader() {
       error,
     });
   }
-
-  const categoryMenuItems = buildStorefrontCategoryMenu(
-    categories.map((category) => ({
-      name: category.name,
-      href: category.href,
-    })),
-  );
 
   const navbarCategoryMenu = buildStorefrontNavbarCategoryMenu(
     categories.map((category) => ({
@@ -68,10 +58,19 @@ export async function AppHeader() {
       </a>
 
       <PageContainer className="relative flex flex-col gap-3 py-3">
-        <div className="flex items-center justify-between gap-3">
+        <div className="grid grid-cols-[minmax(0,1fr)_auto_minmax(0,1fr)] items-center gap-3 md:flex md:justify-between">
+          {/* Mobile: hamburger drawer trigger on the far left */}
+          <div className="justify-self-start md:hidden">
+            <StorefrontHeaderAuthControls
+              topLevelNavItems={topLevelNavItems}
+              mode="mobile"
+            />
+          </div>
+
+          {/* Logo: centered on mobile, leading on desktop */}
           <Link
             href={routes.storefront.home}
-            className="text-base font-semibold tracking-tight"
+            className="justify-self-center text-base font-semibold tracking-tight md:justify-self-start"
             aria-label={`${siteConfig.name} homepage`}
           >
             <span className="flex min-w-0 items-center gap-3">
@@ -81,7 +80,7 @@ export async function AppHeader() {
                 width={450}
                 height={70}
                 sizes="(min-width: 1024px) 200px, (min-width: 768px) 160px, 120px"
-                className="h-10 w-60 lg:h-20 lg:w-70 rounded-md object-contain"
+                className="h-8 w-40 md:h-10 md:w-60 lg:h-20 lg:w-70 rounded-md object-contain"
                 loading="eager"
               />
 
@@ -93,44 +92,37 @@ export async function AppHeader() {
             </span>
           </Link>
 
-          <div className="flex items-center gap-2 md:hidden">
-            <SearchDialogTrigger mode="mobile" />
-            <MobileCartButton />
-            <StorefrontHeaderAuthControls
-              topLevelNavItems={topLevelNavItems}
-              categoryMenuItems={categoryMenuItems}
-              categoryMenuError={
-                categoriesError
-                  ? "Categories are temporarily unavailable."
-                  : null
-              }
-              mode="mobile"
-            />
-          </div>
+          {/* Right side controls */}
+          <div className="flex items-center justify-self-end gap-2">
+            {/* Mobile search — intentionally hidden for now; remove `hidden` to re-enable */}
+            <div className="hidden md:hidden">
+              <SearchDialogTrigger mode="mobile" />
+            </div>
 
-          <div className="hidden items-center gap-2 md:flex">
-            <SearchDialogTrigger mode="desktop" />
-            <Link
-              href={routes.storefront.wishlist}
-              className={buttonVariants({ variant: "outline", size: "sm" })}
-              aria-label="Wishlist"
-            >
-              <Heart className="size-4" aria-hidden="true" />
-              Wishlist
-            </Link>
-            <CartDrawerTrigger />
-            {/* Temporarily disabled */}
-            {/* <ThemeToggle /> */}
-            <StorefrontHeaderAuthControls
-              topLevelNavItems={topLevelNavItems}
-              categoryMenuItems={categoryMenuItems}
-              categoryMenuError={
-                categoriesError
-                  ? "Categories are temporarily unavailable."
-                  : null
-              }
-              mode="desktop"
-            />
+            {/* Mobile cart — rightmost (the hamburger drawer hosts the full menu) */}
+            <div className="md:hidden">
+              <MobileCartButton />
+            </div>
+
+            {/* Desktop controls */}
+            <div className="hidden items-center gap-2 md:flex">
+              <SearchDialogTrigger mode="desktop" />
+              <Link
+                href={routes.storefront.wishlist}
+                className={buttonVariants({ variant: "outline", size: "sm" })}
+                aria-label="Wishlist"
+              >
+                <Heart className="size-4" aria-hidden="true" />
+                Wishlist
+              </Link>
+              <CartDrawerTrigger />
+              {/* Temporarily disabled */}
+              {/* <ThemeToggle /> */}
+              <StorefrontHeaderAuthControls
+                topLevelNavItems={topLevelNavItems}
+                mode="desktop"
+              />
+            </div>
           </div>
         </div>
 
