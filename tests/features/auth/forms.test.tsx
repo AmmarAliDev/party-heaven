@@ -34,7 +34,10 @@ vi.mock("react", async () => {
   };
 });
 
-describe("auth form migration", () => {
+// These tests drive real userEvent interactions with dynamically imported
+// forms; under full-suite parallel load the default 5000ms timeout can be
+// exceeded (same flake class as admin-category-form.test.tsx), so raise it.
+describe("auth form migration", { timeout: 20000 }, () => {
   beforeEach(() => {
     dispatchMock.mockReset();
     useActionStateMock.mockReset();

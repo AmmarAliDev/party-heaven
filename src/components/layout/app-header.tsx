@@ -78,10 +78,10 @@ export async function AppHeader() {
               <Image
                 src={siteConfig.logoPath}
                 alt={`${siteConfig.name} logo`}
-                width={200}
-                height={100}
+                width={450}
+                height={70}
                 sizes="(min-width: 1024px) 200px, (min-width: 768px) 160px, 120px"
-                className="h-20 w-40 lg:h-25 lg:w-50 rounded-md object-contain"
+                className="h-10 w-60 lg:h-20 lg:w-70 rounded-md object-contain"
                 loading="eager"
               />
 

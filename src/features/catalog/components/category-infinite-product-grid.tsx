@@ -123,7 +123,7 @@ export function CategoryInfiniteProductGrid({ listing }: CategoryInfiniteProduct
           }
         >
           <ul
-            className="grid gap-4 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4"
+            className="grid gap-4 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-4"
             data-testid={testIds.storefront.productGrid}
           >
             {products.map((product, index) => (

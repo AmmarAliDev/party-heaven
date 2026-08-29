@@ -18,6 +18,7 @@ import {
   getOrderStatusVariant,
 } from "@/features/orders";
 import { ReorderOrderForm } from "@/features/orders/components/reorder-order-form";
+import { getDisplayVariantLabel } from "@/lib/variant-label";
 
 type AccountOrderDetailPageProps = {
   params: Promise<{ orderNumber: string }>;
@@ -80,18 +81,22 @@ export default async function AccountOrderDetailPage({ params }: AccountOrderDet
           <Badge variant={getOrderStatusVariant(order.status)}>{formatOrderStatusLabel(order.status)}</Badge>
         </CardHeader>
         <CardContent className="space-y-4">
-          {order.items.map((item) => (
-            <div key={item.id} className="flex items-start justify-between gap-4 border-b border-border/60 pb-4 last:border-b-0 last:pb-0">
-              <div className="space-y-1">
-                <p className="font-medium">{item.productName}</p>
-                <p className="text-muted-foreground text-sm">
-                  {item.variantTitle ? `${item.variantTitle} · ` : ""}Qty {item.quantity}
-                </p>
-                <p className="text-muted-foreground text-xs">SKU: {item.sku ?? "N/A"}</p>
+          {order.items.map((item) => {
+            const variantLabel = getDisplayVariantLabel(item.variantTitle);
+
+            return (
+              <div key={item.id} className="flex items-start justify-between gap-4 border-b border-border/60 pb-4 last:border-b-0 last:pb-0">
+                <div className="space-y-1">
+                  <p className="font-medium">{item.productName}</p>
+                  <p className="text-muted-foreground text-sm">
+                    {variantLabel ? `${variantLabel} · ` : ""}Qty {item.quantity}
+                  </p>
+                  <p className="text-muted-foreground text-xs">SKU: {item.sku ?? "N/A"}</p>
+                </div>
+                <PriceDisplay amount={item.subtotal} size="sm" />
               </div>
-              <PriceDisplay amount={item.subtotal} size="sm" />
-            </div>
-          ))}
+            );
+          })}
         </CardContent>
       </Card>
 

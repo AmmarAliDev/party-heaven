@@ -10,7 +10,13 @@ import type { FeaturedProductItem } from "./types";
 
 const logger = createLogger("homepage.featured-products");
 
-export const HOMEPAGE_FEATURED_PRODUCTS_LIMIT = 4;
+/**
+ * Number of products resolved for the homepage featured-products section.
+ *
+ * Matches the widest carousel density (5-up on `2xl`) so the row is always
+ * full; on smaller viewports the extra item simply scrolls into view.
+ */
+export const HOMEPAGE_FEATURED_PRODUCTS_LIMIT = 5;
 const HOMEPAGE_SALES_CANDIDATE_FETCH_LIMIT = 24;
 
 export const HOMEPAGE_MOST_SOLD_ORDER_STATUSES: OrderStatus[] = [
