@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { usePathname, useRouter } from "next/navigation";
 import { Heart } from "lucide-react";
 
@@ -16,27 +16,59 @@ type WishlistToggleButtonProps = {
   optionId?: string | undefined;
   sku: string;
   productName: string;
-  initiallyWishlisted?: boolean;
 };
 
-export function WishlistToggleButton({
-  productSlug,
-  optionId,
-  sku,
-  productName,
-  initiallyWishlisted = false,
-}: WishlistToggleButtonProps) {
+export function WishlistToggleButton({ productSlug, optionId, sku, productName }: WishlistToggleButtonProps) {
   const router = useRouter();
   const pathname = usePathname();
 
   const [pending, setPending] = useState(false);
-  const [wishlisted, setWishlisted] = useState(initiallyWishlisted);
+  const [wishlisted, setWishlisted] = useState(false);
+  const hasUserInteracted = useRef(false);
+
+  // The PDP is statically generated, so the initial wishlist state is resolved
+  // client-side after mount (via GET /api/wishlist/items) instead of reading the
+  // session server-side, which would force the whole product page to be dynamic.
+  useEffect(() => {
+    let cancelled = false;
+
+    async function loadInitialWishlistState() {
+      try {
+        const response = await fetch("/api/wishlist/items");
+
+        if (!response.ok) {
+          return; // Not signed in (401) or an error → nothing wishlisted.
+        }
+
+        const payload = (await response.json()) as { ok?: boolean; skus?: string[] };
+        if (
+          !cancelled &&
+          !hasUserInteracted.current &&
+          payload?.ok &&
+          Array.isArray(payload.skus) &&
+          sku &&
+          payload.skus.includes(sku)
+        ) {
+          setWishlisted(true);
+        }
+      } catch {
+        // Ignore network errors — the toggle simply starts un-wishlisted.
+      }
+    }
+
+    void loadInitialWishlistState();
+
+    return () => {
+      cancelled = true;
+    };
+  }, [sku]);
 
   async function handleToggle() {
     if (pending) {
       return;
     }
 
+    hasUserInteracted.current = true;
     setPending(true);
 
     try {

@@ -3,7 +3,6 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { ChevronRight, Home } from "lucide-react";
 
-import { auth } from "@/auth";
 import { PageShell } from "@/components/layout/page-shell";
 import { buildMetadata } from "@/config/metadata";
 import { routes } from "@/config/routes";
@@ -22,7 +21,6 @@ import {
   toProductStaticParams,
 } from "@/features/rendering/seo-content-rendering";
 import { ProductReviewComposer } from "@/features/reviews/components/product-review-composer";
-import { getWishlistSkusForUser } from "@/features/wishlist";
 
 export const revalidate = 900;
 export const dynamicParams = true;
@@ -66,13 +64,11 @@ export async function generateMetadata({ params }: ProductPageProps): Promise<Me
 
 export default async function ProductPage({ params }: ProductPageProps) {
   const { slug, productSlug } = await params;
-  const session = await auth();
 
-  const [product, category, relatedProducts, wishlistSkus] = await Promise.all([
+  const [product, category, relatedProducts] = await Promise.all([
     getProductBySlug(productSlug),
     getCatalogCategory(slug),
     getRelatedProducts(slug, productSlug),
-    session?.user?.id ? getWishlistSkusForUser(session.user.id) : Promise.resolve([]),
   ]);
 
   // Guard: product must exist and belong to this category
@@ -124,7 +120,7 @@ export default async function ProductPage({ params }: ProductPageProps) {
       </nav>
 
       {/* Hero: gallery + product panel (kept in sync for variant products) */}
-      <ProductOverview product={product} initialWishlistedSkus={wishlistSkus} />
+      <ProductOverview product={product} />
 
       {/* Specifications */}
       {product.specifications.length > 0 ? (

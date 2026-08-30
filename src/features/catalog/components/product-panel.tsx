@@ -13,15 +13,9 @@ type ProductPanelProps = {
   /** Per-group variant selections — owned by `ProductOverview`. */
   selectedOptionIds: Record<string, string>;
   onSelect: (groupId: string, optionId: string) => void;
-  initialWishlistedSkus?: readonly string[];
 };
 
-export function ProductPanel({
-  product,
-  selectedOptionIds,
-  onSelect,
-  initialWishlistedSkus = [],
-}: ProductPanelProps) {
+export function ProductPanel({ product, selectedOptionIds, onSelect }: ProductPanelProps) {
   const activeOption = resolveActiveOption(product, selectedOptionIds);
 
   const effectivePrice = activeOption?.price ?? product.price;
@@ -29,7 +23,6 @@ export function ProductPanel({
   const effectiveSku = activeOption?.sku ?? product.sku;
   const effectiveInventory = activeOption?.inventoryQuantity ?? product.inventoryQuantity;
   const effectiveOptionId = activeOption?.id;
-  const isInitiallyWishlisted = Boolean(effectiveSku && initialWishlistedSkus.includes(effectiveSku));
 
   return (
     <div className="space-y-6">
@@ -66,7 +59,6 @@ export function ProductPanel({
         {...(effectiveOptionId ? { optionId: effectiveOptionId } : {})}
         sku={effectiveSku}
         productName={product.name}
-        initiallyWishlisted={isInitiallyWishlisted}
       />
     </div>
   );

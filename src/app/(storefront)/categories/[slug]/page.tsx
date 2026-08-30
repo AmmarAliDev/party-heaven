@@ -5,27 +5,23 @@ import { PageShell } from "@/components/layout/page-shell";
 import { SectionHeader } from "@/components/ui/section-header";
 import { buildMetadata } from "@/config/metadata";
 import {
-  toCategoryStaticParams,
-} from "@/features/rendering/seo-content-rendering";
-import {
   CategoryInfiniteProductGrid,
   CategoryListingFilters,
   getCatalogCategory,
   getCatalogCategoryListing,
-  getCatalogCategorySlugs,
 } from "@/features/catalog";
 
-export const revalidate = 900;
+// This page reads `searchParams` for filtering/sorting, a request-time API whose
+// values cannot be known ahead of time. It is therefore inherently dynamic and
+// must NOT be combined with `revalidate`/`generateStaticParams` — doing so makes
+// Next.js attempt an on-demand static prerender at runtime where the
+// `searchParams` access throws a `DYNAMIC_SERVER_USAGE` error.
+export const dynamic = "force-dynamic";
 
 type CategoryPageProps = {
   params: Promise<{ slug: string }>;
   searchParams: Promise<Record<string, string | string[] | undefined>>;
 };
-
-export async function generateStaticParams() {
-  const slugs = await getCatalogCategorySlugs();
-  return toCategoryStaticParams(slugs);
-}
 
 export async function generateMetadata({
   params,
