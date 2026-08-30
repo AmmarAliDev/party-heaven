@@ -59,6 +59,15 @@ enum ReviewStatus {
   @@map("review_status")
 }
 
+// Deal lifecycle mirrors Product so admins can stage deals before publishing.
+enum DealStatus {
+  DRAFT
+  PUBLISHED
+  ARCHIVED
+
+  @@map("deal_status")
+}
+
 enum CategoryStatus {
   DRAFT
   PUBLISHED
@@ -257,6 +266,7 @@ model Category {
   parent         Category?      @relation("CategoryToCategory", fields: [parentId], references: [id])
   children       Category[]     @relation("CategoryToCategory")
   products         Product[]
+  deals            Deal[]
   seoTitle         String?        @map("seo_title")
   seoDescription   String?        @map("seo_description")
   seoCanonicalUrl  String?        @map("seo_canonical_url")
@@ -324,6 +334,7 @@ model Product {
   specifications   ProductSpecification[]
   reviews          Review[]
   dealCampaigns    DealCampaignProduct[]
+  dealProducts     DealProduct[]
   metadata         Json?
   seoTitle         String?                @map("seo_title")
   seoDescription   String?                @map("seo_description")
@@ -371,6 +382,7 @@ model ProductVariant {
   images         ProductImage[]
   wishlistItems  WishlistItem[]
   cartItems      CartItem[]
+  dealProducts   DealProduct[]
   isDefault      Boolean        @default(false) @map("is_default")
   createdAt      DateTime       @default(now()) @map("created_at")
   updatedAt      DateTime       @updatedAt @map("updated_at")
@@ -388,6 +400,101 @@ model Inventory {
   safetyStock      Int            @default(0) @map("safety_stock")
   createdAt        DateTime       @default(now()) @map("created_at")
   updatedAt        DateTime       @updatedAt @map("updated_at")
+}
+
+// ---------------------------------------------------------------------------
+// Featured deals
+// ---------------------------------------------------------------------------
+// A Deal bundles multiple catalog products (each with its own quantity, and
+// optionally a specific variant) under deal-specific media, pricing, and a
+// short description. Deals never define their own variant set — availability
+// always derives from the included products'/variants' inventory, and a deal
+// is considered available when every included product is in stock.
+model Deal {
+  id               String             @id @default(uuid())
+  title            String
+  slug             String             @unique
+  shortDescription String?            @map("short_description")
+  description      String?
+  status           DealStatus         @default(DRAFT)
+  // The deal's primary category (same as products — a deal belongs to one
+  // category and appears on the category's surface when published).
+  category         Category?          @relation(fields: [categoryId], references: [id], onDelete: SetNull)
+  categoryId       String?            @map("category_id")
+  // Deal-level pricing (stored in smallest currency unit, PKR paisa).
+  price            Int                @default(0)
+  compareAtPrice   Int?               @map("compare_at_price")
+  images           DealImage[]
+  products         DealProduct[]
+  specifications   DealSpecification[]
+  cartItems        DealCartItem[]
+  // Stores related deal ids (`relatedDealIds: string[]`) for the "Related
+  // deals" cross-sell on the deal detail page.
+  metadata         Json?
+  seoTitle         String?            @map("seo_title")
+  seoDescription   String?            @map("seo_description")
+  seoCanonicalUrl  String?            @map("seo_canonical_url")
+  seoOgTitle       String?            @map("seo_og_title")
+  seoOgDescription String?            @map("seo_og_description")
+  seoImageUrl      String?            @map("seo_image_url")
+  seoNoIndex       Boolean            @default(false) @map("seo_no_index")
+  seoSchemaNotes   String?            @map("seo_schema_notes")
+  createdAt        DateTime           @default(now()) @map("created_at")
+  updatedAt        DateTime           @updatedAt @map("updated_at")
+
+  @@index([categoryId])
+  @@index([status])
+}
+
+// A single product (optionally one specific variant) included in a deal, with
+// the number of units that come with the deal. Each included product can only
+// appear once per deal (per variant); quantities cannot exceed the linked
+// variant's available stock (validated in the admin service).
+model DealProduct {
+  id               String          @id @default(uuid())
+  deal             Deal            @relation(fields: [dealId], references: [id], onDelete: Cascade)
+  dealId           String          @map("deal_id")
+  product          Product         @relation(fields: [productId], references: [id], onDelete: Cascade)
+  productId        String          @map("product_id")
+  // When set, the deal unit maps to this specific variant; otherwise it maps
+  // to the product's default variant.
+  productVariant   ProductVariant? @relation(fields: [productVariantId], references: [id], onDelete: SetNull)
+  productVariantId String?         @map("product_variant_id")
+  // Number of units of this product included in the deal.
+  quantity         Int             @default(1)
+  position         Int             @default(0)
+  createdAt        DateTime        @default(now()) @map("created_at")
+
+  @@unique([dealId, productId, productVariantId])
+  @@index([dealId])
+  @@index([productId])
+  @@index([productVariantId])
+}
+
+// Deal-level specifications (mirrors ProductSpecification).
+model DealSpecification {
+  id        String   @id @default(uuid())
+  deal      Deal     @relation(fields: [dealId], references: [id], onDelete: Cascade)
+  dealId    String   @map("deal_id")
+  key       String
+  value     String
+  position  Int      @default(0)
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  @@index([dealId])
+}
+
+model DealImage {
+  id        String   @id @default(uuid())
+  deal      Deal     @relation(fields: [dealId], references: [id], onDelete: Cascade)
+  dealId    String   @map("deal_id")
+  url       String
+  alt       String?
+  position  Int      @default(0)
+  createdAt DateTime @default(now()) @map("created_at")
+
+  @@index([dealId, position])
 }
 
 model ProductSpecification {
@@ -461,6 +568,9 @@ model Cart {
   userId    String?    @map("user_id")
   status    CartStatus @default(ACTIVE)
   items     CartItem[]
+  // Deal bundle lines — a deal is treated as ONE cart line item (quantity
+  // controls the whole bundle, not its individual products).
+  dealItems DealCartItem[]
   // Abandonment tracking fields — populated by the abandoned-cart service.
   // The background job that sends recovery emails is deferred (future automation).
   abandonedAt         DateTime? @map("abandoned_at")
@@ -485,6 +595,26 @@ model CartItem {
   // Prevent duplicate cart entries for the same cart + variant
   @@unique([cartId, productVariantId])
   @@index([cartId])
+}
+
+// A Deal bundle treated as a single cart line. `quantity` = how many copies of
+// the whole deal are in the cart; `unitPrice` snapshots the deal price at add
+// time. At checkout each deal line expands into order items for every included
+// product (see orders service).
+model DealCartItem {
+  id        String   @id @default(uuid())
+  cart      Cart     @relation(fields: [cartId], references: [id], onDelete: Cascade)
+  cartId    String   @map("cart_id")
+  deal      Deal     @relation(fields: [dealId], references: [id], onDelete: Cascade)
+  dealId    String   @map("deal_id")
+  quantity  Int      @default(1)
+  unitPrice Int      @map("unit_price") // snapshot of deal price when added
+  createdAt DateTime @default(now()) @map("created_at")
+
+  // Prevent duplicate cart entries for the same cart + deal
+  @@unique([cartId, dealId])
+  @@index([cartId])
+  @@index([dealId])
 }
 
 model Order {

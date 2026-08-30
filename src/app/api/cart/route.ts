@@ -5,13 +5,16 @@ import { z } from "zod";
 import { auth } from "@/auth";
 import {
   addCartItemForContext,
+  addDealCartItemForContext,
   applyCartTokenCookie,
   CART_COOKIE_NAME,
   getCartSummaryForContext,
   getOrCreateGuestCartToken,
   readCartTokenFromCookieValue,
   removeCartItemForContext,
+  removeDealCartItemForContext,
   updateCartItemQuantityForContext,
+  updateDealCartItemQuantityForContext,
 } from "@/features/cart";
 import { createRouteHandlerErrorResponse, createValidationAppError } from "@/lib/errors/handling";
 import { assertTrustedRouteHandlerRequest } from "@/lib/security/csrf";
@@ -22,13 +25,27 @@ const addCartItemSchema = z.object({
   quantity: z.coerce.number().int().min(1).max(99).optional(),
 });
 
+const addDealCartItemSchema = z.object({
+  dealSlug: z.string().trim().min(1),
+  quantity: z.coerce.number().int().min(1).max(99).optional(),
+});
+
 const updateCartItemSchema = z.object({
   cartItemId: z.string().trim().min(1),
   quantity: z.coerce.number().int().min(0).max(99),
 });
 
+const updateDealCartItemSchema = z.object({
+  dealCartItemId: z.string().trim().min(1),
+  quantity: z.coerce.number().int().min(0).max(99),
+});
+
 const removeCartItemSchema = z.object({
   cartItemId: z.string().trim().min(1),
+});
+
+const removeDealCartItemSchema = z.object({
+  dealCartItemId: z.string().trim().min(1),
 });
 
 async function getCartContext() {
@@ -103,6 +120,35 @@ export async function POST(request: Request) {
     assertTrustedRouteHandlerRequest(request, { action: "cart:add" });
 
     const payload = await request.json();
+
+    // A `dealSlug` payload adds the WHOLE deal as one cart line; otherwise the
+    // payload is a regular product add.
+    const dealParsed = addDealCartItemSchema.safeParse(payload);
+    if (dealParsed.success) {
+      const context = await getCartContext();
+      const ensuredGuestToken = await getOrCreateGuestCartToken(context.guestToken);
+
+      const summary = await addDealCartItemForContext(
+        {
+          ...context,
+          guestToken: ensuredGuestToken,
+        },
+        dealParsed.data,
+      );
+
+      return withCartCookie(
+        {
+          ok: true,
+          cart: summary,
+        },
+        resolveResponseCartToken({
+          userId: context.userId,
+          ensuredGuestToken,
+          cartToken: summary.token,
+        }),
+      );
+    }
+
     const parsed = addCartItemSchema.safeParse(payload);
 
     if (!parsed.success) {
@@ -143,6 +189,34 @@ export async function PATCH(request: Request) {
     assertTrustedRouteHandlerRequest(request, { action: "cart:update" });
 
     const payload = await request.json();
+
+    // A `dealCartItemId` payload updates a deal bundle line.
+    const dealParsed = updateDealCartItemSchema.safeParse(payload);
+    if (dealParsed.success) {
+      const context = await getCartContext();
+      const ensuredGuestToken = await getOrCreateGuestCartToken(context.guestToken);
+
+      const summary = await updateDealCartItemQuantityForContext(
+        {
+          ...context,
+          guestToken: ensuredGuestToken,
+        },
+        dealParsed.data,
+      );
+
+      return withCartCookie(
+        {
+          ok: true,
+          cart: summary,
+        },
+        resolveResponseCartToken({
+          userId: context.userId,
+          ensuredGuestToken,
+          cartToken: summary.token,
+        }),
+      );
+    }
+
     const parsed = updateCartItemSchema.safeParse(payload);
 
     if (!parsed.success) {
@@ -183,6 +257,34 @@ export async function DELETE(request: Request) {
     assertTrustedRouteHandlerRequest(request, { action: "cart:remove" });
 
     const payload = await request.json();
+
+    // A `dealCartItemId` payload removes a deal bundle line.
+    const dealParsed = removeDealCartItemSchema.safeParse(payload);
+    if (dealParsed.success) {
+      const context = await getCartContext();
+      const ensuredGuestToken = await getOrCreateGuestCartToken(context.guestToken);
+
+      const summary = await removeDealCartItemForContext(
+        {
+          ...context,
+          guestToken: ensuredGuestToken,
+        },
+        dealParsed.data,
+      );
+
+      return withCartCookie(
+        {
+          ok: true,
+          cart: summary,
+        },
+        resolveResponseCartToken({
+          userId: context.userId,
+          ensuredGuestToken,
+          cartToken: summary.token,
+        }),
+      );
+    }
+
     const parsed = removeCartItemSchema.safeParse(payload);
 
     if (!parsed.success) {

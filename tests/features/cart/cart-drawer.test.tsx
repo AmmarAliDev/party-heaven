@@ -54,6 +54,7 @@ function createCart() {
         href: "/categories/decorations/snow-spray-large",
       },
     ],
+    dealItems: [],
   };
 }
 

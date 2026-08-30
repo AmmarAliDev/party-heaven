@@ -22,12 +22,12 @@ import { AppFooter } from "@/components/layout/app-footer";
 
 const categories = [
   {
-    id: "party-heaven",
-    name: "Party Heaven",
-    slug: "party-heaven",
-    description: "Virtual party heaven category",
-    productCount: 4,
-    href: "/categories/party-heaven",
+    id: "beverages",
+    name: "Beverages",
+    slug: "beverages",
+    description: "Drinks and refreshments",
+    productCount: 6,
+    href: "/categories/beverages",
   },
   {
     id: "home-care",
@@ -115,10 +115,10 @@ describe("AppFooter", () => {
     const quickLinksNav = screen.getByRole("navigation", { name: "Quick Links links" });
     const quickLinkItems = quickLinksNav.querySelectorAll("a[href^='/categories/']");
 
-    // Party Heaven first, then categories alphabetically, capped at NAVBAR_DIRECT_CATEGORY_LIMIT = 6.
+    // Categories alphabetically, capped at NAVBAR_DIRECT_CATEGORY_LIMIT = 6.
     expect(quickLinkItems).toHaveLength(6);
-    expect(quickLinkItems[0]).toHaveTextContent("Party Heaven");
-    expect(quickLinkItems[1]).toHaveTextContent("Baby Care");
+    expect(quickLinkItems[0]).toHaveTextContent("Baby Care");
+    expect(quickLinkItems[1]).toHaveTextContent("Beverages");
     expect(quickLinkItems[2]).toHaveTextContent("Cleaning Supplies");
     expect(quickLinkItems[3]).toHaveTextContent("Grocery");
     expect(quickLinkItems[4]).toHaveTextContent("Home Care");

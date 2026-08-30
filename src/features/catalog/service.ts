@@ -28,13 +28,11 @@ import type {
   StorefrontProductRecord,
 } from "@/server/db/catalog-queries";
 import {
-  countPublishedPartyHeavenProducts,
   getAllPublishedProductSlugsWithCategories,
   getPublishedCategoryBySlug,
   getPublishedProductBySlug as dbGetPublishedProductBySlug,
   getPublishedProductContextBySlug,
   getRelatedPublishedProducts,
-  listAllPublishedProducts,
   listPublishedCategories,
   listPublishedProductsByCategory,
   listPublishedProductsByIds,
@@ -44,12 +42,6 @@ import { createPaginatedResult } from "@/server/db/pagination";
 import { normalizeCatalogImageUrl } from "./lib/product-image-url";
 import type { CatalogSearchParams } from "./filters";
 import { parseCatalogSearchParams } from "./filters";
-import {
-  createPartyHeavenVirtualCategory,
-  isPartyHeavenCategorySlug,
-  PARTY_HEAVEN_CATEGORY_SLUG,
-  PARTY_HEAVEN_MAX_PRICE_PKR,
-} from "./party-heaven";
 import { getCatalogSearchAdapter } from "./search-adapter";
 import type {
   CatalogCategory,
@@ -469,10 +461,6 @@ function mapCategoryRecord(record: StorefrontCategoryRecord): CatalogCategory {
   };
 }
 
-function isPartyHeavenEligibleProduct(product: Pick<CatalogProductCard, "price">): boolean {
-  return product.price <= PARTY_HEAVEN_MAX_PRICE_PKR;
-}
-
 // ---------------------------------------------------------------------------
 // Filter / sort helpers
 // ---------------------------------------------------------------------------
@@ -636,26 +624,9 @@ function buildReviewData(
  * Empty array if no categories have been published yet.
  */
 export async function getCatalogCategories(): Promise<CatalogCategory[]> {
-  const [categoryRecords, partyHeavenProductCount] = await Promise.all([
-    listPublishedCategories(),
-    countPublishedPartyHeavenProducts(),
-  ]);
+  const categoryRecords = await listPublishedCategories();
 
-  const hasReservedSlugCollision = categoryRecords.some((record) =>
-    isPartyHeavenCategorySlug(record.slug),
-  );
-
-  if (hasReservedSlugCollision) {
-    catalogServiceLogger.warn("reserved Party Heaven slug found in published categories", {
-      code: "CATALOG_RESERVED_PARTY_HEAVEN_SLUG_COLLISION",
-    });
-  }
-
-  const categories = categoryRecords
-    .filter((record) => !isPartyHeavenCategorySlug(record.slug))
-    .map(mapCategoryRecord);
-
-  return [createPartyHeavenVirtualCategory(partyHeavenProductCount), ...categories];
+  return categoryRecords.map(mapCategoryRecord);
 }
 
 /**
@@ -664,12 +635,6 @@ export async function getCatalogCategories(): Promise<CatalogCategory[]> {
 export async function getCatalogCategory(
   slug: string,
 ): Promise<CatalogCategory | null> {
-  if (isPartyHeavenCategorySlug(slug)) {
-    const partyHeavenProductCount = await countPublishedPartyHeavenProducts();
-
-    return createPartyHeavenVirtualCategory(partyHeavenProductCount);
-  }
-
   const record = await getPublishedCategoryBySlug(slug);
   return record ? mapCategoryRecord(record) : null;
 }
@@ -681,11 +646,7 @@ export async function getCatalogCategory(
 export async function getCatalogCategorySlugs(): Promise<string[]> {
   const records = await listPublishedCategories();
 
-  const categorySlugs = records
-    .map((record) => record.slug)
-    .filter((slug) => !isPartyHeavenCategorySlug(slug));
-
-  return [PARTY_HEAVEN_CATEGORY_SLUG, ...categorySlugs];
+  return records.map((record) => record.slug);
 }
 
 /**
@@ -698,34 +659,6 @@ export async function getCatalogCategoryListing({
   slug,
   searchParams,
 }: CategoryListingInput): Promise<CatalogCategoryListing | null> {
-  if (isPartyHeavenCategorySlug(slug)) {
-    const filters = parseCatalogSearchParams(searchParams);
-    const allCards = (await listAllPublishedProducts()).map(mapProductToCard);
-    const partyHeavenCards = allCards.filter(isPartyHeavenEligibleProduct);
-    const filteredCards = sortProducts(applyFilters(partyHeavenCards, filters), filters.sort);
-
-    const paginatedResult = createPaginatedResult({
-      items: filteredCards.slice(
-        (filters.page - 1) * filters.pageSize,
-        filters.page * filters.pageSize,
-      ),
-      totalItems: filteredCards.length,
-      pagination: {
-        page: filters.page,
-        pageSize: filters.pageSize,
-      },
-    });
-
-    return {
-      category: createPartyHeavenVirtualCategory(partyHeavenCards.length),
-      products: paginatedResult.items,
-      filteredProductCount: filteredCards.length,
-      totalProductCount: partyHeavenCards.length,
-      filters,
-      pagination: paginatedResult.meta,
-    };
-  }
-
   const [categoryRecord, productRecords] = await Promise.all([
     getPublishedCategoryBySlug(slug),
     listPublishedProductsByCategory(slug),

@@ -28,7 +28,6 @@ const mockGetPublishedCategoryBySlug = vi.fn();
 const mockListPublishedProductsByCategory = vi.fn();
 const mockGetPublishedProductBySlug = vi.fn();
 const mockListAllPublishedProducts = vi.fn();
-const mockCountPublishedPartyHeavenProducts = vi.fn().mockResolvedValue(0);
 const mockGetPublishedProductContextBySlug = vi.fn().mockResolvedValue(null);
 
 vi.mock("@/server/db/catalog-queries", () => ({
@@ -36,7 +35,6 @@ vi.mock("@/server/db/catalog-queries", () => ({
   getPublishedCategoryBySlug: (...args: unknown[]) => mockGetPublishedCategoryBySlug(...args),
   listPublishedProductsByCategory: (...args: unknown[]) => mockListPublishedProductsByCategory(...args),
   listAllPublishedProducts: (...args: unknown[]) => mockListAllPublishedProducts(...args),
-  countPublishedPartyHeavenProducts: (...args: unknown[]) => mockCountPublishedPartyHeavenProducts(...args),
   getPublishedProductContextBySlug: (...args: unknown[]) => mockGetPublishedProductContextBySlug(...args),
   listPublishedProductsByIds: vi.fn().mockResolvedValue([]),
   getPublishedProductBySlug: (...args: unknown[]) => mockGetPublishedProductBySlug(...args),
@@ -97,23 +95,19 @@ function makeProduct(overrides: Partial<{ id: string; slug: string }> = {}) {
 describe("category publish visibility", () => {
   it("returns published categories to the storefront", async () => {
     mockListPublishedCategories.mockResolvedValue([PUBLISHED_CATEGORY]);
-    mockCountPublishedPartyHeavenProducts.mockResolvedValue(0);
-
-    const categories = await getCatalogCategories();
-
-    expect(categories).toHaveLength(2);
-    expect(categories[0]?.slug).toBe("party-heaven");
-    expect(categories.some((category) => category.slug === "grocery")).toBe(true);
-  });
-
-  it("returns only Party Heaven when no physical categories are published", async () => {
-    mockListPublishedCategories.mockResolvedValue([]);
-    mockCountPublishedPartyHeavenProducts.mockResolvedValue(0);
 
     const categories = await getCatalogCategories();
 
     expect(categories).toHaveLength(1);
-    expect(categories[0]?.slug).toBe("party-heaven");
+    expect(categories[0]?.slug).toBe("grocery");
+  });
+
+  it("returns an empty list when no physical categories are published", async () => {
+    mockListPublishedCategories.mockResolvedValue([]);
+
+    const categories = await getCatalogCategories();
+
+    expect(categories).toEqual([]);
   });
 
   it("returns null for a DRAFT category slug", async () => {
@@ -146,7 +140,6 @@ describe("category publish visibility", () => {
     mockListPublishedCategories.mockResolvedValue([
       { ...PUBLISHED_CATEGORY, _count: { products: 7 } },
     ]);
-    mockCountPublishedPartyHeavenProducts.mockResolvedValue(0);
 
     const categories = await getCatalogCategories();
     const category = categories.find((entry) => entry.slug === "grocery");

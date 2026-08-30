@@ -16,9 +16,9 @@ const prismaMock = vi.hoisted(() => ({
 }));
 
 const mockGetCatalogCategories = vi.hoisted(() => vi.fn());
-const mockGetCatalogCategoryListing = vi.hoisted(() => vi.fn());
 const mockListAllPublishedProducts = vi.hoisted(() => vi.fn());
 const mockListPublishedProductsByIds = vi.hoisted(() => vi.fn());
+const mockListPublishedDeals = vi.hoisted(() => vi.fn());
 
 vi.mock("@/server/db", () => ({
   getPrismaClient: () => prismaMock,
@@ -26,7 +26,10 @@ vi.mock("@/server/db", () => ({
 
 vi.mock("@/features/catalog", () => ({
   getCatalogCategories: (...args: unknown[]) => mockGetCatalogCategories(...args),
-  getCatalogCategoryListing: (...args: unknown[]) => mockGetCatalogCategoryListing(...args),
+}));
+
+vi.mock("@/features/deals", () => ({
+  listPublishedDeals: (...args: unknown[]) => mockListPublishedDeals(...args),
 }));
 
 vi.mock("@/server/db/catalog-queries", () => ({
@@ -93,8 +96,8 @@ describe("homepage CMS service", () => {
     mockGetCatalogCategories.mockResolvedValue([]);
     mockListAllPublishedProducts.mockResolvedValue([]);
     mockListPublishedProductsByIds.mockResolvedValue([]);
-    // Default: catalog returns an empty listing so Party Heaven section gets hydrated with []
-    mockGetCatalogCategoryListing.mockResolvedValue({ products: [], totalItems: 0 });
+    // Default: no published deals so Featured Deals section hydrates with []
+    mockListPublishedDeals.mockResolvedValue([]);
   });
 
   it("reflects valid admin homepage content on the storefront contract", async () => {
@@ -537,17 +540,6 @@ describe("homepage CMS service", () => {
 
     mockGetCatalogCategories.mockResolvedValue([
       {
-        id: "party-heaven",
-        name: "Party Heaven",
-        slug: "party-heaven",
-        description: "Virtual category",
-        cardImageUrl: "/images/party-heaven.png",
-        seoTitle: undefined,
-        seoDescription: undefined,
-        productCount: 4,
-        href: "/categories/party-heaven",
-      },
-      {
         id: "category-home-care",
         name: "Home Care",
         slug: "home-care",
@@ -672,96 +664,114 @@ describe("homepage CMS service", () => {
     expect(categorySection?.categories[0]).not.toHaveProperty("imageUrl");
   });
 
-  it("hydrates Party Heaven section with live catalog products", async () => {
+  it("hydrates Featured Deals section with live deals", async () => {
     prismaMock.homePageSection.findMany.mockResolvedValue([
       {
-        id: "section-party-heaven",
-        key: "party-heaven-deals",
-        title: "Party Heaven deals",
-        type: "party-heaven",
+        id: "section-featured-deals",
+        key: "featured-deals-home",
+        title: "Featured Deals",
+        type: "featured-deals",
         content: {
-          description: "Best value picks",
-          ctaLabel: "View all Party Heaven deals",
-          ctaHref: "/categories/party-heaven",
-          placeholderMessage: "No Party Heaven products right now.",
+          description: "Hand-picked deals",
+          ctaLabel: "View all Featured Deals",
+          ctaHref: "/deals",
+          placeholderMessage: "No Featured Deals right now.",
         },
         meta: { enabled: true },
         position: 25,
         active: true,
-        createdAt: new Date("2026-04-28T08:00:00.000Z"),
-        updatedAt: new Date("2026-04-28T08:00:00.000Z"),
+        createdAt: new Date("2026-08-30T08:00:00.000Z"),
+        updatedAt: new Date("2026-08-30T08:00:00.000Z"),
       },
     ]);
 
-    mockGetCatalogCategoryListing.mockResolvedValue({
-      products: [
-        {
-          id: "prod-1",
-          slug: "cheap-soap",
-          name: "Cheap Soap",
-          description: "Daily soap bar",
-          categorySlug: "personal-care",
-          price: 250,
-          compareAt: 350,
-          inventoryQuantity: 10,
-          averageRating: 4.5,
-          reviewCount: 12,
-          imageLabel: "Cheap Soap",
-          imageTone: "rose",
-          attributeSummary: [],
-          href: "/categories/personal-care/cheap-soap",
-        },
-      ],
-      totalItems: 1,
-    });
+    mockListPublishedDeals.mockResolvedValue([
+      {
+        id: "deal-1",
+        slug: "cheap-soap-bundle",
+        title: "Cheap Soap Bundle",
+        shortDescription: "Two bars for the price of one",
+        status: "PUBLISHED",
+        categorySlug: "personal-care",
+        price: 250,
+        compareAt: 350,
+        images: [
+          {
+            url: "https://store.public.blob.vercel-storage.com/admin/deals/soap.png",
+            alt: "Cheap Soap Bundle",
+          },
+        ],
+        products: [
+          {
+            id: "prod-1",
+            name: "Cheap Soap",
+            slug: "cheap-soap",
+            href: "/categories/personal-care/cheap-soap",
+            variantTitle: null,
+            quantity: 2,
+            availableStock: 10,
+            isAvailable: true,
+          },
+        ],
+        specifications: [],
+        relatedDealIds: [],
+        availableStock: 10,
+        isAvailable: true,
+        isLowStock: false,
+      },
+    ]);
 
     const result = await getHomepageContent();
-    const partyHeavenSection = result.sections.find((section) => section.kind === "party-heaven");
+    const featuredDealsSection = result.sections.find((section) => section.kind === "featured-deals");
 
-    expect(partyHeavenSection).toMatchObject({
-      kind: "party-heaven",
-      title: "Party Heaven deals",
-      products: [
+    expect(featuredDealsSection).toMatchObject({
+      kind: "featured-deals",
+      title: "Featured Deals",
+      deals: [
         {
-          id: "prod-1",
-          name: "Cheap Soap",
+          id: "deal-1",
+          slug: "cheap-soap-bundle",
+          title: "Cheap Soap Bundle",
+          href: "/deals/cheap-soap-bundle",
           price: 250,
           compareAt: 350,
-          badge: "Party Heaven",
+          productSummary: "Cheap Soap",
+          itemCount: 1,
+          isAvailable: true,
         },
       ],
     });
   });
 
-  it("renders Party Heaven section empty state gracefully when catalog fetch fails", async () => {
+  it("renders Featured Deals section empty state gracefully when deals fetch fails", async () => {
     prismaMock.homePageSection.findMany.mockResolvedValue([
       {
-        id: "section-party-heaven",
-        key: "party-heaven-deals",
-        title: "Party Heaven deals",
-        type: "party-heaven",
+        id: "section-featured-deals",
+        key: "featured-deals-home",
+        title: "Featured Deals",
+        type: "featured-deals",
         content: {
           ctaLabel: "View all",
-          ctaHref: "/categories/party-heaven",
-          placeholderMessage: "No products right now.",
+          ctaHref: "/deals",
+          placeholderMessage: "No deals right now.",
         },
         meta: { enabled: true },
         position: 25,
         active: true,
-        createdAt: new Date("2026-04-28T08:00:00.000Z"),
-        updatedAt: new Date("2026-04-28T08:00:00.000Z"),
+        createdAt: new Date("2026-08-30T08:00:00.000Z"),
+        updatedAt: new Date("2026-08-30T08:00:00.000Z"),
       },
     ]);
 
-    mockGetCatalogCategoryListing.mockRejectedValue(new Error("Catalog DB unavailable"));
+    mockListPublishedDeals.mockRejectedValue(new Error("Deals DB unavailable"));
 
     const result = await getHomepageContent();
-    const partyHeavenSection = result.sections.find((section) => section.kind === "party-heaven");
+    const featuredDealsSection = result.sections.find((section) => section.kind === "featured-deals");
 
-    // Section must still be present; products array will be empty (not hydrated)
-    expect(partyHeavenSection).toMatchObject({
-      kind: "party-heaven",
-      products: [],
+    // Section must still be present; deals array will be empty (not hydrated)
+    expect(featuredDealsSection).toMatchObject({
+      kind: "featured-deals",
+      deals: [],
     });
   });
 

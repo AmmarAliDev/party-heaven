@@ -10,6 +10,7 @@ describe("admin navigation visibility", () => {
     expect(items.map((item) => item.label)).toEqual([
       "Dashboard",
       "Products",
+      "Deals",
       "Reviews",
       "Blog",
       "Categories",

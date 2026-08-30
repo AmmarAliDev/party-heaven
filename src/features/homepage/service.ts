@@ -1,6 +1,6 @@
 import { loadHomepageContentForStorefront } from "@/features/admin/homepage/service";
-import { type CatalogProductCard,getCatalogCategories, getCatalogCategoryListing } from "@/features/catalog";
-import { PARTY_HEAVEN_CATEGORY_SLUG } from "@/features/catalog/party-heaven";
+import { getCatalogCategories } from "@/features/catalog";
+import { listPublishedDeals, type StorefrontDeal } from "@/features/deals";
 import { createLogger } from "@/lib/logger";
 
 import { mapCatalogCategoriesToFeaturedCategoryItems } from "./featured-categories";
@@ -8,21 +8,21 @@ import { resolveHomepageFeaturedProducts } from "./featured-products";
 import { resolveHomepageSections } from "./resolver";
 import type {
   FeaturedCategoriesSection,
-  FeaturedProductItem,
+  FeaturedDealItem,
+  FeaturedDealsSection,
   FeaturedProductsSection,
   HomepageContent,
   HomepageContentResult,
   HomepageSection,
-  PartyHeavenSection,
 } from "./types";
 
 const logger = createLogger("homepage.service");
 /**
- * Maximum number of Party Heaven products fetched from the catalog for the
- * homepage section. Matches HOMEPAGE_CAROUSEL_MAX_ITEMS so the carousel can
- * display the full set without server-side truncation.
+ * Maximum number of Featured Deals fetched for the homepage section. Matches
+ * HOMEPAGE_CAROUSEL_MAX_ITEMS so the carousel can display the full set without
+ * server-side truncation.
  */
-const HOMEPAGE_PARTY_HEAVEN_PRODUCTS_LIMIT = 8;
+const HOMEPAGE_FEATURED_DEALS_LIMIT = 8;
 
 function isFeaturedCategoriesSection(section: HomepageSection): section is FeaturedCategoriesSection {
   return section.kind === "featured-categories";
@@ -85,75 +85,71 @@ async function hydrateFeaturedProductsSections(sections: HomepageSection[]): Pro
   });
 }
 
-function isPartyHeavenSection(section: HomepageSection): section is PartyHeavenSection {
-  return section.kind === "party-heaven";
+function isFeaturedDealsSection(section: HomepageSection): section is FeaturedDealsSection {
+  return section.kind === "featured-deals";
 }
 
 /**
- * Maps a CatalogProductCard to a FeaturedProductItem for use in the Party Heaven
- * homepage section. Adds a "Party Heaven" badge to surface the value proposition.
+ * Maps a StorefrontDeal to a FeaturedDealItem for use in the Featured Deals
+ * homepage section. The card image prefers deal-specific media; the subtitle
+ * summarizes the included products.
  */
-function toPartyHeavenProductItem(card: CatalogProductCard): FeaturedProductItem {
+function toFeaturedDealItem(deal: StorefrontDeal): FeaturedDealItem {
+  const primaryImage = deal.images[0];
+  const names = deal.products.map((product) => product.name);
+
   return {
-    id: card.id,
-    slug: card.slug,
-    name: card.name,
-    ...(card.description ? { description: card.description } : {}),
-    href: card.href,
-    price: card.price,
-    ...(typeof card.compareAt === "number" ? { compareAt: card.compareAt } : {}),
-    badge: "Party Heaven",
-    inventoryQuantity: card.inventoryQuantity,
-    ...(card.imageUrl
+    id: deal.id,
+    slug: deal.slug,
+    title: deal.title,
+    href: `/deals/${deal.slug}`,
+    price: deal.price,
+    ...(typeof deal.compareAt === "number" ? { compareAt: deal.compareAt } : {}),
+    ...(primaryImage
       ? {
-          images: [
-            {
-              url: card.imageUrl,
-              alt: card.name,
-              isPrimary: true,
-            },
-          ],
+          imageUrl: primaryImage.url,
+          imageAlt: primaryImage.alt,
         }
       : {}),
+    productSummary:
+      names.length === 0
+        ? "Bundle deal"
+        : names.length === 1
+          ? (names[0] ?? "Bundle deal")
+          : names.length === 2
+            ? `${names[0] ?? ""} + ${names[1] ?? ""}`
+            : `${names.slice(0, 2).join(" + ")} +${names.length - 2} more`,
+    itemCount: deal.products.length,
+    isAvailable: deal.isAvailable,
   };
 }
 
 /**
- * Hydrates any `party-heaven` sections in the resolved list with live catalog
- * products. If the catalog fetch fails, the section renders its empty state
- * gracefully instead of breaking the page.
+ * Hydrates any `featured-deals` sections in the resolved list with live
+ * published deals. If the deals fetch fails, the section renders its empty
+ * state gracefully instead of breaking the page.
  */
-async function hydratePartyHeavenSections(sections: HomepageSection[]): Promise<HomepageSection[]> {
-  const hasPartyHeavenSection = sections.some(isPartyHeavenSection);
+async function hydrateFeaturedDealsSections(sections: HomepageSection[]): Promise<HomepageSection[]> {
+  const hasFeaturedDealsSection = sections.some(isFeaturedDealsSection);
 
-  if (!hasPartyHeavenSection) {
+  if (!hasFeaturedDealsSection) {
     return sections;
   }
 
   try {
-    const listing = await getCatalogCategoryListing({
-      slug: PARTY_HEAVEN_CATEGORY_SLUG,
-      searchParams: {
-        sort: "featured",
-        page: "1",
-        pageSize: String(HOMEPAGE_PARTY_HEAVEN_PRODUCTS_LIMIT),
-      },
-    });
-
-    const products: FeaturedProductItem[] = listing
-      ? listing.products.slice(0, HOMEPAGE_PARTY_HEAVEN_PRODUCTS_LIMIT).map(toPartyHeavenProductItem)
-      : [];
+    const deals = (await listPublishedDeals()).slice(0, HOMEPAGE_FEATURED_DEALS_LIMIT);
+    const dealItems: FeaturedDealItem[] = deals.map(toFeaturedDealItem);
 
     return sections.map((section) => {
-      if (!isPartyHeavenSection(section)) {
+      if (!isFeaturedDealsSection(section)) {
         return section;
       }
 
-      return { ...section, products };
+      return { ...section, deals: dealItems };
     });
   } catch (error) {
-    logger.error("Failed to hydrate Party Heaven homepage section from catalog.", error);
-    // Return sections unchanged so the component renders its placeholder state.
+    logger.error("Failed to hydrate Featured Deals homepage section.", error);
+    // Return sections unchanged so the component hides the empty section.
     return sections;
   }
 }
@@ -179,7 +175,7 @@ export async function getHomepageContent(): Promise<HomepageContentResult> {
   const resolved = resolveHomepageSections(cmsContent?.sections);
   const hydratedWithCategories = await hydrateFeaturedCategorySections(resolved.sections);
   const hydratedWithFeaturedProducts = await hydrateFeaturedProductsSections(hydratedWithCategories);
-  const hydratedSections = await hydratePartyHeavenSections(hydratedWithFeaturedProducts);
+  const hydratedSections = await hydrateFeaturedDealsSections(hydratedWithFeaturedProducts);
 
   return {
     ...resolved,

@@ -1,5 +1,4 @@
 import { routes } from "@/config/routes";
-import { PARTY_HEAVEN_CATEGORY_SLUG } from "@/features/catalog/party-heaven";
 
 type CategoryMenuInput = {
   name: string;
@@ -9,33 +8,18 @@ type CategoryMenuInput = {
 export type StorefrontCategoryMenuItem = {
   title: string;
   href: string;
-  kind: "party-heaven" | "category" | "all-categories";
+  kind: "category" | "all-categories";
 };
-
-const PARTY_HEAVEN_LABEL = "Party Heaven";
-
-function normalizeLabel(value: string) {
-  return value.trim().toLocaleLowerCase("en-US");
-}
 
 export function buildStorefrontCategoryMenu(
   categories: readonly CategoryMenuInput[],
 ): StorefrontCategoryMenuItem[] {
-  const partyHeavenCategory = categories.find(
-    (category) => normalizeLabel(category.name) === normalizeLabel(PARTY_HEAVEN_LABEL),
+  const sortedCategories = [...categories].sort((left, right) =>
+    left.name.localeCompare(right.name, "en", { sensitivity: "base" }),
   );
 
-  const otherCategories = categories
-    .filter((category) => normalizeLabel(category.name) !== normalizeLabel(PARTY_HEAVEN_LABEL))
-    .sort((left, right) => left.name.localeCompare(right.name, "en", { sensitivity: "base" }));
-
   return [
-    {
-      title: PARTY_HEAVEN_LABEL,
-      href: partyHeavenCategory?.href ?? routes.storefront.category(PARTY_HEAVEN_CATEGORY_SLUG),
-      kind: "party-heaven",
-    },
-    ...otherCategories.map((category) => ({
+    ...sortedCategories.map((category) => ({
       title: category.name,
       href: category.href,
       kind: "category" as const,

@@ -79,6 +79,7 @@ describe("order service", () => {
           },
         },
       ],
+      dealItems: [],
     });
 
     mockDb.order.create.mockImplementation(async ({ data }: { data: { orderNumber: string } }) => ({
@@ -153,6 +154,7 @@ describe("order service", () => {
           },
         },
       ],
+      dealItems: [],
     });
 
     mockDb.order.create.mockImplementation(async ({ data }: { data: { orderNumber: string } }) => ({
@@ -216,6 +218,7 @@ describe("order service", () => {
           },
         },
       ],
+      dealItems: [],
     });
 
     await expect(

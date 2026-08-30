@@ -1,7 +1,8 @@
 import Image from "next/image";
 import Link from "next/link";
-import { ArrowRight } from "lucide-react";
+import { ArrowRight, Tag } from "lucide-react";
 
+import { Badge } from "@/components/ui/badge";
 import { buttonVariants } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import {
@@ -14,38 +15,37 @@ import {
 import { PageContainer } from "@/components/ui/page-container";
 import { PriceDisplay } from "@/components/ui/price-display";
 import { SectionHeader } from "@/components/ui/section-header";
-import { ProductCardAddToCart } from "@/features/catalog/components/product-card-add-to-cart";
 
-import type { PartyHeavenSection } from "../types";
+import type { FeaturedDealsSection } from "../types";
 import {
   HOMEPAGE_CAROUSEL_ITEM_CLASS,
   HOMEPAGE_CAROUSEL_MAX_ITEMS,
   HOMEPAGE_CAROUSEL_OPTIONS,
 } from "./homepage-carousel-config";
 
-type PartyHeavenSectionProps = {
-  section: PartyHeavenSection;
+type FeaturedDealsSectionProps = {
+  section: FeaturedDealsSection;
 };
 
 /**
- * Renders the Party Heaven homepage section.
+ * Renders the Featured Deals homepage section.
  *
- * Products are hydrated at runtime from the live catalog (price ≤ PARTY_HEAVEN_MAX_PRICE_PKR)
- * and therefore always reflect current inventory. The section is hidden entirely when
- * no qualifying products (active deals) are available — an empty/placeholder state is
- * intentionally NOT rendered so the homepage does not advertise a deals section with
- * nothing to show.
+ * Deals are hydrated at runtime from the published Deal records (admin-managed)
+ * and therefore always reflect current availability. The section is hidden
+ * entirely when no deals are available — an empty/placeholder state is
+ * intentionally NOT rendered so the homepage does not advertise a deals
+ * section with nothing to show.
  *
- * Up to HOMEPAGE_CAROUSEL_MAX_ITEMS products are shown in a carousel; the section's
- * ctaHref/ctaLabel "View All" link always appears below the carousel.
+ * Up to HOMEPAGE_CAROUSEL_MAX_ITEMS deals are shown in a carousel; the
+ * section's ctaHref/ctaLabel "View all" link always appears below the carousel.
  */
-export function PartyHeavenSectionBlock({ section }: PartyHeavenSectionProps) {
+export function FeaturedDealsSectionBlock({ section }: FeaturedDealsSectionProps) {
   // Cap display at HOMEPAGE_CAROUSEL_MAX_ITEMS so the carousel stays manageable.
-  const visibleProducts = section.products.slice(0, HOMEPAGE_CAROUSEL_MAX_ITEMS);
-  const hasProducts = visibleProducts.length > 0;
+  const visibleDeals = section.deals.slice(0, HOMEPAGE_CAROUSEL_MAX_ITEMS);
+  const hasDeals = visibleDeals.length > 0;
 
   // No active deals → hide the section completely instead of showing an empty state.
-  if (!hasProducts) {
+  if (!hasDeals) {
     return null;
   }
 
@@ -53,76 +53,71 @@ export function PartyHeavenSectionBlock({ section }: PartyHeavenSectionProps) {
 
   return (
     <PageContainer as="section" className="space-y-6 py-8">
-      <SectionHeader title={section.title} eyebrow="Best value" {...headerDescription} />
+      <SectionHeader title={section.title} eyebrow="Deals" {...headerDescription} />
 
       <Carousel opts={HOMEPAGE_CAROUSEL_OPTIONS} className="w-full">
         <CarouselContent>
-          {visibleProducts.map((product) => {
-            const primary = product?.images?.find((img) => img.isPrimary) ?? product?.images?.[0];
-            const productKey = product.slug ?? product.id;
+          {visibleDeals.map((deal) => {
+            const dealKey = deal.slug ?? deal.id;
             return (
-              <CarouselItem key={product.id} className={HOMEPAGE_CAROUSEL_ITEM_CLASS}>
+              <CarouselItem key={deal.id} className={HOMEPAGE_CAROUSEL_ITEM_CLASS}>
                 <div className="group relative h-full">
                   <Link
-                    href={product.href}
+                    href={deal.href}
                     className="focus-visible:ring-ring block h-full rounded-lg focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:outline-none"
-                    aria-label={`View ${product.name}`}
+                    aria-label={`View ${deal.title}`}
                   >
                     <Card className="h-full transition-transform duration-200 group-hover:-translate-y-0.5">
                       <CardHeader className="space-y-1 p-0">
                         <div className="relative overflow-hidden rounded-lg mb-4" aria-hidden="true">
-                          {primary ? (
+                          {deal.imageUrl ? (
                             <Image
-                              src={primary.url}
-                              alt={primary.alt ?? product.name}
+                              src={deal.imageUrl}
+                              alt={deal.imageAlt ?? deal.title}
                               height={214}
                               width={365}
                               sizes="(max-width: 639px) 85vw, (max-width: 767px) 50vw, (max-width: 1023px) 33vw, (max-width: 1279px) 25vw, (max-width: 1535px) 20vw, 17vw"
                               className="h-54 w-full object-cover"
-                              data-testid={`storefront-product-card-image-${productKey}`}
+                              data-testid={`storefront-deal-card-image-${dealKey}`}
                             />
                           ) : (
                             <div
                               className="flex h-54 rounded-lg w-full items-center justify-center bg-linear-to-br from-slate-100 via-slate-200 to-slate-100 text-xs font-medium uppercase tracking-[0.16em] text-slate-600"
-                              data-testid={`storefront-product-card-fallback-${productKey}`}
+                              data-testid={`storefront-deal-card-fallback-${dealKey}`}
                             >
-                              Product preview
+                              Deal preview
                             </div>
+                          )}
+                          {deal.isAvailable ? (
+                            <Badge className="absolute top-2 left-2">Deal</Badge>
+                          ) : (
+                            <Badge variant="danger" className="absolute top-2 left-2">
+                              Out of stock
+                            </Badge>
                           )}
                         </div>
                       </CardHeader>
                       <CardContent className="space-y-2 p-3 pt-1 pb-4">
                         <div className="flex items-center justify-between gap-4">
-                          <CardTitle className="text-base">{product.name}</CardTitle>
+                          <CardTitle className="text-base">{deal.title}</CardTitle>
                           <ArrowRight
                             className="text-muted-foreground size-4 transition-transform group-hover:translate-x-1"
                             aria-hidden="true"
                           />
                         </div>
 
-                        {product.description ? (
-                          <CardDescription>{product.description}</CardDescription>
-                        ) : null}
+                        <CardDescription className="line-clamp-2">{deal.productSummary}</CardDescription>
                         <PriceDisplay
-                          amount={product.price}
+                          amount={deal.price}
                           size="sm"
-                          {...(typeof product.compareAt === "number" ? { compareAt: product.compareAt } : undefined)}
+                          {...(typeof deal.compareAt === "number" ? { compareAt: deal.compareAt } : undefined)}
                         />
                       </CardContent>
                     </Card>
                   </Link>
-
-                  {product.slug ? (
-                    <ProductCardAddToCart
-                      productSlug={product.slug}
-                      productName={product.name}
-                      isAvailable={(product.inventoryQuantity ?? 1) > 0}
-                      className="absolute right-3 bottom-3 z-10"
-                    />
-                  ) : null}
                 </div>
               </CarouselItem>
-            )
+            );
           })}
         </CarouselContent>
 
@@ -131,9 +126,10 @@ export function PartyHeavenSectionBlock({ section }: PartyHeavenSectionProps) {
         <CarouselNext className="hidden size-10 sm:flex disabled:hidden" />
       </Carousel>
 
-      {/* "View all" CTA — always shown so users can reach the full Party Heaven category */}
+      {/* "View all" CTA — always shown so users can reach the full deals listing */}
       <div className="flex justify-center pt-2">
         <Link href={section.ctaHref} className={buttonVariants({ variant: "outline" })}>
+          <Tag className="size-4" />
           {section.ctaLabel}
         </Link>
       </div>

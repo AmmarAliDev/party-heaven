@@ -1,5 +1,4 @@
 import { normalizeCatalogImageUrl } from "@/features/catalog/lib/product-image-url";
-import { PARTY_HEAVEN_CATEGORY_SLUG } from "@/features/catalog/party-heaven";
 import type { CatalogCategory } from "@/features/catalog/types";
 
 import type { FeaturedCategoryItem } from "./types";
@@ -65,7 +64,5 @@ export function normalizeFeaturedCategoryItems(
 export function mapCatalogCategoriesToFeaturedCategoryItems(
   categories: readonly CatalogCategory[],
 ): FeaturedCategoryItem[] {
-  return categories
-    .filter((category) => category.slug !== PARTY_HEAVEN_CATEGORY_SLUG)
-    .map((category) => toFeaturedCategoryItem(category));
+  return categories.map((category) => toFeaturedCategoryItem(category));
 }

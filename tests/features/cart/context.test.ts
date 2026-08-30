@@ -34,6 +34,13 @@ const mockDb = vi.hoisted(() => ({
     deleteMany: vi.fn(),
     update: vi.fn(),
   },
+  dealCartItem: {
+    findUnique: vi.fn(),
+    upsert: vi.fn(),
+    delete: vi.fn(),
+    deleteMany: vi.fn(),
+    update: vi.fn(),
+  },
 }));
 
 vi.mock("@/server/db", () => ({
@@ -79,6 +86,8 @@ describe("cart context resolution", () => {
       id: "guest-cart-1",
       token: "fresh-guest-token",
       items: [],
+
+        dealItems: [],
     });
 
     const { getCartSummaryForContext } = await import("@/features/cart");
@@ -134,6 +143,8 @@ describe("cart context resolution", () => {
       id: "user-cart-1",
       token: "user-token-1",
       items: [],
+
+        dealItems: [],
     });
 
     const { getCartSummaryForContext } = await import("@/features/cart");
@@ -199,6 +210,7 @@ describe("cart context resolution", () => {
               },
             },
           ],
+            dealItems: [],
         };
       }
 
@@ -219,11 +231,13 @@ describe("cart context resolution", () => {
       token: null,
     });
     mockDb.cartItem.deleteMany.mockResolvedValue({ count: 1 });
+    mockDb.dealCartItem.deleteMany.mockResolvedValue({ count: 0 });
 
     mockDb.cart.findUnique.mockResolvedValue({
       id: "user-cart-1",
       token: "user-token-1",
       items: [],
+      dealItems: [],
     });
 
     const { getCartSummaryForContext } = await import("@/features/cart");
@@ -278,6 +292,8 @@ describe("cart context resolution", () => {
       id: "cart-2",
       token: "race-token",
       items: [],
+
+        dealItems: [],
     });
 
     const { getCartSummaryForContext } = await import("@/features/cart");
@@ -325,6 +341,8 @@ describe("cart context resolution", () => {
       id: "cart-3",
       token: "fresh-token",
       items: [],
+
+        dealItems: [],
     });
 
     const { getCartSummaryForContext } = await import("@/features/cart");
@@ -413,6 +431,7 @@ describe("cart context resolution", () => {
               },
             },
           ],
+            dealItems: [],
         };
       }
 
@@ -536,6 +555,7 @@ describe("cart context resolution", () => {
               },
             },
           ],
+            dealItems: [],
         };
       }
 

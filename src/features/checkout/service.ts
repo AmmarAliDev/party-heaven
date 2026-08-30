@@ -17,7 +17,7 @@ export function calculateCheckoutTotals(subtotal: number): CheckoutTotals {
 }
 
 export function assertCheckoutCartReady(cart: CartSummary | null) {
-  if (!cart || cart.items.length === 0) {
+  if (!cart || (cart.items.length === 0 && cart.dealItems.length === 0)) {
     throw new AppError("Checkout requested with empty cart.", "CHECKOUT_CART_EMPTY", {
       statusCode: 400,
       userMessage: "Your cart is empty. Add products before checkout.",

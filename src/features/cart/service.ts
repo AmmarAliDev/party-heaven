@@ -12,11 +12,15 @@ import { getPrismaClient, runWithTransaction } from "@/server/db";
 
 import type {
   AddCartItemInput,
+  AddDealCartItemInput,
   CartItemSummary,
   CartSummary,
+  DealCartItemSummary,
   RemoveCartItemInput,
+  RemoveDealCartItemInput,
   ResolveCartContextInput,
   UpdateCartItemInput,
+  UpdateDealCartItemInput,
 } from "./types";
 
 type ResolveCartSelectionInput = {
@@ -68,8 +72,87 @@ type CartIncludePayload = Prisma.CartGetPayload<{
         };
       };
     };
+    dealItems: {
+      include: {
+        deal: {
+          include: {
+            images: {
+              orderBy: { position: "asc" };
+              select: { url: true; alt: true };
+            };
+            products: {
+              orderBy: { position: "asc" };
+              select: {
+                productVariantId: true;
+                quantity: true;
+                product: {
+                  select: {
+                    id: true;
+                    name: true;
+                    slug: true;
+                    status: true;
+                    variants: {
+                      orderBy: [{ isDefault: "desc" }, { createdAt: "asc" }];
+                      select: {
+                        id: true;
+                        title: true;
+                        sku: true;
+                        isDefault: true;
+                        inventory: {
+                          select: {
+                            quantity: true;
+                            reserved: true;
+                            safetyStock: true;
+                          };
+                        };
+                      };
+                    };
+                  };
+                };
+              };
+            };
+          };
+        };
+      };
+    };
   };
 }>;
+
+/**
+ * Structural shape of a Deal (as loaded for cart lines) — used both by the cart
+ * include (`CartIncludePayload.dealItems.deal`) and by the deal lookup for
+ * add-to-cart, so availability can be computed from either source.
+ */
+type DealCartLookupPayload = {
+  id: string;
+  title: string;
+  slug: string;
+  price: number;
+  compareAtPrice: number | null;
+  // Accepts Prisma enum types from both the cart include and the deal lookup.
+  status: unknown;
+  images: Array<{ url: string; alt: string | null }>;
+  products: Array<{
+    productVariantId: string | null;
+    quantity: number;
+    product: {
+      id: string;
+      name: string;
+      slug: string;
+      status: unknown;
+      variants: Array<{
+        id: string;
+        title: string | null;
+        sku: string | null;
+        isDefault: boolean;
+        inventory: { quantity: number; reserved: number; safetyStock: number } | null;
+      }>;
+    };
+  }>;
+};
+
+type DealCartDealPayload = DealCartLookupPayload;
+type DealCartProductRow = DealCartLookupPayload["products"][number];
 
 const MAX_CART_ITEM_QUANTITY = 99;
 
@@ -561,6 +644,52 @@ async function getCartWithItemsById(cartId: string, db: DatabaseExecutor) {
           },
         },
       },
+      dealItems: {
+        orderBy: {
+          createdAt: "desc",
+        },
+        include: {
+          deal: {
+            include: {
+              images: {
+                orderBy: { position: "asc" },
+                select: { url: true, alt: true },
+              },
+              products: {
+                orderBy: { position: "asc" },
+                select: {
+                  productVariantId: true,
+                  quantity: true,
+                  product: {
+                    select: {
+                      id: true,
+                      name: true,
+                      slug: true,
+                      status: true,
+                      variants: {
+                        orderBy: [{ isDefault: "desc" }, { createdAt: "asc" }],
+                        select: {
+                          id: true,
+                          title: true,
+                          sku: true,
+                          isDefault: true,
+                          inventory: {
+                            select: {
+                              quantity: true,
+                              reserved: true,
+                              safetyStock: true,
+                            },
+                          },
+                        },
+                      },
+                    },
+                  },
+                },
+              },
+            },
+          },
+        },
+      },
     },
   });
 }
@@ -595,16 +724,107 @@ export function calculateCartSubtotal(items: ReadonlyArray<{ quantity: number; u
   return items.reduce((total, item) => total + item.quantity * item.unitPrice, 0);
 }
 
+/**
+ * Resolves the effective variant for a deal's included product: the explicitly
+ * linked variant, or the product's default variant (falling back to the first).
+ */
+function resolveDealCartEffectiveVariant(row: DealCartProductRow) {
+  const linkedVariantId = row.productVariantId ?? null;
+  const defaultVariant =
+    row.product.variants.find((variant) => variant.isDefault) ?? row.product.variants[0] ?? null;
+
+  if (linkedVariantId) {
+    return row.product.variants.find((variant) => variant.id === linkedVariantId) ?? defaultVariant;
+  }
+
+  return defaultVariant;
+}
+
+/**
+ * How many copies of the whole deal can still be fulfilled: the minimum across
+ * included published products of floor(available stock / per-deal quantity).
+ * Unpublished products, missing variants, or zero stock make the whole deal
+ * unavailable (0).
+ */
+function computeDealCartAvailableQuantity(deal: DealCartDealPayload) {
+  const quantities = deal.products.flatMap((row) => {
+    if (row.product.status !== "PUBLISHED" || row.quantity <= 0) {
+      return [0];
+    }
+
+    const variant = resolveDealCartEffectiveVariant(row);
+    if (!variant) {
+      return [0];
+    }
+
+    const stock = getAvailableInventoryQuantity(variant.inventory);
+    return [Number.isFinite(stock) ? Math.floor(stock / row.quantity) : stock];
+  });
+
+  return quantities.length === 0 ? 0 : Math.min(...quantities);
+}
+
+function buildDealCartProductSummary(deal: DealCartDealPayload) {
+  const names = deal.products
+    .filter((row) => row.product.status === "PUBLISHED")
+    .map((row) => row.product.name);
+
+  if (names.length === 0) {
+    return "Bundle deal";
+  }
+
+  if (names.length === 1) {
+    return names[0] ?? "Bundle deal";
+  }
+
+  if (names.length === 2) {
+    return `${names[0] ?? ""} + ${names[1] ?? ""}`;
+  }
+
+  return `${names.slice(0, 2).join(" + ")} +${names.length - 2} more`;
+}
+
+function mapDealCartItem(item: CartIncludePayload["dealItems"][number]): DealCartItemSummary {
+  const deal = item.deal;
+  const availableQuantity = computeDealCartAvailableQuantity(deal);
+  const normalizedAvailableQuantity = Number.isFinite(availableQuantity)
+    ? availableQuantity
+    : MAX_CART_ITEM_QUANTITY;
+  const primaryImage = deal.images[0] ?? null;
+
+  return {
+    id: item.id,
+    dealId: deal.id,
+    dealSlug: deal.slug,
+    title: deal.title,
+    productSummary: buildDealCartProductSummary(deal),
+    itemCount: deal.products.filter((row) => row.product.status === "PUBLISHED").length,
+    quantity: item.quantity,
+    unitPrice: item.unitPrice,
+    compareAtPrice: deal.compareAtPrice,
+    lineSubtotal: item.unitPrice * item.quantity,
+    availableQuantity: normalizedAvailableQuantity,
+    href: routes.storefront.deal(deal.slug),
+    imageUrl: primaryImage?.url ?? null,
+    imageAlt: primaryImage?.alt ?? null,
+    sku: `deal:${deal.slug}`,
+  };
+}
+
 function toCartSummary(cart: CartIncludePayload): CartSummary {
   const items = cart.items.map(mapCartItem);
-  const itemCount = items.reduce((total, item) => total + item.quantity, 0);
+  const dealItems = cart.dealItems.map(mapDealCartItem);
+  const itemCount =
+    items.reduce((total, item) => total + item.quantity, 0) +
+    dealItems.reduce((total, item) => total + item.quantity, 0);
 
   return {
     id: cart.id,
     token: cart.token ?? "",
     items,
+    dealItems,
     itemCount,
-    subtotal: calculateCartSubtotal(items),
+    subtotal: calculateCartSubtotal(items) + calculateCartSubtotal(dealItems),
   };
 }
 
@@ -677,10 +897,53 @@ export async function mergeGuestCartIntoUserCart(
             },
           },
         },
+        dealItems: {
+          include: {
+            deal: {
+              include: {
+                images: {
+                  orderBy: { position: "asc" },
+                  select: { url: true, alt: true },
+                },
+                products: {
+                  orderBy: { position: "asc" },
+                  select: {
+                    productVariantId: true,
+                    quantity: true,
+                    product: {
+                      select: {
+                        id: true,
+                        name: true,
+                        slug: true,
+                        status: true,
+                        variants: {
+                          orderBy: [{ isDefault: "desc" }, { createdAt: "asc" }],
+                          select: {
+                            id: true,
+                            title: true,
+                            sku: true,
+                            isDefault: true,
+                            inventory: {
+                              select: {
+                                quantity: true,
+                                reserved: true,
+                                safetyStock: true,
+                              },
+                            },
+                          },
+                        },
+                      },
+                    },
+                  },
+                },
+              },
+            },
+          },
+        },
       },
     });
 
-    if (!guestCart || guestCart.items.length === 0) {
+    if (!guestCart || (guestCart.items.length === 0 && guestCart.dealItems.length === 0)) {
       return getOrCreateActiveCartForUser(input.userId, transaction);
     }
 
@@ -728,6 +991,48 @@ export async function mergeGuestCartIntoUserCart(
       });
     }
 
+    for (const guestDealItem of guestCart.dealItems) {
+      const availableQuantity = computeDealCartAvailableQuantity(guestDealItem.deal);
+      if (availableQuantity < 1) {
+        continue;
+      }
+
+      const existing = await transaction.dealCartItem.findUnique({
+        where: {
+          cartId_dealId: {
+            cartId: userCart.id,
+            dealId: guestDealItem.dealId,
+          },
+        },
+      });
+
+      const requestedQuantity = (existing?.quantity ?? 0) + guestDealItem.quantity;
+      const nextQuantity = Math.min(
+        Math.max(1, requestedQuantity),
+        Number.isFinite(availableQuantity) ? availableQuantity : MAX_CART_ITEM_QUANTITY,
+        MAX_CART_ITEM_QUANTITY,
+      );
+
+      await transaction.dealCartItem.upsert({
+        where: {
+          cartId_dealId: {
+            cartId: userCart.id,
+            dealId: guestDealItem.dealId,
+          },
+        },
+        update: {
+          quantity: nextQuantity,
+          unitPrice: guestDealItem.unitPrice,
+        },
+        create: {
+          cartId: userCart.id,
+          dealId: guestDealItem.dealId,
+          quantity: Math.min(guestDealItem.quantity, nextQuantity),
+          unitPrice: guestDealItem.unitPrice,
+        },
+      });
+    }
+
     await transaction.cart.update({
       where: { id: guestCart.id },
       data: {
@@ -737,6 +1042,12 @@ export async function mergeGuestCartIntoUserCart(
     });
 
     await transaction.cartItem.deleteMany({
+      where: {
+        cartId: guestCart.id,
+      },
+    });
+
+    await transaction.dealCartItem.deleteMany({
       where: {
         cartId: guestCart.id,
       },
@@ -929,5 +1240,264 @@ export async function removeCartItemForContext(context: ResolveCartContextInput,
     }
 
     return toCartSummary(snapshot);
+  }, db);
+}
+
+/**
+ * Loads a published deal (with included products + variants + inventory) for
+ * adding it to the cart as a single line.
+ */
+async function loadDealCartLookup(dealSlug: string, db: DatabaseExecutor) {
+  return db.deal.findUnique({
+    where: { slug: dealSlug },
+    select: {
+      id: true,
+      title: true,
+      slug: true,
+      price: true,
+      compareAtPrice: true,
+      status: true,
+      images: {
+        orderBy: { position: "asc" },
+        select: { url: true, alt: true },
+      },
+      products: {
+        orderBy: { position: "asc" },
+        select: {
+          productVariantId: true,
+          quantity: true,
+          product: {
+            select: {
+              id: true,
+              name: true,
+              slug: true,
+              status: true,
+              variants: {
+                orderBy: [{ isDefault: "desc" }, { createdAt: "asc" }],
+                select: {
+                  id: true,
+                  title: true,
+                  sku: true,
+                  isDefault: true,
+                  inventory: {
+                    select: {
+                      quantity: true,
+                      reserved: true,
+                      safetyStock: true,
+                    },
+                  },
+                },
+              },
+            },
+          },
+        },
+      },
+    },
+  });
+}
+
+async function snapshotCartSummary(cartId: string, transaction: DatabaseExecutor) {
+  const snapshot = await getCartWithItemsById(cartId, transaction);
+  if (!snapshot) {
+    throw new AppError("Cart not found after mutation.", "CART_SNAPSHOT_MISSING", {
+      statusCode: 500,
+    });
+  }
+
+  return toCartSummary(snapshot);
+}
+
+/**
+ * Adds a whole deal to the cart as a SINGLE line item (quantity controls the
+ * bundle, not its individual products). Availability is the deal-level
+ * available quantity (min across included products of floor(stock / qty)).
+ */
+export async function addDealCartItemForContext(
+  context: ResolveCartContextInput,
+  input: AddDealCartItemInput,
+) {
+  const db = getPrismaClient();
+  const deal = await loadDealCartLookup(input.dealSlug.trim(), db);
+
+  if (!deal || deal.status !== "PUBLISHED") {
+    throw new AppError("Deal not found for cart add.", "CART_DEAL_NOT_FOUND", {
+      statusCode: 404,
+      userMessage: "This deal is no longer available.",
+    });
+  }
+
+  const availableQuantity = computeDealCartAvailableQuantity(deal);
+
+  if (availableQuantity < 1) {
+    throw toOutOfStockError(deal.title);
+  }
+
+  const quantity = normalizeQuantity(input.quantity);
+
+  return runWithTransaction(async (transaction) => {
+    const cart = await requireActiveCartForMutation(context, transaction);
+
+    const existing = await transaction.dealCartItem.findUnique({
+      where: {
+        cartId_dealId: {
+          cartId: cart.id,
+          dealId: deal.id,
+        },
+      },
+    });
+
+    const nextQuantity = (existing?.quantity ?? 0) + quantity;
+    if (nextQuantity > availableQuantity) {
+      throw toInsufficientStockError(deal.title, availableQuantity);
+    }
+
+    await transaction.dealCartItem.upsert({
+      where: {
+        cartId_dealId: {
+          cartId: cart.id,
+          dealId: deal.id,
+        },
+      },
+      update: {
+        quantity: nextQuantity,
+        unitPrice: deal.price,
+      },
+      create: {
+        cartId: cart.id,
+        dealId: deal.id,
+        quantity,
+        unitPrice: deal.price,
+      },
+    });
+
+    return snapshotCartSummary(cart.id, transaction);
+  }, db);
+}
+
+/**
+ * Updates the quantity of a deal cart line (0 or negative removes the line).
+ */
+export async function updateDealCartItemQuantityForContext(
+  context: ResolveCartContextInput,
+  input: UpdateDealCartItemInput,
+) {
+  const db = getPrismaClient();
+
+  return runWithTransaction(async (transaction) => {
+    const cart = await requireActiveCartForMutation(context, transaction);
+
+    const item = await transaction.dealCartItem.findFirst({
+      where: {
+        id: input.dealCartItemId,
+        cartId: cart.id,
+      },
+      include: {
+        deal: {
+          select: {
+            id: true,
+            title: true,
+            slug: true,
+            price: true,
+            compareAtPrice: true,
+            status: true,
+            images: {
+              orderBy: { position: "asc" },
+              select: { url: true, alt: true },
+            },
+            products: {
+              orderBy: { position: "asc" },
+              select: {
+                productVariantId: true,
+                quantity: true,
+                product: {
+                  select: {
+                    id: true,
+                    name: true,
+                    slug: true,
+                    status: true,
+                    variants: {
+                      orderBy: [{ isDefault: "desc" }, { createdAt: "asc" }],
+                      select: {
+                        id: true,
+                        title: true,
+                        sku: true,
+                        isDefault: true,
+                        inventory: {
+                          select: {
+                            quantity: true,
+                            reserved: true,
+                            safetyStock: true,
+                          },
+                        },
+                      },
+                    },
+                  },
+                },
+              },
+            },
+          },
+        },
+      },
+    });
+
+    if (!item) {
+      throw new AppError("Deal cart item not found for update.", "CART_DEAL_ITEM_NOT_FOUND", {
+        statusCode: 404,
+        userMessage: "This deal line no longer exists.",
+      });
+    }
+
+    if (input.quantity < 1) {
+      await transaction.dealCartItem.delete({
+        where: {
+          id: item.id,
+        },
+      });
+    } else {
+      const nextQuantity = Math.min(MAX_CART_ITEM_QUANTITY, Math.trunc(input.quantity));
+      const availableQuantity = computeDealCartAvailableQuantity(item.deal);
+
+      if (availableQuantity < 1) {
+        throw toOutOfStockError(item.deal.title);
+      }
+
+      if (nextQuantity > availableQuantity) {
+        throw toInsufficientStockError(item.deal.title, availableQuantity);
+      }
+
+      await transaction.dealCartItem.update({
+        where: {
+          id: item.id,
+        },
+        data: {
+          quantity: nextQuantity,
+        },
+      });
+    }
+
+    return snapshotCartSummary(cart.id, transaction);
+  }, db);
+}
+
+/**
+ * Removes a deal line from the cart.
+ */
+export async function removeDealCartItemForContext(
+  context: ResolveCartContextInput,
+  input: RemoveDealCartItemInput,
+) {
+  const db = getPrismaClient();
+
+  return runWithTransaction(async (transaction) => {
+    const cart = await requireActiveCartForMutation(context, transaction);
+
+    await transaction.dealCartItem.deleteMany({
+      where: {
+        id: input.dealCartItemId,
+        cartId: cart.id,
+      },
+    });
+
+    return snapshotCartSummary(cart.id, transaction);
   }, db);
 }

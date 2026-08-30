@@ -3,9 +3,9 @@ import type { HomepageContentResult, HomepageSection, HomepageSectionKind } from
 
 const SECTION_RENDER_ORDER: HomepageSectionKind[] = [
   "announcement-bar",
-  "party-heaven",
   "featured-categories",
   "featured-products",
+  "featured-deals",
   "deal-spotlight",
 ];
 

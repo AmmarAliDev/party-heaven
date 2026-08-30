@@ -94,8 +94,11 @@ export function CartDrawer() {
     }
   }, [open, cart]);
 
-  const hasItems = Boolean(cart && cart.items.length > 0);
-  const canCheckout = hasItems && cart!.items.every((item) => item.quantity <= item.availableQuantity);
+  const hasItems = Boolean(cart && (cart.items.length > 0 || cart.dealItems.length > 0));
+  const canCheckout =
+    hasItems &&
+    cart!.items.every((item) => item.quantity <= item.availableQuantity) &&
+    cart!.dealItems.every((item) => item.quantity <= item.availableQuantity);
 
   return (
     <Drawer
@@ -160,6 +163,57 @@ export function CartDrawer() {
 
           {!pending && !errorMessage && hasItems ? (
             <ul className="space-y-3">
+              {cart!.dealItems.map((item) => {
+                const hasStockIssue = item.quantity > item.availableQuantity;
+
+                return (
+                  <li key={item.id} className="border-border/70 rounded-lg border p-3">
+                    <div className="flex items-start gap-3">
+                      <CartItemThumbnail
+                        productName={item.title}
+                        imageUrl={item.imageUrl}
+                        imageAlt={item.imageAlt}
+                        href={item.href}
+                        onClick={closeCartDrawer}
+                      />
+
+                      <div className="min-w-0 flex-1 space-y-2">
+                        <div className="space-y-0.5">
+                          <Link
+                            href={item.href}
+                            onClick={closeCartDrawer}
+                            className="hover:text-primary line-clamp-2 text-sm font-medium"
+                          >
+                            {item.title}
+                          </Link>
+                          <p className="text-muted-foreground line-clamp-1 text-xs">
+                            {item.productSummary} · {item.itemCount}{" "}
+                            {item.itemCount === 1 ? "product" : "products"}
+                          </p>
+                          <PriceDisplay amount={item.unitPrice} size="sm" className="shrink-0" />
+                        </div>
+
+                        {hasStockIssue ? (
+                          <p className="text-destructive inline-flex items-center gap-1 text-xs">
+                            <AlertTriangle className="size-3.5" aria-hidden="true" />
+                            Deal unavailable for this quantity (max {item.availableQuantity}).
+                          </p>
+                        ) : null}
+
+                        <div className="flex items-center justify-between gap-3">
+                          <CartItemQuantityControls
+                            cartItemId={item.id}
+                            dealCartItemId={item.id}
+                            productName={item.title}
+                            quantity={item.quantity}
+                            availableQuantity={item.availableQuantity}
+                          />
+                        </div>
+                      </div>
+                    </div>
+                  </li>
+                );
+              })}
               {cart!.items.map((item) => {
                 const hasStockIssue = item.quantity > item.availableQuantity;
                 const variantLabel = getDisplayVariantLabel(item.optionLabel);

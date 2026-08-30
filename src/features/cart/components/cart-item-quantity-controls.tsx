@@ -16,6 +16,11 @@ type CartItemQuantityControlsProps = {
   productName: string;
   quantity: number;
   availableQuantity: number;
+  /**
+   * When set, the control targets a deal bundle line instead of a regular
+   * product line (PATCH/DELETE use `dealCartItemId` payloads).
+   */
+  dealCartItemId?: string;
 };
 
 type CartMutationPayload = {
@@ -43,16 +48,23 @@ function parseWholeQuantity(value: string) {
   return Number.parseInt(trimmed, 10);
 }
 
-async function updateQuantity(cartItemId: string, quantity: number) {
+async function updateQuantity(itemId: string, quantity: number, dealLine: boolean) {
   const response = await fetch("/api/cart", {
     method: "PATCH",
     headers: {
       "Content-Type": "application/json",
     },
-    body: JSON.stringify({
-      cartItemId,
-      quantity,
-    }),
+    body: JSON.stringify(
+      dealLine
+        ? {
+            dealCartItemId: itemId,
+            quantity,
+          }
+        : {
+            cartItemId: itemId,
+            quantity,
+          },
+    ),
   });
 
   const payload = (await response.json().catch(() => null)) as CartMutationPayload | null;
@@ -66,15 +78,21 @@ async function updateQuantity(cartItemId: string, quantity: number) {
   return payload?.cart ?? null;
 }
 
-async function removeItem(cartItemId: string) {
+async function removeItem(itemId: string, dealLine: boolean) {
   const response = await fetch("/api/cart", {
     method: "DELETE",
     headers: {
       "Content-Type": "application/json",
     },
-    body: JSON.stringify({
-      cartItemId,
-    }),
+    body: JSON.stringify(
+      dealLine
+        ? {
+            dealCartItemId: itemId,
+          }
+        : {
+            cartItemId: itemId,
+          },
+    ),
   });
 
   const payload = (await response.json().catch(() => null)) as CartMutationPayload | null;
@@ -93,8 +111,11 @@ export function CartItemQuantityControls({
   productName,
   quantity,
   availableQuantity,
+  dealCartItemId,
 }: CartItemQuantityControlsProps) {
   const effectiveAllowedMax = getEffectiveAllowedMax(availableQuantity);
+  const dealLine = Boolean(dealCartItemId);
+  const itemId = dealCartItemId ?? cartItemId;
   const [pending, setPending] = useState(false);
   const [displayQuantity, setDisplayQuantity] = useState(quantity);
   const [inputValue, setInputValue] = useState(String(quantity));
@@ -118,7 +139,8 @@ export function CartItemQuantityControls({
 
     try {
       const cart = await action();
-      const nextQuantity = cart?.items.find((item) => item.id === cartItemId)?.quantity ?? 0;
+      const nextQuantity =
+        [...(cart?.items ?? []), ...(cart?.dealItems ?? [])].find((item) => item.id === itemId)?.quantity ?? 0;
 
       dispatchCartChanged(cart);
       setDisplayQuantity(nextQuantity);
@@ -158,7 +180,7 @@ export function CartItemQuantityControls({
     }
 
     // Commit the change via mutation
-    await runMutation(() => updateQuantity(cartItemId, committedQuantity), committedQuantity);
+    await runMutation(() => updateQuantity(itemId, committedQuantity, dealLine), committedQuantity);
   }
 
   function handleInputChange(e: React.ChangeEvent<HTMLInputElement>) {
@@ -186,7 +208,7 @@ export function CartItemQuantityControls({
         variant="outline"
         size="icon"
         className="max-w-7 max-h-7 shrink-0"
-        onClick={() => runMutation(() => updateQuantity(cartItemId, displayQuantity - 1), displayQuantity - 1)}
+        onClick={() => runMutation(() => updateQuantity(itemId, displayQuantity - 1, dealLine), displayQuantity - 1)}
         disabled={pending || !canDecrease}
         aria-label={`Decrease quantity for ${productName}`}
       >
@@ -213,7 +235,7 @@ export function CartItemQuantityControls({
         variant="outline"
         size="icon"
         className="max-w-7 max-h-7 shrink-0"
-        onClick={() => runMutation(() => updateQuantity(cartItemId, displayQuantity + 1), displayQuantity + 1)}
+        onClick={() => runMutation(() => updateQuantity(itemId, displayQuantity + 1, dealLine), displayQuantity + 1)}
         disabled={pending || !canIncrease}
         aria-label={`Increase quantity for ${productName}`}
       >
@@ -224,7 +246,7 @@ export function CartItemQuantityControls({
         type="button"
         variant="ghost"
         size="icon"
-        onClick={() => runMutation(() => removeItem(cartItemId), 0)}
+        onClick={() => runMutation(() => removeItem(itemId, dealLine), 0)}
         disabled={pending}
         aria-label={`Remove ${productName} from cart`}
       >
