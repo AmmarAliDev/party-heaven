@@ -11,7 +11,10 @@ import { submitCustomerReviewAction } from "../actions";
 import { customerReviewSchema } from "../validation";
 
 type CustomerReviewFormProps = {
-  productId: string;
+  /** Product target id — set when reviewing a product. */
+  productId?: string;
+  /** Deal target id — set when reviewing a deal bundle. */
+  dealId?: string;
   returnTo: string;
   reviewNoticeCode?: "submitted" | "updated" | undefined;
   canSubmit: boolean;
@@ -22,6 +25,11 @@ type CustomerReviewFormProps = {
     body: string | null;
     statusLabel: string;
   } | null;
+  /**
+   * Renders the form always expanded without the mobile collapse toggle.
+   * Used when the form lives inside a dialog.
+   */
+  embedded?: boolean;
 };
 
 const customerReviewClientSchema = customerReviewSchema.extend({
@@ -32,7 +40,12 @@ type CustomerReviewFormValues = z.infer<typeof customerReviewClientSchema>;
 
 function buildCustomerReviewFormData(values: CustomerReviewFormValues) {
   const formData = new FormData();
-  formData.set("productId", values.productId);
+  if (values.productId) {
+    formData.set("productId", values.productId);
+  }
+  if (values.dealId) {
+    formData.set("dealId", values.dealId);
+  }
   formData.set("returnTo", values.returnTo);
   formData.set("rating", String(values.rating));
   formData.set("title", values.title ?? "");
@@ -57,19 +70,24 @@ const ratingOptions = [
  * mobile auto-collapse fires again, leaving the form neatly closed.
  *
  * Desktop: always expanded; the toggle button is not rendered.
+ *
+ * When `embedded` is set (inside a dialog) the form is always expanded.
  */
 export function CustomerReviewForm({
   productId,
+  dealId,
   returnTo,
   reviewNoticeCode,
   canSubmit,
   disabledReason,
   existingReview,
+  embedded = false,
 }: CustomerReviewFormProps) {
   const form = useAppForm<CustomerReviewFormValues>({
     schema: customerReviewClientSchema,
     defaultValues: {
-      productId,
+      productId: productId ?? "",
+      dealId: dealId ?? "",
       returnTo,
       rating: existingReview?.rating ?? 5,
       title: existingReview?.title ?? "",
@@ -82,10 +100,11 @@ export function CustomerReviewForm({
   // The default follows the viewport (expanded on desktop, collapsed on
   // mobile) via derived state, so no server-side viewport signal or
   // post-hydration effect is required. Once the user toggles, their explicit
-  // choice is honored until they toggle again.
+  // choice is honored until they toggle again. Embedded forms (dialogs) are
+  // always expanded.
   const [expansionChoice, setExpansionChoice] = useState<boolean | null>(null);
   const isMobile = useIsMobile();
-  const isExpanded = expansionChoice ?? !isMobile;
+  const isExpanded = embedded ? true : expansionChoice ?? !isMobile;
 
   useEffect(() => {
     if (!reviewNoticeCode) {
@@ -93,13 +112,14 @@ export function CustomerReviewForm({
     }
 
     form.reset({
-      productId,
+      productId: productId ?? "",
+      dealId: dealId ?? "",
       returnTo,
       rating: 5,
       title: "",
       body: "",
     });
-  }, [form, productId, returnTo, reviewNoticeCode]);
+  }, [form, productId, dealId, returnTo, reviewNoticeCode]);
 
   function toggleExpanded() {
     setExpansionChoice((prev) => !(prev ?? !isMobile));
@@ -109,6 +129,10 @@ export function CustomerReviewForm({
     {
       type: "hidden",
       name: "productId",
+    },
+    {
+      type: "hidden",
+      name: "dealId",
     },
     {
       type: "hidden",
@@ -177,8 +201,8 @@ export function CustomerReviewForm({
       <div className="flex items-center justify-between gap-2">
         <h3 className="text-base font-semibold tracking-tight">Write a review</h3>
 
-        {/* Toggle button is only rendered on mobile viewports */}
-        {isMobile ? (
+        {/* Toggle button is only rendered on mobile viewports outside a dialog */}
+        {!embedded && isMobile ? (
           <button
             type="button"
             onClick={toggleExpanded}
@@ -206,7 +230,7 @@ export function CustomerReviewForm({
         <div id="review-form-body">
           <p className="mt-1 text-sm text-muted-foreground">
             {existingReview
-              ? `You already reviewed this product (${existingReview.statusLabel}). Submitting changes will return it to moderation.`
+              ? `You already reviewed this ${dealId ? "deal" : "product"} (${existingReview.statusLabel}). Submitting changes will return it to moderation.`
               : "Share your experience. Reviews are moderated before appearing on the storefront."}
           </p>
 

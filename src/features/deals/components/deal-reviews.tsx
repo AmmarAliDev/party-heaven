@@ -1,13 +1,12 @@
 import type { ReactNode } from "react";
 
 import { Badge } from "@/components/ui/badge";
+import type { StorefrontDealReview, StorefrontDealReviewSummary } from "@/features/reviews";
 import { isReviewVisibleOnStorefront } from "@/lib/reviews/moderation";
 
-import type { ProductReview, ProductReviewSummary } from "../types";
-
-type ProductReviewsProps = {
-  reviews: ProductReview[];
-  summary: ProductReviewSummary;
+type DealReviewsProps = {
+  reviews: StorefrontDealReview[];
+  summary: StorefrontDealReviewSummary;
   /** Optional review composer (Add review button + dialog) shown in the header. */
   composer?: ReactNode;
 };
@@ -36,7 +35,11 @@ function RatingBar({ count, total, label }: { count: number; total: number; labe
   );
 }
 
-export function ProductReviews({ reviews, summary, composer }: ProductReviewsProps) {
+/**
+ * Storefront deal reviews section — mirrors the PDP's product reviews layout
+ * (summary panel + review list) with an "Add review" composer in the header.
+ */
+export function DealReviews({ reviews, summary, composer }: DealReviewsProps) {
   const visibleReviews = reviews.filter((review) => isReviewVisibleOnStorefront(review.status ?? "APPROVED"));
   const visibleTotal = visibleReviews.length;
   const visibleAverage =
@@ -58,11 +61,11 @@ export function ProductReviews({ reviews, summary, composer }: ProductReviewsPro
   }
 
   return (
-    <section aria-labelledby="reviews-heading">
+    <section aria-labelledby="deal-reviews-heading">
       <div className="mb-6 flex flex-wrap items-start justify-between gap-3">
         <div className="space-y-3">
           <Badge variant="secondary">Community</Badge>
-          <h2 id="reviews-heading" className="text-2xl font-semibold tracking-tight">
+          <h2 id="deal-reviews-heading" className="text-2xl font-semibold tracking-tight">
             Reviews
           </h2>
         </div>
@@ -70,7 +73,7 @@ export function ProductReviews({ reviews, summary, composer }: ProductReviewsPro
       </div>
 
       {visibleTotal === 0 ? (
-        <p className="text-muted-foreground text-sm">No reviews for this product yet.</p>
+        <p className="text-muted-foreground text-sm">No reviews for this deal yet.</p>
       ) : (
         <div className="grid gap-8 lg:grid-cols-[240px_1fr]">
           {/* Summary panel */}

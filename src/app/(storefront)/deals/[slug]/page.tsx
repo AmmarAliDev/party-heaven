@@ -12,8 +12,11 @@ import { DealGallery } from "@/features/deals/components/deal-gallery";
 import { DealInfoBlock } from "@/features/deals/components/deal-info-block";
 import { DealProductsList } from "@/features/deals/components/deal-products-list";
 import { DealRelatedGrid } from "@/features/deals/components/deal-related-grid";
+import { DealReviews } from "@/features/deals/components/deal-reviews";
 import { DealSpecifications } from "@/features/deals/components/deal-specifications";
 import { DealWishlistToggleButton } from "@/features/deals/components/deal-wishlist-toggle-button";
+import { ReviewComposer } from "@/features/reviews/components/review-composer";
+import { listPublishedDealReviews } from "@/features/reviews/service";
 
 export const revalidate = 900;
 export const dynamicParams = true;
@@ -76,6 +79,11 @@ export default async function DealPage({ params }: DealPageProps) {
   // products section.
   const relatedDeals = deal.relatedDealIds.length > 0 ? await listPublishedDealsByIds(deal.relatedDealIds) : [];
   const visibleRelatedDeals = relatedDeals.filter((related) => related.id !== deal.id).slice(0, 4);
+
+  // Deal reviews (approved only) for the storefront reviews section.
+  const dealReviews = await listPublishedDealReviews(deal.id);
+
+  const returnTo = routes.storefront.deal(slug);
 
   return (
     <PageShell className="gap-14">
@@ -150,8 +158,15 @@ export default async function DealPage({ params }: DealPageProps) {
       {/* Specifications */}
       {deal.specifications.length > 0 ? <DealSpecifications specifications={deal.specifications} /> : null}
 
-      {/* Related deals */}
+      {/* Related deals (rendered above reviews) */}
       <DealRelatedGrid deals={visibleRelatedDeals} />
+
+      {/* Reviews */}
+      <DealReviews
+        reviews={dealReviews.reviews}
+        summary={dealReviews.summary}
+        composer={<ReviewComposer dealId={deal.id} returnTo={returnTo} />}
+      />
     </PageShell>
   );
 }

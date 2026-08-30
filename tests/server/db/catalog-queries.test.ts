@@ -34,7 +34,7 @@ describe('catalog searchPublishedProducts query widening', () => {
     const { searchPublishedProducts } = await import('@/server/db/catalog-queries');
     await searchPublishedProducts('candles', 8);
 
-    const [args] = mockProductFindMany.mock.calls[0];
+    const [args] = mockProductFindMany.mock.calls[0] ?? [];
     expect(args.where.OR).toEqual(
       expect.arrayContaining([
         { category: { name: { contains: 'candle', mode: 'insensitive' } } },
@@ -46,7 +46,7 @@ describe('catalog searchPublishedProducts query widening', () => {
     const { searchPublishedProducts } = await import('@/server/db/catalog-queries');
     await searchPublishedProducts('chains', 8);
 
-    const [args] = mockProductFindMany.mock.calls[0];
+    const [args] = mockProductFindMany.mock.calls[0] ?? [];
     expect(args.where.OR).toEqual(
       expect.arrayContaining([
         { name: { contains: 'chain', mode: 'insensitive' } },
@@ -58,7 +58,7 @@ describe('catalog searchPublishedProducts query widening', () => {
     const { searchPublishedProducts } = await import('@/server/db/catalog-queries');
     await searchPublishedProducts('scented candle', 8);
 
-    const [args] = mockProductFindMany.mock.calls[0];
+    const [args] = mockProductFindMany.mock.calls[0] ?? [];
     expect(args.where.OR).toEqual(
       expect.arrayContaining([
         { name: { contains: 'scented', mode: 'insensitive' } },
@@ -71,7 +71,7 @@ describe('catalog searchPublishedProducts query widening', () => {
     const { searchPublishedProducts } = await import('@/server/db/catalog-queries');
     await searchPublishedProducts('candle', 8);
 
-    const [args] = mockProductFindMany.mock.calls[0];
+    const [args] = mockProductFindMany.mock.calls[0] ?? [];
     expect(args.where.status).toBe('PUBLISHED');
     expect(args.where.category).toEqual(expect.objectContaining({ status: 'PUBLISHED' }));
   });

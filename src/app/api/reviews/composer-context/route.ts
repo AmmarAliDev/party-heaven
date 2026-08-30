@@ -5,15 +5,27 @@ import { auth } from "@/auth";
 import { getCustomerReviewComposerContext } from "@/features/reviews/service";
 import { createRouteHandlerErrorResponse, createValidationAppError } from "@/lib/errors/handling";
 
-const querySchema = z.object({
-  productId: z.string().trim().min(1),
-});
+const querySchema = z
+  .object({
+    productId: z.string().trim().min(1).optional(),
+    dealId: z.string().trim().min(1).optional(),
+  })
+  .superRefine((data, ctx) => {
+    if (!data.productId && !data.dealId) {
+      ctx.addIssue({
+        code: "custom",
+        path: ["productId"],
+        message: "A productId or dealId is required.",
+      });
+    }
+  });
 
 export async function GET(request: Request) {
   try {
     const { searchParams } = new URL(request.url);
     const parsed = querySchema.safeParse({
-      productId: searchParams.get("productId"),
+      productId: searchParams.get("productId") ?? undefined,
+      dealId: searchParams.get("dealId") ?? undefined,
     });
 
     if (!parsed.success) {
@@ -23,7 +35,8 @@ export async function GET(request: Request) {
     const session = await auth();
     const context = await getCustomerReviewComposerContext({
       userId: session?.user?.id ?? null,
-      productId: parsed.data.productId,
+      ...(parsed.data.productId ? { productId: parsed.data.productId } : {}),
+      ...(parsed.data.dealId ? { dealId: parsed.data.dealId } : {}),
     });
 
     return NextResponse.json(

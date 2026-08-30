@@ -139,16 +139,22 @@ export default async function AdminReviewsPage({ searchParams }: AdminReviewsPag
           ) : (
             <div className="space-y-4">
               {reviewResult.items.map((review) => {
-                const storefrontHref = review.product.categorySlug
-                  ? routes.storefront.product(review.product.categorySlug, review.product.slug)
-                  : null;
+                const storefrontHref =
+                  review.target.kind === "deal"
+                    ? routes.storefront.deal(review.target.slug)
+                    : review.target.categorySlug
+                      ? routes.storefront.product(review.target.categorySlug, review.target.slug)
+                      : null;
 
                 return (
                   <article key={review.id} className="rounded-lg border p-4">
                     <div className="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
                       <div className="space-y-3">
                         <div className="flex flex-wrap items-center gap-2">
-                          <p className="font-semibold">{review.product.name}</p>
+                          <p className="font-semibold">{review.target.name}</p>
+                          <Badge variant="secondary">
+                            {review.target.kind === "deal" ? "Deal review" : "Product review"}
+                          </Badge>
                           <Badge variant={statusBadgeVariantMap[review.status]}>{review.statusLabel}</Badge>
                           <Badge variant={review.storefrontVisible ? "success" : "secondary"}>
                             {review.storefrontVisible ? "Visible on storefront" : "Hidden from storefront"}
@@ -183,7 +189,7 @@ export default async function AdminReviewsPage({ searchParams }: AdminReviewsPag
 
                         {storefrontHref ? (
                           <Link href={storefrontHref} className={buttonVariants({ variant: "ghost", size: "sm" })}>
-                            View product
+                            {review.target.kind === "deal" ? "View deal" : "View product"}
                           </Link>
                         ) : null}
                       </div>

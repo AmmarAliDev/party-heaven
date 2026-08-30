@@ -81,9 +81,11 @@ export async function moderateAdminReviewAction(formData: FormData) {
 
       revalidatePath(routes.admin.reviews);
 
-      if (result.product.categorySlug) {
-        revalidatePath(routes.storefront.category(result.product.categorySlug));
-        revalidatePath(routes.storefront.product(result.product.categorySlug, result.product.slug));
+      if (result.target.kind === "deal") {
+        revalidatePath(routes.storefront.deal(result.target.slug));
+      } else if (result.target.categorySlug) {
+        revalidatePath(routes.storefront.category(result.target.categorySlug));
+        revalidatePath(routes.storefront.product(result.target.categorySlug, result.target.slug));
       }
     }
   } catch (error) {

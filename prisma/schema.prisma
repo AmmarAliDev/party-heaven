@@ -428,6 +428,7 @@ model Deal {
   products         DealProduct[]
   specifications   DealSpecification[]
   cartItems        DealCartItem[]
+  reviews          Review[]
   // Stores related deal ids (`relatedDealIds: string[]`) for the "Related
   // deals" cross-sell on the deal detail page.
   metadata         Json?
@@ -512,8 +513,12 @@ model ProductSpecification {
 
 model Review {
   id               String       @id @default(uuid())
-  product          Product      @relation(fields: [productId], references: [id])
-  productId        String       @map("product_id")
+  // Review target: exactly one of `product` or `deal` must be set (enforced in
+  // the service layer). Reviews for a deal cover the whole bundle.
+  product          Product?     @relation(fields: [productId], references: [id], onDelete: Cascade)
+  productId        String?      @map("product_id")
+  deal             Deal?        @relation(fields: [dealId], references: [id], onDelete: Cascade)
+  dealId           String?      @map("deal_id")
   user             User?        @relation("AuthorReviews", fields: [userId], references: [id])
   userId           String?      @map("user_id")
   // rating must be between 1 and 5 (validated by DB CHECK constraint)
@@ -532,8 +537,10 @@ model Review {
   updatedAt        DateTime     @updatedAt @map("updated_at")
 
   @@index([productId])
+  @@index([dealId])
   @@index([status])
   @@index([productId, status])
+  @@index([dealId, status])
 }
 
 model Wishlist {

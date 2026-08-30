@@ -43,7 +43,7 @@ Do not move business logic into route/page files when a feature service seam exi
 - Admin inventory adjustment service: `src/features/admin/inventory/service.ts`
 - Blog storefront/admin service seam: `src/features/blog/service.ts`
 - SEO content rendering seam: `src/features/rendering/seo-content-rendering.ts` (shared ISR window + static-param mappers)
-- PDP personalized review seam: `src/features/reviews/components/product-review-composer.tsx` + `GET /api/reviews/composer-context`
+- PDP/DDP personalized review seam: `src/features/reviews/components/review-composer.tsx` + `GET /api/reviews/composer-context` (supports product and deal targets)
 - Storefront auth UI seam: `src/components/layout/storefront-header-auth-controls.tsx` (client-side session-aware header controls)
 
 ## Working Conventions for AI

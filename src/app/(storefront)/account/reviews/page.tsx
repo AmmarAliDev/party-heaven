@@ -99,15 +99,19 @@ export default async function AccountReviewsPage({ searchParams }: AccountReview
       ) : null}
 
       {reviewResult.items.map((review) => {
-        const storefrontHref = review.product.categorySlug
-          ? routes.storefront.product(review.product.categorySlug, review.product.slug)
-          : null;
+        const storefrontHref = review.deal
+          ? routes.storefront.deal(review.deal.slug)
+          : review.product?.categorySlug
+            ? routes.storefront.product(review.product.categorySlug, review.product.slug)
+            : null;
 
         return (
           <Card key={review.id}>
             <CardHeader className="pb-3">
               <div className="flex flex-wrap items-center justify-between gap-2">
-                <CardTitle className="text-base">{review.product.name}</CardTitle>
+                <CardTitle className="text-base">
+                  {review.deal ? review.deal.title : (review.product?.name ?? "Unknown item")}
+                </CardTitle>
                 <div className="flex flex-wrap items-center gap-2">
                   <Badge variant={statusVariantMap[review.status]}>{review.statusLabel}</Badge>
                   <Badge variant={review.storefrontVisible ? "success" : "secondary"}>
@@ -128,7 +132,7 @@ export default async function AccountReviewsPage({ searchParams }: AccountReview
               ) : null}
               {storefrontHref ? (
                 <Link href={storefrontHref} className="text-xs font-medium underline underline-offset-4">
-                  View product
+                  {review.deal ? "View deal" : "View product"}
                 </Link>
               ) : null}
             </CardContent>

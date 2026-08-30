@@ -20,7 +20,7 @@ import { ProductSpecifications } from "@/features/catalog/components/product-spe
 import {
   toProductStaticParams,
 } from "@/features/rendering/seo-content-rendering";
-import { ProductReviewComposer } from "@/features/reviews/components/product-review-composer";
+import { ReviewComposer } from "@/features/reviews/components/review-composer";
 
 export const revalidate = 900;
 export const dynamicParams = true;
@@ -127,16 +127,15 @@ export default async function ProductPage({ params }: ProductPageProps) {
         <ProductSpecifications specifications={product.specifications} />
       ) : null}
 
-      <ProductReviewComposer
-        productId={product.id}
-        returnTo={returnTo}
-      />
+      {/* Related products (rendered above reviews) */}
+      <ProductRelatedGrid products={relatedProducts} />
 
       {/* Reviews */}
-      <ProductReviews reviews={product.reviews} summary={product.reviewSummary} />
-
-      {/* Related products */}
-      <ProductRelatedGrid products={relatedProducts} />
+      <ProductReviews
+        reviews={product.reviews}
+        summary={product.reviewSummary}
+        composer={<ReviewComposer productId={product.id} returnTo={returnTo} />}
+      />
     </PageShell>
   );
 }
