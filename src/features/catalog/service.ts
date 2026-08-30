@@ -28,7 +28,7 @@ import type {
   StorefrontProductRecord,
 } from "@/server/db/catalog-queries";
 import {
-  countPublishedOneDollarProducts,
+  countPublishedPartyHeavenProducts,
   getAllPublishedProductSlugsWithCategories,
   getPublishedCategoryBySlug,
   getPublishedProductBySlug as dbGetPublishedProductBySlug,
@@ -45,11 +45,11 @@ import { normalizeCatalogImageUrl } from "./lib/product-image-url";
 import type { CatalogSearchParams } from "./filters";
 import { parseCatalogSearchParams } from "./filters";
 import {
-  createOneDollarVirtualCategory,
-  isOneDollarCategorySlug,
-  ONE_DOLLAR_CATEGORY_SLUG,
-  ONE_DOLLAR_MAX_PRICE_PKR,
-} from "./one-dollar";
+  createPartyHeavenVirtualCategory,
+  isPartyHeavenCategorySlug,
+  PARTY_HEAVEN_CATEGORY_SLUG,
+  PARTY_HEAVEN_MAX_PRICE_PKR,
+} from "./party-heaven";
 import { getCatalogSearchAdapter } from "./search-adapter";
 import type {
   CatalogCategory,
@@ -469,8 +469,8 @@ function mapCategoryRecord(record: StorefrontCategoryRecord): CatalogCategory {
   };
 }
 
-function isOneDollarEligibleProduct(product: Pick<CatalogProductCard, "price">): boolean {
-  return product.price <= ONE_DOLLAR_MAX_PRICE_PKR;
+function isPartyHeavenEligibleProduct(product: Pick<CatalogProductCard, "price">): boolean {
+  return product.price <= PARTY_HEAVEN_MAX_PRICE_PKR;
 }
 
 // ---------------------------------------------------------------------------
@@ -636,26 +636,26 @@ function buildReviewData(
  * Empty array if no categories have been published yet.
  */
 export async function getCatalogCategories(): Promise<CatalogCategory[]> {
-  const [categoryRecords, oneDollarProductCount] = await Promise.all([
+  const [categoryRecords, partyHeavenProductCount] = await Promise.all([
     listPublishedCategories(),
-    countPublishedOneDollarProducts(),
+    countPublishedPartyHeavenProducts(),
   ]);
 
   const hasReservedSlugCollision = categoryRecords.some((record) =>
-    isOneDollarCategorySlug(record.slug),
+    isPartyHeavenCategorySlug(record.slug),
   );
 
   if (hasReservedSlugCollision) {
-    catalogServiceLogger.warn("reserved One Dollar slug found in published categories", {
-      code: "CATALOG_RESERVED_ONE_DOLLAR_SLUG_COLLISION",
+    catalogServiceLogger.warn("reserved Party Heaven slug found in published categories", {
+      code: "CATALOG_RESERVED_PARTY_HEAVEN_SLUG_COLLISION",
     });
   }
 
   const categories = categoryRecords
-    .filter((record) => !isOneDollarCategorySlug(record.slug))
+    .filter((record) => !isPartyHeavenCategorySlug(record.slug))
     .map(mapCategoryRecord);
 
-  return [createOneDollarVirtualCategory(oneDollarProductCount), ...categories];
+  return [createPartyHeavenVirtualCategory(partyHeavenProductCount), ...categories];
 }
 
 /**
@@ -664,10 +664,10 @@ export async function getCatalogCategories(): Promise<CatalogCategory[]> {
 export async function getCatalogCategory(
   slug: string,
 ): Promise<CatalogCategory | null> {
-  if (isOneDollarCategorySlug(slug)) {
-    const oneDollarProductCount = await countPublishedOneDollarProducts();
+  if (isPartyHeavenCategorySlug(slug)) {
+    const partyHeavenProductCount = await countPublishedPartyHeavenProducts();
 
-    return createOneDollarVirtualCategory(oneDollarProductCount);
+    return createPartyHeavenVirtualCategory(partyHeavenProductCount);
   }
 
   const record = await getPublishedCategoryBySlug(slug);
@@ -683,9 +683,9 @@ export async function getCatalogCategorySlugs(): Promise<string[]> {
 
   const categorySlugs = records
     .map((record) => record.slug)
-    .filter((slug) => !isOneDollarCategorySlug(slug));
+    .filter((slug) => !isPartyHeavenCategorySlug(slug));
 
-  return [ONE_DOLLAR_CATEGORY_SLUG, ...categorySlugs];
+  return [PARTY_HEAVEN_CATEGORY_SLUG, ...categorySlugs];
 }
 
 /**
@@ -698,11 +698,11 @@ export async function getCatalogCategoryListing({
   slug,
   searchParams,
 }: CategoryListingInput): Promise<CatalogCategoryListing | null> {
-  if (isOneDollarCategorySlug(slug)) {
+  if (isPartyHeavenCategorySlug(slug)) {
     const filters = parseCatalogSearchParams(searchParams);
     const allCards = (await listAllPublishedProducts()).map(mapProductToCard);
-    const oneDollarCards = allCards.filter(isOneDollarEligibleProduct);
-    const filteredCards = sortProducts(applyFilters(oneDollarCards, filters), filters.sort);
+    const partyHeavenCards = allCards.filter(isPartyHeavenEligibleProduct);
+    const filteredCards = sortProducts(applyFilters(partyHeavenCards, filters), filters.sort);
 
     const paginatedResult = createPaginatedResult({
       items: filteredCards.slice(
@@ -717,10 +717,10 @@ export async function getCatalogCategoryListing({
     });
 
     return {
-      category: createOneDollarVirtualCategory(oneDollarCards.length),
+      category: createPartyHeavenVirtualCategory(partyHeavenCards.length),
       products: paginatedResult.items,
       filteredProductCount: filteredCards.length,
-      totalProductCount: oneDollarCards.length,
+      totalProductCount: partyHeavenCards.length,
       filters,
       pagination: paginatedResult.meta,
     };

@@ -1,4 +1,4 @@
-// Prisma schema for One Dollar single-vendor e-commerce
+// Prisma schema for Party Heaven single-vendor e-commerce
 // Design goals:
 // - Single vendor, Pakistan-only (Karachi initially)
 // - Inventory tracked per ProductVariant

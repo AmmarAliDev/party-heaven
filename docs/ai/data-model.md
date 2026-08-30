@@ -1,4 +1,4 @@
-# AI Data Model Reference — One Dollar
+# AI Data Model Reference — Party Heaven
 
 This file provides a compact reference of the Prisma data model for AI tooling, generation, and prompt-context use.
 

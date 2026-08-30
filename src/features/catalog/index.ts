@@ -21,12 +21,12 @@ export {
   parseCatalogSearchParams,
 } from "./filters";
 export {
-  createOneDollarVirtualCategory,
-  isOneDollarCategorySlug,
-  ONE_DOLLAR_CATEGORY_LABEL,
-  ONE_DOLLAR_CATEGORY_SLUG,
-  ONE_DOLLAR_MAX_PRICE_PKR,
-} from "./one-dollar";
+  createPartyHeavenVirtualCategory,
+  isPartyHeavenCategorySlug,
+  PARTY_HEAVEN_CATEGORY_LABEL,
+  PARTY_HEAVEN_CATEGORY_SLUG,
+  PARTY_HEAVEN_MAX_PRICE_PKR,
+} from "./party-heaven";
 export { POPULAR_SEARCHES, POPULAR_SEARCHES_MAX_ITEMS } from "./popular-searches";
 export {
   closeSearchDialog,

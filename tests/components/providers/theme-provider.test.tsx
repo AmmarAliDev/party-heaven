@@ -37,7 +37,7 @@ describe("ThemeProvider", () => {
         defaultTheme: "light",
         disableTransitionOnChange: true,
         enableSystem: true,
-        storageKey: "one-dollar-theme",
+        storageKey: "party-heaven-theme",
         themes: ["light", "dark", "system"],
       }),
     );

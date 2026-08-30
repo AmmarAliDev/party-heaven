@@ -1,6 +1,6 @@
 # Analytics Setup
 
-This document outlines the analytics integration for the One Dollar store. We currently support tracking e-commerce events through **Google Analytics 4 (GA4)** and **Meta Pixel**. The implementation is unified, meaning a single analytics call dispatches to all configured providers securely and cleanly.
+This document outlines the analytics integration for the Party Heaven store. We currently support tracking e-commerce events through **Google Analytics 4 (GA4)** and **Meta Pixel**. The implementation is unified, meaning a single analytics call dispatches to all configured providers securely and cleanly.
 
 ## Environment Setup
 

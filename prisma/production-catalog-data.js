@@ -1,4 +1,4 @@
-const ONE_DOLLAR_MAX_PRICE_PKR = 280;
+const PARTY_HEAVEN_MAX_PRICE_PKR = 280;
 
 const CATEGORY_DEFINITIONS = [
   {
@@ -952,10 +952,10 @@ function createCategoryRecord(definition) {
     description: definition.description,
     cardImageUrl: buildCategoryImageUrl(definition.slug),
     status: 'PUBLISHED',
-    seoTitle: `${definition.name} in Pakistan | Everyday Value | One Dollar`,
+    seoTitle: `${definition.name} in Pakistan | Everyday Value | Party Heaven`,
     seoDescription: `Shop ${definition.name.toLowerCase()} with practical picks, clear Rs. pricing, and Karachi-first delivery focus for everyday households.`,
     seoCanonicalUrl: `/categories/${definition.slug}`,
-    seoOgTitle: `${definition.name} Collection | One Dollar Pakistan`,
+    seoOgTitle: `${definition.name} Collection | Party Heaven Pakistan`,
     seoOgDescription: `Browse ${definition.name.toLowerCase()} selected for daily use, gifting, and organized living across Pakistan.`,
     seoImageUrl: buildCategoryImageUrl(definition.slug),
     seoSchemaNotes: `Category page should target ${definition.searchIntent} with FAQ and internal links to complementary household categories.`,
@@ -963,7 +963,7 @@ function createCategoryRecord(definition) {
 }
 
 function createProductRecord(category, productDefinition, productIndex) {
-  const isOneDollarEligible = productDefinition.price <= ONE_DOLLAR_MAX_PRICE_PKR;
+  const isPartyHeavenEligible = productDefinition.price <= PARTY_HEAVEN_MAX_PRICE_PKR;
   const productImages = buildProductImageUrls(productDefinition.slug, productDefinition.name);
   const masterSku = `OD-${category.slug.replace(/-/g, '').toUpperCase()}-${String(productIndex + 1).padStart(2, '0')}`;
 
@@ -978,10 +978,10 @@ function createProductRecord(category, productDefinition, productIndex) {
     heightMm: productDefinition.dimensions.heightMm,
     widthMm: productDefinition.dimensions.widthMm,
     depthMm: productDefinition.dimensions.depthMm,
-    seoTitle: `${productDefinition.name} in Pakistan | ${category.name} | One Dollar`,
+    seoTitle: `${productDefinition.name} in Pakistan | ${category.name} | Party Heaven`,
     seoDescription: `Buy ${productDefinition.name.toLowerCase()} for Rs. ${productDefinition.price}. ${productDefinition.shortDescription}`,
     seoCanonicalUrl: `/categories/${category.slug}/${productDefinition.slug}`,
-    seoOgTitle: `${productDefinition.name} | One Dollar Pakistan`,
+    seoOgTitle: `${productDefinition.name} | Party Heaven Pakistan`,
     seoOgDescription: `${productDefinition.shortDescription} Karachi-focused everyday store with practical delivery-ready catalog coverage.`,
     seoImageUrl: productImages[0],
     seoSchemaNotes:
@@ -993,8 +993,8 @@ function createProductRecord(category, productDefinition, productIndex) {
       highlights: productDefinition.highlights,
       material: productDefinition.material,
       care: productDefinition.care,
-      oneDollarEligible: isOneDollarEligible,
-      merchandisingSegment: isOneDollarEligible ? 'value' : 'core',
+      partyHeavenEligible: isPartyHeavenEligible,
+      merchandisingSegment: isPartyHeavenEligible ? 'value' : 'core',
     },
     specifications: Object.entries(productDefinition.specifications).map(([key, value], index) => ({
       key,
@@ -1037,8 +1037,8 @@ function createProductionCatalogData() {
   });
 
   const allProducts = categoryProducts.flatMap((entry) => entry.products);
-  const oneDollarEligibleCount = allProducts.filter((product) =>
-    product.variant.price <= ONE_DOLLAR_MAX_PRICE_PKR,
+  const partyHeavenEligibleCount = allProducts.filter((product) =>
+    product.variant.price <= PARTY_HEAVEN_MAX_PRICE_PKR,
   ).length;
 
   return {
@@ -1047,13 +1047,13 @@ function createProductionCatalogData() {
     totals: {
       categories: categories.length,
       products: allProducts.length,
-      oneDollarEligibleProducts: oneDollarEligibleCount,
+      partyHeavenEligibleProducts: partyHeavenEligibleCount,
     },
   };
 }
 
 module.exports = {
   CATEGORY_DEFINITIONS,
-  ONE_DOLLAR_MAX_PRICE_PKR,
+  PARTY_HEAVEN_MAX_PRICE_PKR,
   createProductionCatalogData,
 };

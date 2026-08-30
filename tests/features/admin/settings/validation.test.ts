@@ -5,9 +5,9 @@ import { validateAdminStoreSettingsInput } from "@/features/admin/settings";
 describe("admin store settings validation", () => {
   it("accepts practical first-pass settings payload", () => {
     const result = validateAdminStoreSettingsInput({
-      storeName: "One Dollar Karachi",
+      storeName: "Party Heaven Karachi",
       storeTagline: "Daily essentials at practical prices",
-      supportEmail: "support@onedollar.pk",
+      supportEmail: "support@partyheaven.co",
       supportPhone: "+92 300 1234567",
       supportWhatsapp: "+92 321 7654321",
       supportHours: "Mon-Sat, 9:00 AM to 6:00 PM",
@@ -30,7 +30,7 @@ describe("admin store settings validation", () => {
 
   it("rejects invalid support email and inconsistent shipping threshold", () => {
     const result = validateAdminStoreSettingsInput({
-      storeName: "One Dollar",
+      storeName: "Party Heaven",
       supportEmail: "bad-email",
       shippingOriginCity: "Karachi",
       shippingFlatRate: "500",
@@ -45,9 +45,9 @@ describe("admin store settings validation", () => {
 
   it("allows optional fields to stay empty", () => {
     const result = validateAdminStoreSettingsInput({
-      storeName: "One Dollar",
+      storeName: "Party Heaven",
       storeTagline: "",
-      supportEmail: "support@onedollar.pk",
+      supportEmail: "support@partyheaven.co",
       supportPhone: "",
       supportWhatsapp: "",
       supportHours: "",

@@ -9,7 +9,7 @@ import { ResetPasswordForm } from "@/features/auth/components/reset-password-for
 export const metadata = buildMetadata({
   title: "Reset Password",
   path: "/auth/reset-password",
-  description: "Set a new password for your One Dollar account.",
+  description: "Set a new password for your Party Heaven account.",
 });
 
 type ResetPasswordPageProps = {

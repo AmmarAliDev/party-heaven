@@ -16,21 +16,21 @@ import { PriceDisplay } from "@/components/ui/price-display";
 import { SectionHeader } from "@/components/ui/section-header";
 import { ProductCardAddToCart } from "@/features/catalog/components/product-card-add-to-cart";
 
-import type { OneDollarSection } from "../types";
+import type { PartyHeavenSection } from "../types";
 import {
   HOMEPAGE_CAROUSEL_ITEM_CLASS,
   HOMEPAGE_CAROUSEL_MAX_ITEMS,
   HOMEPAGE_CAROUSEL_OPTIONS,
 } from "./homepage-carousel-config";
 
-type OneDollarSectionProps = {
-  section: OneDollarSection;
+type PartyHeavenSectionProps = {
+  section: PartyHeavenSection;
 };
 
 /**
- * Renders the One Dollar homepage section.
+ * Renders the Party Heaven homepage section.
  *
- * Products are hydrated at runtime from the live catalog (price ≤ ONE_DOLLAR_MAX_PRICE_PKR)
+ * Products are hydrated at runtime from the live catalog (price ≤ PARTY_HEAVEN_MAX_PRICE_PKR)
  * and therefore always reflect current inventory. The section is hidden entirely when
  * no qualifying products (active deals) are available — an empty/placeholder state is
  * intentionally NOT rendered so the homepage does not advertise a deals section with
@@ -39,7 +39,7 @@ type OneDollarSectionProps = {
  * Up to HOMEPAGE_CAROUSEL_MAX_ITEMS products are shown in a carousel; the section's
  * ctaHref/ctaLabel "View All" link always appears below the carousel.
  */
-export function OneDollarSectionBlock({ section }: OneDollarSectionProps) {
+export function PartyHeavenSectionBlock({ section }: PartyHeavenSectionProps) {
   // Cap display at HOMEPAGE_CAROUSEL_MAX_ITEMS so the carousel stays manageable.
   const visibleProducts = section.products.slice(0, HOMEPAGE_CAROUSEL_MAX_ITEMS);
   const hasProducts = visibleProducts.length > 0;
@@ -131,7 +131,7 @@ export function OneDollarSectionBlock({ section }: OneDollarSectionProps) {
         <CarouselNext className="hidden size-10 sm:flex disabled:hidden" />
       </Carousel>
 
-      {/* "View all" CTA — always shown so users can reach the full One Dollar category */}
+      {/* "View all" CTA — always shown so users can reach the full Party Heaven category */}
       <div className="flex justify-center pt-2">
         <Link href={section.ctaHref} className={buttonVariants({ variant: "outline" })}>
           {section.ctaLabel}

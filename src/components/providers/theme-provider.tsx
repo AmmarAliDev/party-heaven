@@ -10,7 +10,7 @@ export function ThemeProvider({ children, ...props }: ThemeProviderProps) {
       defaultTheme="light"
       disableTransitionOnChange
       enableSystem
-      storageKey="one-dollar-theme"
+      storageKey="party-heaven-theme"
       themes={["light", "dark", "system"]}
       {...props}
     >

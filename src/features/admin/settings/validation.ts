@@ -116,9 +116,9 @@ export const adminStoreSettingsSchema = z
 export type AdminStoreSettingsInput = z.infer<typeof adminStoreSettingsSchema>;
 
 export const defaultAdminStoreSettings: AdminStoreSettingsInput = {
-  storeName: "One Dollar",
+  storeName: "Party Heaven",
   storeTagline: undefined,
-  supportEmail: "support@onedollar.pk",
+  supportEmail: "support@partyheaven.co",
   supportPhone: undefined,
   supportWhatsapp: undefined,
   supportHours: "Mon-Sat, 9:00 AM to 6:00 PM",

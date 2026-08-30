@@ -39,8 +39,8 @@ INSERT INTO "store_settings" (
 )
 VALUES (
   'default',
-  'One Dollar',
-  'support@onedollar.pk',
+  'Party Heaven',
+  'support@partyheaven.co',
   'Karachi'
 )
 ON CONFLICT ("id") DO NOTHING;

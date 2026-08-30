@@ -1,6 +1,6 @@
 # Operations Guide
 
-This document covers backup strategy, database operations, monitoring, and routine maintenance for the One Dollar production deployment.
+This document covers backup strategy, database operations, monitoring, and routine maintenance for the Party Heaven production deployment.
 
 ---
 
@@ -39,7 +39,7 @@ pg_dump \
   --no-acl \
   --no-owner \
   --format=custom \
-  --file="onedollar_$(date +%Y%m%d_%H%M%S).dump" \
+  --file="partyheaven_$(date +%Y%m%d_%H%M%S).dump" \
   "$POSTGRES_URL_NON_POOLING"
 ```
 
@@ -53,7 +53,7 @@ pg_restore \
   --no-acl \
   --no-owner \
   --dbname="<target_connection_string>" \
-  onedollar_YYYYMMDD_HHMMSS.dump
+  partyheaven_YYYYMMDD_HHMMSS.dump
 ```
 
 After restoring, run `prisma migrate deploy` to ensure the migration history table is in sync.
@@ -77,7 +77,7 @@ After restoring, run `prisma migrate deploy` to ensure the migration history tab
 Set up an external uptime check at `/api/health`:
 
 ```
-URL:     https://onedollar.pk/api/health
+URL:     https://partyheaven.co/api/health
 Method:  GET
 Interval: 1 minute
 Expected: HTTP 200, body contains "ok"

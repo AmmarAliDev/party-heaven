@@ -91,7 +91,7 @@ export function loadSiteConfig(runtimeEnv: RuntimeEnv = env) {
     locale: "en-PK",
     country: "Pakistan",
     defaultCity: runtimeEnv.defaultCity,
-    supportEmail: "support@onedollar.local",
+    supportEmail: "support@partyheaven.co",
     primaryNav: storefrontNav,
     storefrontNav,
     adminNav,

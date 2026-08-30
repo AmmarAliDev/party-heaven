@@ -1,6 +1,6 @@
-# Domain model — One Dollar
+# Domain model — Party Heaven
 
-This document explains the Prisma-based domain model for the single-vendor One Dollar store.
+This document explains the Prisma-based domain model for the single-vendor Party Heaven store.
 
 ## Quick reference
 
@@ -45,7 +45,7 @@ Key entities
 - `Account` / `Session` — NextAuth-compatible tables are included to make integration straightforward.
 - `Address` — user addresses. Orders use `OrderAddress` snapshots so address changes do not mutate historic orders.
 - `Category` — currently managed as simple categories in admin (no parent assignment), with `name`, `slug`, `description`, optional `cardImageUrl` (storefront category-card background media), `status`, and SEO fields.
-- `One Dollar` storefront category is intentionally virtual/system-level (not persisted in `Category`). Membership is derived from published products priced at `<= Rs. 280`, and does not remove products from their original category assignments.
+- `Party Heaven` storefront category is intentionally virtual/system-level (not persisted in `Category`). Membership is derived from published products priced at `<= Rs. 280`, and does not remove products from their original category assignments.
 - `BlogPost` — CMS-style article record for storefront blog content with locale, title, slug, excerpt, structured content JSON blocks, cover-image metadata, publication status/date, and SEO fields.
 - `Product` — product master record for both simple and variant-based products. Admin management covers content copy, related product links, images, specifications, status, an optional `masterSku`/`product_code` parent identifier, and shared SEO/metadata.
 - Homepage most-sold ranking reads published `Product` records indirectly through `OrderItem.productId`; storefront rendering still applies the same published product + published category visibility rules as the main catalog.
@@ -86,7 +86,7 @@ Internationalization & future features
 
 Seeding and migrations
 - Minimal seed script `prisma/seed.js` creates roles and a default category. Keep seed data lightweight.
-- Local/dev demo catalog populator `prisma/populate-dev-catalog.js` (run via `pnpm prisma:seed:dev-catalog`) upserts a deterministic multi-category dataset with SEO/image fields and mixed price bands so One Dollar eligibility (`<= Rs. 280`) can be tested without production data.
+- Local/dev demo catalog populator `prisma/populate-dev-catalog.js` (run via `pnpm prisma:seed:dev-catalog`) upserts a deterministic multi-category dataset with SEO/image fields and mixed price bands so Party Heaven eligibility (`<= Rs. 280`) can be tested without production data.
 - The included `prisma/schema.prisma` is the source of truth. Run `npm run prisma:validate` and `npm run prisma:migrate:dev` locally to generate migrations and apply them.
 
 Notes and next steps

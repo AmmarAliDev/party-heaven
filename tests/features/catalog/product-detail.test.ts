@@ -127,14 +127,14 @@ const mockGetPublishedProductContextBySlug = vi.fn();
 const mockGetRelatedPublishedProducts = vi.fn();
 const mockGetAllPublishedProductSlugsWithCategories = vi.fn();
 const mockListPublishedProductsByIds = vi.fn().mockResolvedValue([]);
-const mockCountPublishedOneDollarProducts = vi.fn().mockResolvedValue(0);
+const mockCountPublishedPartyHeavenProducts = vi.fn().mockResolvedValue(0);
 
 vi.mock("@/server/db/catalog-queries", () => ({
   listPublishedCategories: vi.fn().mockResolvedValue([]),
   getPublishedCategoryBySlug: vi.fn().mockResolvedValue(null),
   listPublishedProductsByCategory: vi.fn().mockResolvedValue([]),
   listPublishedProductsByIds: (...args: unknown[]) => mockListPublishedProductsByIds(...args),
-  countPublishedOneDollarProducts: (...args: unknown[]) => mockCountPublishedOneDollarProducts(...args),
+  countPublishedPartyHeavenProducts: (...args: unknown[]) => mockCountPublishedPartyHeavenProducts(...args),
   getPublishedProductContextBySlug: (...args: unknown[]) => mockGetPublishedProductContextBySlug(...args),
   getPublishedProductBySlug: (...args: unknown[]) => mockGetPublishedProductBySlug(...args),
   getRelatedPublishedProducts: (...args: unknown[]) => mockGetRelatedPublishedProducts(...args),
@@ -154,8 +154,8 @@ describe("product detail service", () => {
     mockGetRelatedPublishedProducts.mockReset();
     mockGetAllPublishedProductSlugsWithCategories.mockReset();
     mockListPublishedProductsByIds.mockReset();
-    mockCountPublishedOneDollarProducts.mockReset();
-    mockCountPublishedOneDollarProducts.mockResolvedValue(0);
+    mockCountPublishedPartyHeavenProducts.mockReset();
+    mockCountPublishedPartyHeavenProducts.mockResolvedValue(0);
     mockListPublishedProductsByIds.mockResolvedValue([]);
   });
 

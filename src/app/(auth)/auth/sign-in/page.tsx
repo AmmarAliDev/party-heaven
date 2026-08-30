@@ -14,7 +14,7 @@ import { SignInForm } from "@/features/auth/components/sign-in-form";
 export const metadata = buildMetadata({
   title: "Sign In",
   path: "/auth/sign-in",
-  description: "Sign in to your One Dollar account.",
+  description: "Sign in to your Party Heaven account.",
 });
 
 type SignInPageProps = {

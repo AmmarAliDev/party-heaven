@@ -1,5 +1,5 @@
 /**
- * Payment provider abstraction for the One Dollar checkout.
+ * Payment provider abstraction for the Party Heaven checkout.
  *
  * ## Architecture
  *

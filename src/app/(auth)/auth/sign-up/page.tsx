@@ -14,7 +14,7 @@ import { SignUpForm } from "@/features/auth/components/sign-up-form";
 export const metadata = buildMetadata({
   title: "Create Account",
   path: "/auth/sign-up",
-  description: "Create your One Dollar account to start shopping.",
+  description: "Create your Party Heaven account to start shopping.",
 });
 
 export default async function SignUpPage() {
@@ -30,7 +30,7 @@ export default async function SignUpPage() {
       <CardHeader className="text-center">
         <CardTitle className="text-2xl">Create account</CardTitle>
         <CardDescription>
-          Sign up to start shopping with One Dollar. We&apos;ll ask you to verify your email.
+          Sign up to start shopping with Party Heaven. We&apos;ll ask you to verify your email.
         </CardDescription>
       </CardHeader>
 

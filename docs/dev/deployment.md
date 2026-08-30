@@ -1,6 +1,6 @@
 # Deployment Guide
 
-This guide covers production deployment of **One Dollar** on Vercel with a hosted PostgreSQL database (Supabase or Vercel Postgres), Upstash Redis, Google OAuth, SMTP email, Telegram alerts, and analytics.
+This guide covers production deployment of **Party Heaven** on Vercel with a hosted PostgreSQL database (Supabase or Vercel Postgres), Upstash Redis, Google OAuth, SMTP email, Telegram alerts, and analytics.
 
 > **Quick-start checklist** — things you must set before the first deployment:
 > 1. `DATABASE_URL` (pooled) and `POSTGRES_URL_NON_POOLING` (direct)
@@ -143,7 +143,7 @@ Mark secrets as "Sensitive" (encrypted at rest, masked in logs).
 
 | Variable | Example | Notes |
 |---|---|---|
-| `NEXT_PUBLIC_APP_URL` | `https://onedollar.pk` | No trailing slash. Used in metadata and canonical URLs. |
+| `NEXT_PUBLIC_APP_URL` | `https://partyheaven.co` | No trailing slash. Used in metadata and canonical URLs. |
 | `DATABASE_URL` | `postgresql://...?pgbouncer=true` | Pooled connection string. |
 | `POSTGRES_URL_NON_POOLING` | `postgresql://...` | Direct connection for migrations. |
 | `AUTH_SECRET` | `openssl rand -base64 32` | Min 32 chars. Rotate if compromised. |
@@ -152,7 +152,7 @@ Mark secrets as "Sensitive" (encrypted at rest, masked in logs).
 
 | Variable | Example | Notes |
 |---|---|---|
-| `AUTH_URL` | `https://onedollar.pk` | Explicit Auth.js canonical URL. Prevents redirect issues behind reverse proxies. |
+| `AUTH_URL` | `https://partyheaven.co` | Explicit Auth.js canonical URL. Prevents redirect issues behind reverse proxies. |
 | `AUTH_GOOGLE_ID` | `123...apps.googleusercontent.com` | Google OAuth Client ID. |
 | `AUTH_GOOGLE_SECRET` | `GOCSPX-...` | Google OAuth Client Secret. |
 | `UPSTASH_REDIS_REST_URL` | `https://xxx.upstash.io` | Redis rate limiting. Falls back to in-memory if omitted. |
@@ -167,9 +167,9 @@ Mark secrets as "Sensitive" (encrypted at rest, masked in logs).
 | `SMTP_SECURE` | `false` | Set `true` for port 465. |
 | `SMTP_USER` | `hello@example.com` | Use App Passwords for Gmail. |
 | `SMTP_PASSWORD` | `abcd efgh ijkl mnop` | |
-| `SMTP_FROM_EMAIL` | `orders@onedollar.pk` | Sender address. |
-| `SMTP_FROM_NAME` | `One Dollar` | Display name. |
-| `NOTIFY_ADMIN_EMAILS` | `ops@onedollar.pk` | Comma-separated. |
+| `SMTP_FROM_EMAIL` | `orders@partyheaven.co` | Sender address. |
+| `SMTP_FROM_NAME` | `Party Heaven` | Display name. |
+| `NOTIFY_ADMIN_EMAILS` | `ops@partyheaven.co` | Comma-separated. |
 
 ### Telegram alerts
 
@@ -189,7 +189,7 @@ Mark secrets as "Sensitive" (encrypted at rest, masked in logs).
 
 | Variable | Example | Notes |
 |---|---|---|
-| `APP_ALLOWED_ORIGINS` | `https://admin.onedollar.pk` | Extra CSRF-trusted origins. Usually empty. |
+| `APP_ALLOWED_ORIGINS` | `https://admin.partyheaven.co` | Extra CSRF-trusted origins. Usually empty. |
 | `APP_SECRET` | `openssl rand -hex 32` | Reserved for future server-side integrations. |
 
 ---
@@ -387,7 +387,7 @@ Playwright E2E tests (`pnpm test:e2e`) can be run in CI against a preview deploy
   "status": "ok",
   "uptime": 1234,
   "timestamp": "2026-04-23T12:00:00.000Z",
-  "appUrl": "https://onedollar.pk",
+  "appUrl": "https://partyheaven.co",
   "checks": {
     "env":  { "status": "pass" },
     "db":   { "status": "pass" }
@@ -407,7 +407,7 @@ Under **Project → Settings → Health Checks**, set the path to `/api/health`.
 Use [Better Uptime](https://betterstack.com/better-uptime), [UptimeRobot](https://uptimerobot.com), or [Checkly](https://checklyhq.com):
 
 ```
-URL:      https://onedollar.pk/api/health
+URL:      https://partyheaven.co/api/health
 Method:   GET
 Interval: 1 minute
 Expected: status 200, body contains "ok"

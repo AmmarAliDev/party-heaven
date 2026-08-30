@@ -15,7 +15,7 @@ describe("admin SEO helpers", () => {
 
   it("accepts practical SEO field input for admin workflows", () => {
     const parsed = adminSeoFieldsSchema.safeParse({
-      seoTitle: "Daily Face Wash | One Dollar",
+      seoTitle: "Daily Face Wash | Party Heaven",
       seoDescription: "A gentle cleanser for everyday routines and quick shopping decisions.",
       seoCanonicalUrl: "/categories/personal-care/daily-face-wash",
       seoOgTitle: "Daily Face Wash deal",

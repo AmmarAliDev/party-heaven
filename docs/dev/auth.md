@@ -28,7 +28,7 @@ AUTH_GOOGLE_ID=
 AUTH_GOOGLE_SECRET=
 
 # ── Database (already used by Prisma) ───────────────────────────────────────
-DATABASE_URL=postgresql://user:password@localhost:5432/one_dollar
+DATABASE_URL=postgresql://user:password@localhost:5432/party_heaven
 
 # ── SMTP (required for email-based password reset) ─────────────────────────
 SMTP_HOST=
@@ -37,7 +37,7 @@ SMTP_SECURE=false
 SMTP_USER=
 SMTP_PASSWORD=
 SMTP_FROM_EMAIL=no-reply@yourdomain.com
-SMTP_FROM_NAME=One Dollar
+SMTP_FROM_NAME=Party Heaven
 ```
 
 ## Google OAuth Setup
@@ -271,8 +271,8 @@ In this project the list is built at startup by `getServerActionAllowedOrigins()
 
 | Source | Example entries |
 |---|---|
-| `NEXT_PUBLIC_APP_URL` | `onedollar.com`, `www.onedollar.com` |
-| `AUTH_URL` | `onedollar.com` |
+| `NEXT_PUBLIC_APP_URL` | `partyheaven.co`, `www.partyheaven.co` |
+| `AUTH_URL` | `partyheaven.co` |
 | `APP_ALLOWED_ORIGINS` | Comma-separated extra origins you control (e.g. a staging proxy) |
 | Hard-coded dev origins | `localhost:3000`, `127.0.0.1:3000` |
 

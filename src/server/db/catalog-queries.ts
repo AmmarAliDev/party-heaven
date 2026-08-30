@@ -30,7 +30,7 @@ import { getPrismaClient } from "@/server/db";
 const CATALOG_CACHE_REVALIDATE_SECONDS = 900;
 const PRISMA_POOL_TIMEOUT_ERROR_CODE = "P2024";
 const PRISMA_POOL_TIMEOUT_MAX_ATTEMPTS = 2;
-const ONE_DOLLAR_MAX_PRICE_PKR = 280;
+const PARTY_HEAVEN_MAX_PRICE_PKR = 280;
 const catalogQueriesLogger = createLogger("catalog-queries");
 
 // Search candidate pooling: the DB query intentionally fetches a larger
@@ -428,13 +428,13 @@ export const listAllPublishedProducts = unstable_cache(
 );
 
 /**
- * Counts One Dollar eligible published products using only one selected
+ * Counts Party Heaven eligible published products using only one selected
  * variant per product (default variant first, then oldest variant fallback).
  *
  * This avoids loading full product cards just to compute the virtual
  * category count used by global navigation and category badges.
  */
-async function _countPublishedOneDollarProductsImpl() {
+async function _countPublishedPartyHeavenProductsImpl() {
   const db = getPrismaClient();
   try {
     const result = await db.$queryRaw<Array<{ count: bigint | number }>>`
@@ -450,7 +450,7 @@ async function _countPublishedOneDollarProductsImpl() {
       ) AS selected_variant ON TRUE
       WHERE p."status" = 'PUBLISHED'
         AND c."status" = 'PUBLISHED'
-        AND selected_variant."price" <= ${ONE_DOLLAR_MAX_PRICE_PKR}
+        AND selected_variant."price" <= ${PARTY_HEAVEN_MAX_PRICE_PKR}
     `;
 
     const countValue = result[0]?.count;
@@ -465,8 +465,8 @@ async function _countPublishedOneDollarProductsImpl() {
 
     return 0;
   } catch (error) {
-    catalogQueriesLogger.warn("raw one-dollar count failed; using fallback query", {
-      code: "CATALOG_ONE_DOLLAR_COUNT_RAW_QUERY_FAILED",
+    catalogQueriesLogger.warn("raw party-heaven count failed; using fallback query", {
+      code: "CATALOG_PARTY_HEAVEN_COUNT_RAW_QUERY_FAILED",
       error,
     });
 
@@ -500,14 +500,14 @@ async function _countPublishedOneDollarProductsImpl() {
         return total;
       }
 
-      return price <= ONE_DOLLAR_MAX_PRICE_PKR ? total + 1 : total;
+      return price <= PARTY_HEAVEN_MAX_PRICE_PKR ? total + 1 : total;
     }, 0);
   }
 }
 
-export const countPublishedOneDollarProducts = unstable_cache(
-  _countPublishedOneDollarProductsImpl,
-  ["storefront:published-products-one-dollar-count"],
+export const countPublishedPartyHeavenProducts = unstable_cache(
+  _countPublishedPartyHeavenProductsImpl,
+  ["storefront:published-products-party-heaven-count"],
   {
     revalidate: CATALOG_CACHE_REVALIDATE_SECONDS,
     tags: [CATALOG_CACHE_TAGS.products],

@@ -7,7 +7,7 @@ const slugRegex = /^[a-z0-9]+(?:-[a-z0-9]+)*$/;
 export const adminHomepageSectionKindValues = [
   "announcement-bar",
   "featured-categories",
-  "one-dollar",
+  "party-heaven",
   "featured-products",
   "deal-spotlight",
 ] as const;
@@ -299,13 +299,13 @@ const dealSpotlightContentSchema = z
   });
 
 /**
- * One Dollar section — admin configures the shell (title, description, CTA
+ * Party Heaven section — admin configures the shell (title, description, CTA
  * text and link, placeholder message). Products are never stored in CMS; they
  * are auto-hydrated from the live catalog at render time.
  */
-const oneDollarContentSchema = z.object({
+const partyHeavenContentSchema = z.object({
   description: optionalText,
-  ctaLabel: z.string().trim().min(1, "CTA label is required.").max(80, "CTA label is too long.").default("View all One Dollar deals"),
+  ctaLabel: z.string().trim().min(1, "CTA label is required.").max(80, "CTA label is too long.").default("View all Party Heaven deals"),
   ctaHref: z
     .string()
     .trim()
@@ -313,19 +313,19 @@ const oneDollarContentSchema = z.object({
     .refine((value) => isValidHref(value), {
       message: "Please enter a valid relative path or URL for the CTA.",
     })
-    .default("/categories/one-dollar"),
+    .default("/categories/party-heaven"),
   placeholderMessage: z
     .string()
     .trim()
     .min(2, "Placeholder message is required.")
     .max(240, "Placeholder message is too long.")
-    .default("No One Dollar products are available right now. Check back soon."),
+    .default("No Party Heaven products are available right now. Check back soon."),
 });
 
 const homepageSectionContentSchemas = {
   "announcement-bar": announcementBarContentSchema,
   "featured-categories": featuredCategoriesContentSchema,
-  "one-dollar": oneDollarContentSchema,
+  "party-heaven": partyHeavenContentSchema,
   "featured-products": featuredProductsContentSchema,
   "deal-spotlight": dealSpotlightContentSchema,
 } satisfies Record<AdminHomepageSectionType, z.ZodTypeAny>;
@@ -469,11 +469,11 @@ const homepageSectionContentTemplates: Record<AdminHomepageSectionType, Record<s
     description: "Highlight key shopping categories.",
     categories: [],
   },
-  "one-dollar": {
+  "party-heaven": {
     description: "Products priced at Rs. 280 or less. Products are auto-loaded from the catalog.",
-    ctaLabel: "View all One Dollar deals",
-    ctaHref: "/categories/one-dollar",
-    placeholderMessage: "No One Dollar products are available right now. Check back soon.",
+    ctaLabel: "View all Party Heaven deals",
+    ctaHref: "/categories/party-heaven",
+    placeholderMessage: "No Party Heaven products are available right now. Check back soon.",
   },
   "featured-products": {
     description: "Feature products or hero SKUs.",

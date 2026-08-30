@@ -56,7 +56,7 @@ describe("AdminShell component layout and background styling", () => {
 
     expect(screen.getByText("Admin Content")).toBeInTheDocument();
     expect(screen.getByText("Admin workspace")).toBeInTheDocument();
-    expect(screen.getByText("One Dollar Ops")).toBeInTheDocument();
+    expect(screen.getByText("Party Heaven Ops")).toBeInTheDocument();
 
     const sidebar = container.querySelector("div[aria-label='Admin navigation sidebar']");
     expect(sidebar).not.toBeNull();

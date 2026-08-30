@@ -146,7 +146,7 @@
 - `Home`, `About`, `Blog`, `Contact`, `Admin Panel`, `Account`/`Sign in`, `Your Orders`, and `Sign out` live in the shared `<UserMenu />` dropdown on desktop (`StorefrontHeaderAuthControls` mode `"desktop"`). On mobile the same options live inside the hamburger drawer (`StorefrontMobileNav`): page links, `Admin Panel` (admins), `Your Orders` (signed-in users), plus wishlist/account/sign-out actions — there is no separate user-menu button in the mobile header.
 - `Your Orders` (`/account/orders`) appears directly before `Sign out` for signed-in users — inside `<UserMenu />` on desktop and inside the mobile drawer.
 - The mobile drawer (`src/components/layout/storefront-mobile-nav.tsx`) does not render the catalog category list; category browsing on mobile is served by the mobile bottom nav's **Collections** action (`/categories`).
-- Category ordering is deterministic and must remain: `One Dollar` first, published categories in alphabetical order next, and `All Categories` last (inside the `More` dropdown).
+- Category ordering is deterministic and must remain: `Party Heaven` first, published categories in alphabetical order next, and `All Categories` last (inside the `More` dropdown).
 - Desktop uses accessible dropdown menus (`DropdownMenuTrigger` + keyboard navigation).
 - Mobile navigation behavior lives in `src/components/layout/storefront-mobile-nav.tsx` and must keep `aria-expanded`, `aria-controls`, and a labeled toggle button.
 - `AppFooter` is a four-column footer: **Quick Links** (up to `NAVBAR_DIRECT_CATEGORY_LIMIT` = 6 live catalog categories via `buildStorefrontNavbarCategoryMenu` plus a `View All` link to `/categories`), **Help** (About us, Contact us, Your Orders), **Policies** (Privacy Policy, Refund Policy, Shipping Policy, Terms of Service), and **Contact** (Email/Phone placeholders). `AppFooter` is an async server component that loads published categories (same source as the header); each column renders through the client `FooterColumn` (`src/components/layout/footer-column.tsx`), which collapses behind its heading on mobile (chevron toggle with `aria-expanded`/`aria-controls`, content `hidden md:block`) and always renders expanded from the `md` breakpoint up. Column headings are responsive (`text-sm md:text-xl`), column links use the muted footer palette (`text-muted hover:text-muted-foreground`), and the `View All` action renders as a ghost text-link (`buttonVariants({ variant: "ghost" })` with `hover:bg-transparent`), not a bordered button.
@@ -178,7 +178,7 @@
 - **View All button rules**:
   - Always shown when the data was capped (`totalItems > HOMEPAGE_CAROUSEL_MAX_ITEMS`).
   - Optionally shown when the section payload includes an explicit `viewAllHref` (even if no cap was reached).
-  - For `one-dollar` sections the CTA is always rendered because those products link to the live One Dollar catalog page.
+  - For `party-heaven` sections the CTA is always rendered because those products link to the live Party Heaven catalog page.
   - Falls back to the relevant route (e.g. `routes.storefront.categories`) when no explicit href is supplied by the section payload.
 - Storefront-facing category and product cards must be fully clickable with one semantic wrapping `Link` per card. Do not place additional nested anchors or buttons inside those linked cards.
 - Keep card headings and key metadata inside the same wrapping link so keyboard users and crawlers get a single coherent navigation target.

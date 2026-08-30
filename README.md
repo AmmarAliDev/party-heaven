@@ -1,4 +1,4 @@
-# One Dollar
+# Party Heaven
 
 Production-ready **single-vendor e-commerce application** built with **Next.js 16 App Router**, **TypeScript**, **Tailwind CSS 4**, and **shadcn/ui-compatible patterns**. Targets the Pakistani market (Rs., Karachi-first).
 

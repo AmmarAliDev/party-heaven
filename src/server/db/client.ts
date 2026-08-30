@@ -2,7 +2,7 @@ import type { Prisma } from '@prisma/client';
 import { PrismaClient } from '@prisma/client';
 
 type GlobalPrismaCache = typeof globalThis & {
-  __oneDollarPrisma?: PrismaClient;
+  __partyHeavenPrisma?: PrismaClient;
 };
 
 const globalForPrisma = globalThis as GlobalPrismaCache;
@@ -99,11 +99,11 @@ export function createPrismaClient(): PrismaClient {
 }
 
 export function getPrismaClient(): PrismaClient {
-  if (!globalForPrisma.__oneDollarPrisma) {
-    globalForPrisma.__oneDollarPrisma = createPrismaClient();
+  if (!globalForPrisma.__partyHeavenPrisma) {
+    globalForPrisma.__partyHeavenPrisma = createPrismaClient();
   }
 
-  return globalForPrisma.__oneDollarPrisma;
+  return globalForPrisma.__partyHeavenPrisma;
 }
 
 export function resolveDbExecutor(db?: DatabaseExecutor): DatabaseExecutor {

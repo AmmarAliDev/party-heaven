@@ -9,7 +9,7 @@ import { ForgotPasswordForm } from "@/features/auth/components/forgot-password-f
 export const metadata = buildMetadata({
   title: "Forgot Password",
   path: "/auth/forgot-password",
-  description: "Request a password reset link for your One Dollar account.",
+  description: "Request a password reset link for your Party Heaven account.",
 });
 
 export default function ForgotPasswordPage() {

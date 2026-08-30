@@ -26,10 +26,10 @@ Complete this once before the first production deployment and revisit before any
 ### Authentication
 
 - [ ] `AUTH_SECRET` set to a random 32+ character secret (`openssl rand -base64 32`)
-- [ ] `AUTH_URL` set to the production domain (e.g. `https://onedollar.pk`)
+- [ ] `AUTH_URL` set to the production domain (e.g. `https://partyheaven.co`)
 - [ ] Google OAuth Client ID and Secret configured (`AUTH_GOOGLE_ID`, `AUTH_GOOGLE_SECRET`)
 - [ ] Production domain added to Google OAuth "Authorized redirect URIs":
-      `https://onedollar.pk/api/auth/callback/google`
+      `https://partyheaven.co/api/auth/callback/google`
 - [ ] Test sign-in with credentials and Google OAuth on the production deployment
 
 ### Database

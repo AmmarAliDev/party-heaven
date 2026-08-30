@@ -7,24 +7,24 @@ import {
 } from "@/components/layout/storefront-category-menu";
 
 describe("buildStorefrontCategoryMenu", () => {
-  it("pins One Dollar first, sorts other categories, and appends All Categories", () => {
+  it("pins Party Heaven first, sorts other categories, and appends All Categories", () => {
     const menu = buildStorefrontCategoryMenu([
       { name: "Home Care", href: "/categories/home-care" },
-      { name: "one dollar", href: "/categories/one-dollar" },
+      { name: "party heaven", href: "/categories/party-heaven" },
       { name: "Grocery", href: "/categories/grocery" },
     ]);
 
     expect(menu.map((item) => item.title)).toEqual([
-      "One Dollar",
+      "Party Heaven",
       "Grocery",
       "Home Care",
       "All Categories",
     ]);
 
     expect(menu[0]).toMatchObject({
-      title: "One Dollar",
-      href: "/categories/one-dollar",
-      kind: "one-dollar",
+      title: "Party Heaven",
+      href: "/categories/party-heaven",
+      kind: "party-heaven",
     });
 
     expect(menu.at(-1)).toMatchObject({
@@ -34,15 +34,15 @@ describe("buildStorefrontCategoryMenu", () => {
     });
   });
 
-  it("falls back to the One Dollar category route when category data is unavailable", () => {
+  it("falls back to the Party Heaven category route when category data is unavailable", () => {
     const menu = buildStorefrontCategoryMenu([
       { name: "Personal Care", href: "/categories/personal-care" },
     ]);
 
     expect(menu[0]).toMatchObject({
-      title: "One Dollar",
-      href: "/categories/one-dollar",
-      kind: "one-dollar",
+      title: "Party Heaven",
+      href: "/categories/party-heaven",
+      kind: "party-heaven",
     });
   });
 });
@@ -50,7 +50,7 @@ describe("buildStorefrontCategoryMenu", () => {
 describe("buildStorefrontNavbarCategoryMenu", () => {
   const categories = [
     { name: "Home Care", href: "/categories/home-care" },
-    { name: "one dollar", href: "/categories/one-dollar" },
+    { name: "party heaven", href: "/categories/party-heaven" },
     { name: "Grocery", href: "/categories/grocery" },
     { name: "Personal Care", href: "/categories/personal-care" },
     { name: "Cleaning Supplies", href: "/categories/cleaning-supplies" },
@@ -63,7 +63,7 @@ describe("buildStorefrontNavbarCategoryMenu", () => {
     const menu = buildStorefrontNavbarCategoryMenu(categories);
 
     expect(menu.directCategories.map((item) => item.title)).toEqual([
-      "One Dollar",
+      "Party Heaven",
       "Baby Care",
       "Cleaning Supplies",
       "Grocery",
@@ -124,11 +124,11 @@ describe("buildStorefrontNavbarCategoryMenu", () => {
 
   it("handles fewer categories than the direct limit without duplication", () => {
     const menu = buildStorefrontNavbarCategoryMenu([
-      { name: "One Dollar", href: "/categories/one-dollar" },
+      { name: "Party Heaven", href: "/categories/party-heaven" },
       { name: "Grocery", href: "/categories/grocery" },
     ]);
 
-    expect(menu.directCategories.map((item) => item.title)).toEqual(["One Dollar", "Grocery"]);
+    expect(menu.directCategories.map((item) => item.title)).toEqual(["Party Heaven", "Grocery"]);
     expect(menu.moreCategories).toEqual([]);
     expect(menu.allCategories.title).toBe("All Categories");
   });
