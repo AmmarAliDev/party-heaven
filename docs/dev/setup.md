@@ -243,7 +243,7 @@ Use `pnpm test:watch` during local iteration.
 ## UI Foundation Checks
 
 During local development, verify these manual flows:
-- theme toggle switches between `system`, `light`, and `dark`
+- app always renders the fixed light theme regardless of the device color preference
 - storefront shell loads at `/` and `/preview`
 - admin shell placeholder loads at `/admin`
 - toast preview button on `/preview` (Storefront Preview page header) renders a frontend notification

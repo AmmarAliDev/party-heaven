@@ -28,7 +28,7 @@ Provide a compact testing map for AI prompts so changes can target the right tes
 - Homepage featured categories carousel covered with rendering, responsive card, and empty-state scenarios (`tests/features/homepage/featured-categories-section.test.tsx`)
 - Homepage service coverage now includes featured-products most-sold ordering, published-product filtering, sparse-data fallback behavior, and recent-published-before-fallback backfill ordering (`tests/features/homepage/service.test.ts`)
 - Product admin form upload integration covered with file selection, upload progress, and URL-write-back scenarios (`tests/features/admin/products/admin-product-form.test.tsx`)
-- Smoke test suite extended with palette/token sanity checks for light/dark theme consistency (`tests/smoke/ui-foundation.test.ts`)
+- Smoke test suite extended with palette/token sanity checks for the fixed light theme (`tests/smoke/ui-foundation.test.ts`)
 
 ## Known Gaps (from current docs and coverage posture)
 

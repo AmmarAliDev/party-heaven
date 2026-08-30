@@ -53,7 +53,7 @@
 ## Styling Conventions
 
 - Use Tailwind utilities with shared design tokens from `src/app/globals.css`; avoid hard-coded page-only color values when a semantic token already exists.
-- Placeholder color: global placeholder color is centralized in `src/app/globals.css` as the `--placeholder` token and is set to `#17171769`. Prefer the token for placeholder styling and avoid per-component placeholder overrides so placeholder appearance stays consistent across themes and surfaces.
+- Placeholder color: global placeholder color is centralized in `src/app/globals.css` as the `--placeholder` token and is set to `#17171769`. Prefer the token for placeholder styling and avoid per-component placeholder overrides so placeholder appearance stays consistent across surfaces.
 - Follow shadcn/ui-compatible patterns for reusable primitives.
 - Prefer the shared UI wrappers before creating one-off markup:
   - `PageContainer` / `PageShell`

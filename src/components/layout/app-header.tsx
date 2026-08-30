@@ -116,8 +116,6 @@ export async function AppHeader() {
                 Wishlist
               </Link>
               <CartDrawerTrigger />
-              {/* Temporarily disabled */}
-              {/* <ThemeToggle /> */}
               <StorefrontHeaderAuthControls
                 topLevelNavItems={topLevelNavItems}
                 mode="desktop"

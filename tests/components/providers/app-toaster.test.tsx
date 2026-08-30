@@ -3,12 +3,7 @@
 import { cleanup, render, screen } from "@testing-library/react";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
-const useThemeMock = vi.hoisted(() => vi.fn());
 const toasterMock = vi.hoisted(() => vi.fn());
-
-vi.mock("next-themes", () => ({
-  useTheme: () => useThemeMock(),
-}));
 
 vi.mock("sonner", () => ({
   Toaster: (props: unknown) => {
@@ -19,7 +14,6 @@ vi.mock("sonner", () => ({
 
 describe("AppToaster", () => {
   beforeEach(() => {
-    useThemeMock.mockReset();
     toasterMock.mockReset();
   });
 
@@ -27,9 +21,7 @@ describe("AppToaster", () => {
     cleanup();
   });
 
-  it("maps dark mode and applies theme-aware action button classes", async () => {
-    useThemeMock.mockReturnValue({ resolvedTheme: "dark" });
-
+  it("always renders in the fixed light theme", async () => {
     const { AppToaster } = await import("@/components/providers/app-toaster");
 
     render(<AppToaster />);
@@ -40,10 +32,8 @@ describe("AppToaster", () => {
     const toasterProps = toasterMock.mock.calls[0]?.[0] as {
       theme?: string;
       toastOptions?: {
-        actionButtonStyle?: {
-          background?: string;
-          color?: string;
-        };
+        actionButtonStyle?: { background?: string };
+        cancelButtonStyle?: { background?: string };
         classNames?: {
           actionButton?: string;
           cancelButton?: string;
@@ -51,22 +41,10 @@ describe("AppToaster", () => {
       };
     };
 
-    expect(toasterProps.theme).toBe("dark");
+    expect(toasterProps.theme).toBe("light");
+    expect(toasterProps.toastOptions?.actionButtonStyle?.background).toBe("#2b1735");
+    expect(toasterProps.toastOptions?.cancelButtonStyle?.background).toBe("#977aa1");
     expect(toasterProps.toastOptions?.classNames?.actionButton).toContain("bg-primary");
     expect(toasterProps.toastOptions?.classNames?.cancelButton).toContain("border");
-  });
-
-  it("maps non-dark mode to light theme", async () => {
-    useThemeMock.mockReturnValue({ resolvedTheme: "system" });
-
-    const { AppToaster } = await import("@/components/providers/app-toaster");
-
-    render(<AppToaster />);
-
-    const toasterProps = toasterMock.mock.calls[0]?.[0] as {
-      theme?: string;
-    };
-
-    expect(toasterProps.theme).toBe("light");
   });
 });

@@ -1,7 +1,5 @@
 @import "tailwindcss";
 
-@custom-variant dark (&:where(.dark, .dark *));
-
 :root {
   --background: #ffffff;
   --background-header-footer: #111111;
@@ -46,54 +44,6 @@
   --space-page: clamp(1rem, 0.85rem + 0.8vw, 1.5rem);
   --space-section: clamp(2.5rem, 1.6rem + 2.8vw, 4.5rem);
   --space-stack: clamp(1rem, 0.8rem + 1vw, 1.5rem);
-}
-
-.dark {
-  /* --background: #000000;
-  --foreground: #f4eefa;
-  --card: #0b0610;
-  --card-foreground: #f4eefa;
-  --popover: #100815;
-  --popover-foreground: #f4eefa;
-  --muted: #140c19;
-  --muted-foreground: #ccb7d5;
-  --accent: #25112f;
-  --accent-foreground: #f6ecfa;
-  --primary: #977aa1;
-  --primary-foreground: #f6effa;
-  --secondary: #190f20;
-  --secondary-foreground: #efe5f5;
-  --border: #2b1735;
-  --input: #392145;
-  --ring: #8f5ca8;
-  --success: #4ade80;
-  --warning: #f59e0b;
-  --destructive: #f87171;
-  --info: #60a5fa;
-  --shadow-soft: 0 20px 44px -28px rgb(0 0 0 / 0.74);
-  --shadow-elevated: 0 30px 74px -36px rgb(0 0 0 / 0.82); */
-
-  --background: #090305;
-  --foreground: #fff0f5;
-
-  --card: #14070b;
-  --card-foreground: #fff0f5;
-
-  --muted: #210a11;
-  --muted-foreground: #efc0d0;
-
-  --accent: #34101c;
-  --accent-foreground: #fff0f5;
-
-  --primary: #e11d48;
-  --primary-foreground: #ffffff;
-
-  --secondary: #220a12;
-  --secondary-foreground: #ffe4ec;
-
-  --border: #431221;
-  --input: #5d1930;
-  --ring: #e11d48;
 }
 
 @theme inline {
@@ -184,11 +134,6 @@ body {
 ::selection {
   background: color-mix(in srgb, var(--primary) 26%, white);
   color: var(--foreground);
-}
-
-.dark ::selection {
-  background: color-mix(in srgb, var(--primary) 70%, black);
-  color: var(--primary-foreground);
 }
 
 /* Global placeholder color for inputs and textareas.

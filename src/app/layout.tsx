@@ -3,7 +3,6 @@ import type { ReactNode } from "react";
 
 import { AppToaster } from "@/components/providers/app-toaster";
 import { AuthProvider } from "@/components/providers/auth-provider";
-import { ThemeProvider } from "@/components/providers/theme-provider";
 import { buildMetadata } from "@/config/metadata";
 import { appViewport } from "@/config/viewport";
 import { AnalyticsProvider } from "@/features/analytics/components/analytics-provider";
@@ -25,20 +24,13 @@ export const viewport = appViewport;
 
 export default function RootLayout({ children }: Readonly<{ children: ReactNode }>) {
   return (
-    <html
-      lang="en"
-      suppressHydrationWarning
-      data-scroll-behavior="smooth"
-      className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
-    >
-      <body suppressHydrationWarning className="bg-background text-foreground min-h-full font-sans antialiased">
-        <ThemeProvider>
-          <AuthProvider>
-            {children}
-            <AppToaster />
-            <AnalyticsProvider />
-          </AuthProvider>
-        </ThemeProvider>
+    <html lang="en" data-scroll-behavior="smooth" className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}>
+      <body className="bg-background text-foreground min-h-full font-sans antialiased">
+        <AuthProvider>
+          {children}
+          <AppToaster />
+          <AnalyticsProvider />
+        </AuthProvider>
       </body>
     </html>
   );

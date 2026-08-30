@@ -49,8 +49,6 @@ export function StorefrontMobileNav({
         >
           <div className="mx-auto flex w-full max-w-(--container-width) flex-col gap-4">
             <div className={cn("grid gap-2 place-items-center", isSignedIn ? "grid-cols-3" : "grid-cols-2")}>
-              {/* Temporarily disabled */}
-              {/* <ThemeToggle /> */}
               <Link
                 href={wishlistHref}
                 className={buttonVariants({ variant: "outline", size: "icon" })}
