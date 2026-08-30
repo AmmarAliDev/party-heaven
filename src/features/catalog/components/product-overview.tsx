@@ -15,7 +15,6 @@ import { ProductPanel } from "./product-panel";
 
 type ProductOverviewProps = {
   product: CatalogProductDetail;
-  initialWishlistedSkus?: readonly string[];
 };
 
 /**
@@ -27,7 +26,7 @@ type ProductOverviewProps = {
  * - Simple products (no variant groups) render exactly like before: a static
  *   gallery and the standard add-to-cart panel.
  */
-export function ProductOverview({ product, initialWishlistedSkus = [] }: ProductOverviewProps) {
+export function ProductOverview({ product }: ProductOverviewProps) {
   const [selectedOptionIds, setSelectedOptionIds] = useState<Record<string, string>>(
     () => buildDefaultSelections(product),
   );
@@ -62,7 +61,6 @@ export function ProductOverview({ product, initialWishlistedSkus = [] }: Product
         product={product}
         selectedOptionIds={selectedOptionIds}
         onSelect={handleSelect}
-        initialWishlistedSkus={initialWishlistedSkus}
       />
     </section>
   );

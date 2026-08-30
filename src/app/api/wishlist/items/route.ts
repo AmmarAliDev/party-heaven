@@ -3,6 +3,7 @@ import { z } from "zod";
 
 import {
   addWishlistItemForUser,
+  getWishlistSkusForUser,
   removeWishlistSelectionForUser,
   removeWishlistSkuForUser,
 } from "@/features/wishlist";
@@ -32,6 +33,23 @@ function requireUserId(userId: string | undefined) {
   }
 
   return userId;
+}
+
+export async function GET() {
+  try {
+    const access = await guardRouteHandlerAccess();
+    if (!access.ok) {
+      return access.response;
+    }
+
+    const skus = await getWishlistSkusForUser(requireUserId(access.session.user.id));
+
+    return NextResponse.json({ ok: true, skus });
+  } catch (error) {
+    return createRouteHandlerErrorResponse(error, "wishlist:list", {
+      userMessage: "We could not load your wishlist. Please try again.",
+    });
+  }
 }
 
 export async function POST(request: Request) {
