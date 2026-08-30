@@ -1,6 +1,7 @@
 "use client";
 
 import { useMemo, useState } from "react";
+import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { Controller } from "react-hook-form";
 
@@ -16,6 +17,14 @@ import {
 } from "@/components/ui/field";
 import { FormErrorSummary } from "@/components/ui/form-error-summary";
 import { PriceDisplay } from "@/components/ui/price-display";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
+import { routes } from "@/config/routes";
+import { upsertSavedAddressRequest } from "@/features/addresses";
 import type { CartSummary } from "@/features/cart/types";
 import {
   CHECKOUT_FIXED_PROVINCE,
@@ -23,8 +32,10 @@ import {
   type CheckoutPayload,
   checkoutPayloadSchema,
   type CheckoutPaymentMethodDefinition,
+  type CheckoutShippingAddress,
   submitCheckoutRequest,
 } from "@/features/checkout";
+import { AppError } from "@/lib/errors/app-error";
 import { toUserMessage } from "@/lib/errors/error-messages";
 import { notify } from "@/lib/notify";
 import { testIds } from "@/lib/test-selectors";
@@ -39,7 +50,14 @@ type CheckoutPageClientProps = {
     email: string;
     phone: string;
   };
+  /** Whether the current customer is signed in (needed to offer address saving). */
+  isAuthenticated?: boolean;
+  /** Saved default shipping address to pre-fill for signed-in customers. */
+  initialShippingAddress?: CheckoutShippingAddress | null;
 };
+
+const CHECKOUT_SAVE_ADDRESS_TOOLTIP =
+  "Save the address to use for later orders, You can change your address from addresses inside profile";
 
 export function CheckoutPageClient({
   cart,
@@ -47,6 +65,8 @@ export function CheckoutPageClient({
   allowSubmit,
   paymentMethods,
   initialCustomer,
+  isAuthenticated = false,
+  initialShippingAddress = null,
 }: CheckoutPageClientProps) {
   const router = useRouter();
   const defaultPaymentMethod = paymentMethods[0]?.code ?? "COD";
@@ -61,12 +81,11 @@ export function CheckoutPageClient({
         phone: initialCustomer.phone,
       },
       shippingAddress: {
-        addressLine1: "",
-        addressLine2: "",
-        city: CHECKOUT_SUPPORTED_CITY,
-        province: CHECKOUT_FIXED_PROVINCE,
-        country: "Pakistan",
-        postcode: "",
+        addressLine1: initialShippingAddress?.addressLine1 ?? "",
+        city: initialShippingAddress?.city ?? CHECKOUT_SUPPORTED_CITY,
+        province: initialShippingAddress?.province ?? CHECKOUT_FIXED_PROVINCE,
+        country: initialShippingAddress?.country ?? "Pakistan",
+        postcode: initialShippingAddress?.postcode ?? "",
       },
       paymentMethod: defaultPaymentMethod,
       notes: "",
@@ -77,8 +96,52 @@ export function CheckoutPageClient({
   const [retryPayload, setRetryPayload] = useState<CheckoutPayload | null>(null);
   const [submitted, setSubmitted] = useState(false);
   const [retryPending, setRetryPending] = useState(false);
+  const [saveAddressPending, setSaveAddressPending] = useState(false);
 
   const isPending = form.formState.isSubmitting || retryPending;
+
+  async function handleSaveAddress() {
+    if (saveAddressPending || isPending || submitted) {
+      return;
+    }
+
+    const addressValid = await form.trigger("shippingAddress");
+    if (!addressValid) {
+      notify.warning("Address incomplete", "Please fill in the required address fields before saving.");
+      return;
+    }
+
+    const values = form.getValues();
+    setSaveAddressPending(true);
+
+    try {
+      await upsertSavedAddressRequest({
+        addressLine1: values.shippingAddress.addressLine1,
+        city: values.shippingAddress.city,
+        province: values.shippingAddress.province,
+        country: values.shippingAddress.country,
+        ...(values.shippingAddress.postcode
+          ? { postcode: values.shippingAddress.postcode }
+          : {}),
+        ...(values.customer.phone ? { phone: values.customer.phone } : {}),
+      });
+
+      notify.success(
+        "Address saved",
+        "You can change your address anytime from Addresses in your profile.",
+      );
+    } catch (error) {
+      if (error instanceof AppError && error.statusCode === 401) {
+        notify.info("Sign in required", "Please sign in to save your address.");
+        router.push(`${routes.auth.signIn}?from=${encodeURIComponent(routes.storefront.checkout)}`);
+        return;
+      }
+
+      notify.error("Could not save address", toUserMessage(error));
+    } finally {
+      setSaveAddressPending(false);
+    }
+  }
 
   const totals = useMemo(
     () => ({
@@ -204,8 +267,38 @@ export function CheckoutPageClient({
         </Card>
 
         <Card>
-          <CardHeader>
+          <CardHeader className="flex flex-row flex-wrap items-center justify-between gap-3">
             <CardTitle>Shipping address</CardTitle>
+            {isAuthenticated ? (
+              <div className="flex items-center gap-4">
+                <Link
+                  href={routes.storefront.accountAddresses}
+                  className="text-xs font-medium text-muted-foreground underline underline-offset-4 transition-colors hover:text-foreground"
+                  data-testid={testIds.storefront.checkoutManageAddresses}
+                >
+                  Manage saved addresses
+                </Link>
+                <TooltipProvider delayDuration={200}>
+                  <Tooltip>
+                    <TooltipTrigger asChild>
+                      <Button
+                        type="button"
+                        variant="outline"
+                        size="sm"
+                        onClick={() => void handleSaveAddress()}
+                        disabled={saveAddressPending || isPending || submitted}
+                        data-testid={testIds.storefront.checkoutSaveAddress}
+                      >
+                        {saveAddressPending ? "Saving..." : "Save"}
+                      </Button>
+                    </TooltipTrigger>
+                    <TooltipContent className="max-w-64 text-left">
+                      {CHECKOUT_SAVE_ADDRESS_TOOLTIP}
+                    </TooltipContent>
+                  </Tooltip>
+                </TooltipProvider>
+              </div>
+            ) : null}
           </CardHeader>
           <CardContent className="grid gap-4 sm:grid-cols-2">
             <div className="sm:col-span-2">
@@ -216,7 +309,7 @@ export function CheckoutPageClient({
                   id: "checkout-address-line-1",
                   name: "shippingAddress.addressLine1",
                   type: "text",
-                  label: "Address line 1",
+                  label: "Address",
                   autoComplete: "address-line1",
                   placeholder: "House, street, area",
                   required: true,
@@ -224,23 +317,7 @@ export function CheckoutPageClient({
               />
             </div>
 
-            <div className="sm:col-span-2">
-              <DynamicFormField
-                control={form.control}
-                disabled={isPending || submitted}
-                fieldConfig={{
-                  id: "checkout-address-line-2",
-                  name: "shippingAddress.addressLine2",
-                  type: "text",
-                  label: "Address line 2",
-                  description: "Optional apartment, landmark, or delivery note.",
-                  autoComplete: "address-line2",
-                  placeholder: "Apartment, landmark",
-                }}
-              />
-            </div>
-
-            <DynamicFormField
+            {/* <DynamicFormField
               control={form.control}
               disabled={true}
               fieldConfig={{
@@ -249,7 +326,7 @@ export function CheckoutPageClient({
                 type: "text",
                 label: "Province",
               }}
-            />
+            /> */}
 
             <DynamicFormField
               control={form.control}
@@ -270,14 +347,13 @@ export function CheckoutPageClient({
                 id: "checkout-postcode",
                 name: "shippingAddress.postcode",
                 type: "text",
-                label: "Postal code",
+                label: "Postal code (optional)",
                 inputMode: "numeric",
                 placeholder: "75500",
-                required: true,
               }}
             />
 
-            <DynamicFormField
+            {/* <DynamicFormField
               control={form.control}
               disabled={true}
               fieldConfig={{
@@ -286,7 +362,7 @@ export function CheckoutPageClient({
                 type: "text",
                 label: "Country",
               }}
-            />
+            /> */}
           </CardContent>
         </Card>
 

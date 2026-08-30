@@ -24,6 +24,8 @@ export const testIds = {
     cartSummary: "storefront-cart-summary",
     checkoutForm: "storefront-checkout-form",
     checkoutSubmit: "storefront-checkout-submit",
+    checkoutSaveAddress: "storefront-checkout-save-address",
+    checkoutManageAddresses: "storefront-checkout-manage-addresses",
     checkoutConfirmation: "storefront-order-confirmation",
   },
   auth: {

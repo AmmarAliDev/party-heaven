@@ -162,6 +162,8 @@ Validation behavior:
 - if city is not Karachi, payload is rejected with user-safe error
 - API returns friendly error messages through central error handlers
 
+Shipping address fields: only `addressLine1` is required (there is no address line 2 field at checkout); `postcode` is optional — an empty or missing postal code is accepted and normalized away, and a provided one must be 4–10 numeric characters. `city`/`province`/`country` are fixed (Karachi / Sindh / Pakistan).
+
 ## Totals
 
 Totals are calculated from cart subtotal with fixed shipping:
@@ -173,6 +175,18 @@ Totals are calculated from cart subtotal with fixed shipping:
 ## Retry handling
 
 The checkout form keeps the last payload on failed submit and exposes a "Retry last attempt" action. This gives users a direct recovery path for transient failures.
+
+## Saved addresses
+
+Signed-in customers can save a delivery address from checkout and manage it from their profile:
+
+- The Shipping address card header shows a **Save** button (signed-in only) wrapped in a tooltip — "Save the address to use for later orders, You can change your address from addresses inside profile" — plus a **Manage saved addresses** link to `/account/addresses`.
+- Saving validates the address fields first, then POSTs to `/api/addresses` (phone is taken from the customer phone field). Saving upserts by `street1`, so clicking Save again never duplicates.
+- Pre-fill: the checkout page loads the signed-in user's default saved address (`listSavedAddresses` on the server) and passes it to `CheckoutPageClient` as `initialShippingAddress`; the address fields and the customer phone (taken from the saved address's phone) are pre-populated. Guests get empty fields.
+- Saved addresses live in the existing Prisma `Address` model (`userId`, `label`, `street1/street2`, `city`/`province`/`country` enums, `postcode`, `phone`, `isDefault`).
+- The profile **Addresses** page (`/account/addresses`) renders a client address book (`AddressBook`) with Add / Edit / Remove / Make-default, hosting the shared `AddressForm` in a dialog. City is locked to Karachi (disabled field); province/country/label are hidden for now but stored with their region defaults. The first saved address automatically becomes the default, and setting a default clears all others transactionally.
+- Feature code: `src/features/addresses/` (types, `savedAddressInputSchema` validation, service CRUD, client fetch helpers, `AddressBook`/`AddressForm`/`AddressFormDialog` components).
+- API routes: `GET|POST /api/addresses` (list / save-upsert) and `PATCH|DELETE /api/addresses/[addressId]` (update / remove; PATCH accepts a full address payload or `{ isDefault: true }` for make-default). Both are protected by `guardRouteHandlerAccess`; mutations also run the trusted-origin CSRF check.
 
 ## API
 

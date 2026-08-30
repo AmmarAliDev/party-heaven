@@ -66,6 +66,35 @@ describe("checkout payload validation", () => {
     }
   });
 
+  it("accepts a payload without a postal code", () => {
+    const parsed = checkoutPayloadSchema.safeParse({
+      ...basePayload,
+      shippingAddress: {
+        addressLine1: basePayload.shippingAddress.addressLine1,
+        city: basePayload.shippingAddress.city,
+        province: basePayload.shippingAddress.province,
+        country: basePayload.shippingAddress.country,
+      },
+    });
+
+    expect(parsed.success).toBe(true);
+    if (parsed.success) {
+      expect(parsed.data.shippingAddress.postcode).toBeUndefined();
+    }
+  });
+
+  it("accepts an empty postal code and normalizes it away", () => {
+    const parsed = checkoutPayloadSchema.safeParse({
+      ...basePayload,
+      shippingAddress: { ...basePayload.shippingAddress, postcode: "" },
+    });
+
+    expect(parsed.success).toBe(true);
+    if (parsed.success) {
+      expect(parsed.data.shippingAddress.postcode).toBeUndefined();
+    }
+  });
+
   it("rejects unsupported payment methods", () => {
     const parsed = checkoutPayloadSchema.safeParse({ ...basePayload, paymentMethod: "CARD" });
 

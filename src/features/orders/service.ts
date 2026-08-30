@@ -739,13 +739,12 @@ export async function placeOrderFromCheckout(input: PlaceOrderInput): Promise<Pl
               phone: input.payload.customer.phone.trim(),
               email: input.payload.customer.email.trim(),
               street1: input.payload.shippingAddress.addressLine1.trim(),
-              ...(input.payload.shippingAddress.addressLine2
-                ? { street2: input.payload.shippingAddress.addressLine2.trim() }
-                : {}),
               city: mapCityStringToEnum(input.payload.shippingAddress.city),
               province: input.payload.shippingAddress.province.trim(),
               country: mapCountryStringToEnum(input.payload.shippingAddress.country),
-              postcode: input.payload.shippingAddress.postcode.trim(),
+              ...(input.payload.shippingAddress.postcode
+                ? { postcode: input.payload.shippingAddress.postcode.trim() }
+                : {}),
               ...(input.payload.notes ? { notes: input.payload.notes.trim() } : {}),
             },
           });
