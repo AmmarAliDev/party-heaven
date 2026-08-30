@@ -56,6 +56,7 @@ function mapReviewErrorCode(code: string): ReviewErrorCode {
     case "REVIEW_PURCHASE_REQUIRED":
       return "purchaseRequired";
     case "REVIEW_PRODUCT_NOT_FOUND":
+    case "REVIEW_DEAL_NOT_FOUND":
       return "notFound";
     case "RATE_LIMITED":
       return "rateLimited";
@@ -80,6 +81,7 @@ export async function submitCustomerReviewAction(formData: FormData) {
 
     const parsed = validateCustomerReviewInput({
       productId: `${formData.get("productId") ?? ""}`,
+      dealId: `${formData.get("dealId") ?? ""}`,
       rating: `${formData.get("rating") ?? ""}`,
       title: `${formData.get("title") ?? ""}`,
       body: `${formData.get("body") ?? ""}`,
@@ -91,7 +93,8 @@ export async function submitCustomerReviewAction(formData: FormData) {
 
     const result = await submitCustomerReview({
       userId,
-      productId: parsed.data.productId,
+      ...(parsed.data.productId ? { productId: parsed.data.productId } : {}),
+      ...(parsed.data.dealId ? { dealId: parsed.data.dealId } : {}),
       rating: parsed.data.rating,
       ...(parsed.data.title ? { title: parsed.data.title } : {}),
       body: parsed.data.body,
@@ -100,7 +103,12 @@ export async function submitCustomerReviewAction(formData: FormData) {
     revalidatePath(targetPath);
     revalidatePath(routes.storefront.accountReviews);
     revalidatePath(routes.admin.reviews);
-    revalidatePath(routes.storefront.product(result.categorySlug, result.productSlug));
+
+    if ("dealSlug" in result && result.dealSlug) {
+      revalidatePath(routes.storefront.deal(result.dealSlug));
+    } else if ("productSlug" in result && "categorySlug" in result && result.productSlug && result.categorySlug) {
+      revalidatePath(routes.storefront.product(result.categorySlug, result.productSlug));
+    }
 
     const noticeCode: ReviewNoticeCode = result.action;
     redirect(appendFlash(returnTo, "reviewNotice", noticeCode));

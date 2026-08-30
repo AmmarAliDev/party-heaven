@@ -8,14 +8,15 @@ export default function robots(): MetadataRoute.Robots {
   return {
     rules: {
       userAgent: "*",
-      allow: "/",
-      disallow: [
-        "/admin/",
-        "/api/",
-        "/*?*query=", // Search results
-        "/checkout/",
-        "/account/",
-      ],
+      // allow: "/",
+      // disallow: [
+      //   "/admin/",
+      //   "/api/",
+      //   "/*?*query=", // Search results
+      //   "/checkout/",
+      //   "/account/",
+      // ],
+      disallow: "/",
     },
     sitemap: `${baseUrl}/sitemap.xml`,
   };

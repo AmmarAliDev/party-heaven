@@ -6,8 +6,8 @@ const reviewNoticeMessages = {
 const reviewErrorMessages = {
   invalidInput: "Please review your rating and comment, then try again.",
   signInRequired: "Please sign in to submit a review.",
-  purchaseRequired: "Only customers with a delivered order for this product can leave a review.",
-  notFound: "We could not find this product for reviewing.",
+  purchaseRequired: "Only customers with a delivered order can leave a review.",
+  notFound: "We could not find this item for reviewing.",
   rateLimited: "Too many review updates in a short time. Please wait a few minutes and try again.",
   submitFailed: "Your review could not be submitted right now. Please try again.",
 } as const;

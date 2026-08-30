@@ -1,3 +1,4 @@
+export { DealReviews } from "./components/deal-reviews";
 export {
   DEAL_LOW_STOCK_THRESHOLD,
   getDealBySlug,

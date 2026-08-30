@@ -47,7 +47,9 @@ export type AdminReviewListItem = {
   moderatedAt: Date | null;
   moderationReason: string | null;
   storefrontVisible: boolean;
-  product: {
+  /** Review subject — a product or a deal bundle. */
+  target: {
+    kind: "product" | "deal";
     id: string;
     name: string;
     slug: string;
@@ -91,6 +93,13 @@ const adminReviewSelect = {
       },
     },
   },
+  deal: {
+    select: {
+      id: true,
+      title: true,
+      slug: true,
+    },
+  },
   user: {
     select: {
       id: true,
@@ -117,7 +126,7 @@ type LegacyAdminReviewRecord = {
     category: {
       slug: string;
     } | null;
-  };
+  } | null;
   user: {
     id: string;
     name: string | null;
@@ -205,6 +214,36 @@ function getSafeReviewerInfo(user: SelectedAdminReview["user"]) {
   };
 }
 
+function resolveAdminReviewTarget(record: SelectedAdminReview): AdminReviewListItem["target"] {
+  if (record.deal) {
+    return {
+      kind: "deal",
+      id: record.deal.id,
+      name: record.deal.title,
+      slug: record.deal.slug,
+      categorySlug: null,
+    };
+  }
+
+  if (record.product) {
+    return {
+      kind: "product",
+      id: record.product.id,
+      name: record.product.name,
+      slug: record.product.slug,
+      categorySlug: record.product.category?.slug ?? null,
+    };
+  }
+
+  return {
+    kind: "product",
+    id: "",
+    name: "Unknown item",
+    slug: "",
+    categorySlug: null,
+  };
+}
+
 function mapAdminReview(record: SelectedAdminReview): AdminReviewListItem {
   const status = isKnownStatus(record.status) ? record.status : record.approved ? "APPROVED" : "PENDING";
 
@@ -219,12 +258,7 @@ function mapAdminReview(record: SelectedAdminReview): AdminReviewListItem {
     moderatedAt: record.moderatedAt ?? null,
     moderationReason: record.moderationReason ?? null,
     storefrontVisible: isReviewVisibleOnStorefront(status),
-    product: {
-      id: record.product.id,
-      name: record.product.name,
-      slug: record.product.slug,
-      categorySlug: record.product.category?.slug ?? null,
-    },
+    target: resolveAdminReviewTarget(record),
     reviewer: getSafeReviewerInfo(record.user),
   };
 }
@@ -243,12 +277,21 @@ function mapLegacyAdminReview(record: LegacyAdminReviewRecord): AdminReviewListI
     moderatedAt: null,
     moderationReason: null,
     storefrontVisible: isReviewVisibleOnStorefront(status),
-    product: {
-      id: record.product.id,
-      name: record.product.name,
-      slug: record.product.slug,
-      categorySlug: record.product.category?.slug ?? null,
-    },
+    target: record.product
+      ? {
+          kind: "product",
+          id: record.product.id,
+          name: record.product.name,
+          slug: record.product.slug,
+          categorySlug: record.product.category?.slug ?? null,
+        }
+      : {
+          kind: "product",
+          id: "",
+          name: "Unknown item",
+          slug: "",
+          categorySlug: null,
+        },
     reviewer: getSafeReviewerInfo(record.user),
   };
 }
@@ -285,8 +328,7 @@ async function writeReviewAuditLog(
     beforeStatus: ReviewModerationStatus;
     afterStatus: ReviewModerationStatus;
     rating: number;
-    productId: string;
-    productName: string;
+    target: { kind: "product" | "deal"; id: string; name: string };
     reason: string | null;
   },
 ) {
@@ -302,8 +344,9 @@ async function writeReviewAuditLog(
         afterStatus: input.afterStatus,
         storefrontVisible: isReviewVisibleOnStorefront(input.afterStatus),
         rating: input.rating,
-        productId: input.productId,
-        productName: input.productName,
+        targetKind: input.target.kind,
+        targetId: input.target.id,
+        targetName: input.target.name,
         reason: input.reason,
       },
     },
@@ -377,6 +420,16 @@ export async function listAdminReviews(filters: AdminReviewListFilters = {}): Pr
             name: {
               contains: query,
               mode: "insensitive",
+            },
+          },
+        },
+        {
+          deal: {
+            is: {
+              title: {
+                contains: query,
+                mode: "insensitive",
+              },
             },
           },
         },
@@ -591,14 +644,15 @@ export async function moderateAdminReview(input: {
       select: adminReviewSelect,
     });
 
+    const target = resolveAdminReviewTarget(updated);
+
     await writeReviewAuditLog(tx, {
       reviewId,
       actor: input.actor,
       beforeStatus: previousStatus,
       afterStatus: nextStatus,
       rating: updated.rating,
-      productId: updated.product.id,
-      productName: updated.product.name,
+      target: { kind: target.kind, id: target.id, name: target.name },
       reason: updated.moderationReason ?? null,
     });
 

@@ -6,6 +6,10 @@ export {
   type CustomerReviewListResult,
   getCustomerReviewComposerContext,
   listCustomerReviews,
+  listPublishedDealReviews,
+  type StorefrontDealReview,
+  type StorefrontDealReviews,
+  type StorefrontDealReviewSummary,
   submitCustomerReview,
 } from "./service";
 export { type CustomerReviewInput,customerReviewSchema, validateCustomerReviewInput } from "./validation";
