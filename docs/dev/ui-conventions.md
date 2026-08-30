@@ -8,15 +8,14 @@
 
 ## Theme and Feedback
 
-- Theme selection supports `system`, `light`, and `dark` through `next-themes`.
-- Default initial theme is `light` (via `ThemeProvider.defaultTheme`) for first-time visits before a stored preference is present.
-- System-following behavior remains available through the `system` option and should continue to be treated as an explicit user preference.
+- The app is **light-only** by design: the light palette is constant on every device and does not follow the OS/device color preference. There is no theme switching and no `next-themes` dependency.
+- All design tokens live in `src/app/globals.css` under `:root`; do not reintroduce `.dark` overrides or theme toggles.
 - Shared frontend notifications should use `notify.*()` from `src/lib/notify.ts`.
 - `notify.*()` supports typed Sonner option passthrough as a third argument when a feature needs scoped behaviors like custom duration or toast actions.
-- Keep theme-dependent visuals tied to semantic tokens like `bg-card`, `text-muted-foreground`, and `border-border`.
+- `AppToaster` renders Sonner in fixed `theme="light"` mode with static action/cancel button colors.
+- Keep visuals tied to semantic tokens like `bg-card`, `text-muted-foreground`, and `border-border`.
 - Current palette baseline:
-	- Light theme anchor colors: `--background: #ffffff`, `--primary: #431b52`
-	- Dark theme anchor colors: `--background: #000000`, `--primary: #431b52`
+	- `--background: #ffffff`, `--primary: #b88a24`
 - Avoid hardcoded one-off hex values in feature components. Prefer semantic tokens so palette updates remain centralized and safe.
 - Keep overlays, menus, and dialogs on semantic surfaces (`bg-popover`, `bg-card`) and preserve readable foreground contrast.
 
@@ -43,7 +42,7 @@
 - `CartItemQuantityControls` (drawer + cart page) never shows a success toast on quantity updates or removal.
 - Error toasts are still shown on failed cart mutations (user-friendly messages via `toUserMessage`).
 - The `buildAddToCartToastPayload` helper in `src/features/catalog/lib/add-to-cart-toast.ts` remains available (and tested) for any future surface that intentionally opts back into a success toast, but no current app surface uses it.
-- Sonner CTA buttons must inherit shared app button variants through `AppToaster` (`actionButton`/`cancelButton` classNames) instead of relying on Sonner defaults, so toast actions stay theme-aware across light and dark modes.
+- Sonner CTA buttons must inherit shared app button variants through `AppToaster` (`actionButton`/`cancelButton` classNames) instead of relying on Sonner defaults, so toast actions keep the fixed light-theme styling.
 
 ## Surface Consistency Rules
 
@@ -51,7 +50,7 @@
 	- Placeholder color: placeholders across `Input`/`Textarea` are standardized via the `--placeholder` token in `src/app/globals.css` and should be `#17171769`. Do not set placeholder colors directly in feature components; prefer the shared token so updates remain centralized.
 - Cards and table containers should keep semantic surface classes and shared elevation tokens (`--shadow-soft`, `--shadow-elevated`) for consistent depth across desktop and mobile.
 - Navigation surfaces (sidebar and mobile nav) should use semantic hover/active states (`bg-muted`, `bg-accent`, `bg-primary/*`) instead of custom ad-hoc colors.
-- Admin workspace shell layout (`AdminShell`) and navigation sidebar (`Sidebar`) explicitly bind to `bg-background` to guarantee consistent theme-aware surface coloring across light and dark modes.
+- Admin workspace shell layout (`AdminShell`) and navigation sidebar (`Sidebar`) explicitly bind to `bg-background` to guarantee consistent surface coloring in the light-only theme.
 - Related products grid (`ProductRelatedGrid`) renders product card image previews directly via `backgroundImage: url(${product.imageUrl})` cover style for accurate visual representations.
 - Confirmation and high-impact dialogs should keep backdrop contrast strong enough for readability while preserving focus and keyboard behavior.
 
@@ -107,7 +106,7 @@
 - Keep semantic landmarks in place: `header`, `nav`, `main`, `section`, and `footer`.
 - Preserve visible focus states and `aria-label` support on interactive controls.
 - Error summaries and page fallbacks should keep `role="alert"` / `aria-live` semantics so assistive tech announces important failures clearly.
-- Prefer server components by default; only use client components for interactivity like theme switching, toast triggers, and confirmation dialogs.
+- Prefer server components by default; only use client components for interactivity like toast triggers, search dialogs, and confirmation dialogs.
 
 ## SEO Semantic HTML Conventions
 
@@ -216,7 +215,7 @@
 	- Empty: `EmptyState`
 	- Loading: `LoadingState` + `TableSkeleton` where tabular data is expected
 	- Error: `PageErrorFallback` for route-level failures and `SectionErrorState` for module-level failures
-- Keep admin actions discoverable in the top-right area (theme toggle, storefront shortcut, user menu) and avoid hidden critical controls.
+- Keep admin actions discoverable in the top-right area (storefront shortcut, user menu) and avoid hiding critical controls.
 - Use the shared shadcn-style sidebar primitives in `src/components/ui/sidebar.tsx` (`SidebarProvider`, `Sidebar`, `SidebarInset`, `SidebarTrigger`) for app-level admin navigation shells. This keeps desktop collapse and mobile drawer behavior consistent across future admin modules.
 - Keep role-aware rendering in feature-level nav modules (for example `getVisibleAdminNavigation`) and pass only visible links into sidebar UI components.
 - If a role resolves to zero sidebar links, render a user-friendly empty sidebar status instead of a blank panel.

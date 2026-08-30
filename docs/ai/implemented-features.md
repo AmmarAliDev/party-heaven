@@ -69,7 +69,7 @@ Use this as the quick implementation map for future AI prompts. Each section des
 
 ## Shared Foundations
 
-- Shared UI primitives and fallback states; global design tokens enforce a white/black + `#431b52` palette via semantic CSS classes across light and dark themes; Admin workspace shell (`AdminShell`) and sidebar (`Sidebar`) explicitly bind to `bg-background`
+- Shared UI primitives and fallback states; global design tokens enforce the light-only palette via semantic CSS classes (the app always renders light regardless of the device color preference); Admin workspace shell (`AdminShell`) and sidebar (`Sidebar`) explicitly bind to `bg-background`
 - Shared carousel primitives (`src/components/ui/carousel.tsx`) used by homepage category surfaces; keyboard-accessible and touch-friendly
 - Shared form system (React Hook Form + Zod + server-action bridge)
 - Shared data-table foundation used by multiple admin pages

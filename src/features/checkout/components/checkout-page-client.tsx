@@ -148,7 +148,7 @@ export function CheckoutPageClient({
 
         {successMessage ? (
           <Card className="border-emerald-500/40 bg-emerald-500/5">
-            <CardContent className="p-4 text-sm text-emerald-800 dark:text-emerald-200">
+            <CardContent className="p-4 text-sm text-emerald-800">
               {successMessage}
             </CardContent>
           </Card>

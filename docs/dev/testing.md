@@ -60,7 +60,7 @@ Lightweight import-level checks that verify public API contracts without mocking
 | --------------------------- | ------------------------------------------------------------------------------------------------------ |
 | `config.test.ts`            | `loadAppConfig`, `loadRuntimeEnv`, `getRequiredServerEnv`, `featureFlags`, `buildMetadata`, `routes`   |
 | `storefront-shell.test.ts`  | All `routes.storefront.*` values, `loadSiteConfig().storefrontNav`                                     |
-| `ui-foundation.test.ts`     | `themeOptions`, `loadSiteConfig()`, `formatPrice`                                                      |
+| `ui-foundation.test.ts`     | `loadSiteConfig()`, `formatPrice`, light palette tokens                                             |
 | `ux-infrastructure.test.ts` | `toUserMessage`, `getFormErrorMessages`, `sanitizeForLogging`, `PageErrorFallback`, `FormErrorSummary` |
 
 ### Prisma / database (`tests/prisma/`)

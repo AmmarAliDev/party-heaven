@@ -9,23 +9,13 @@ import { describe, expect, it } from "vitest";
 import { Input } from "@/components/ui/input";
 import { Table } from "@/components/ui/table";
 import { loadSiteConfig } from "@/config/site";
-import { themeOptions } from "@/config/theme";
 import { formatPrice } from "@/lib/currency";
-import type { AppTheme } from "@/types/app";
 
 const currentDir = path.dirname(fileURLToPath(import.meta.url));
 const globalsCssPath = path.resolve(currentDir, "../../src/app/globals.css");
 const globalsCss = readFileSync(globalsCssPath, "utf8");
 
 describe("ui foundation", () => {
-  it("supports light, dark, and system theme selection", () => {
-    expect(themeOptions.map((option: { value: AppTheme }) => option.value)).toEqual([
-      "system",
-      "light",
-      "dark",
-    ]);
-  });
-
   it("exposes reusable storefront and admin navigation structures", () => {
     const site = loadSiteConfig();
 
@@ -41,11 +31,10 @@ describe("ui foundation", () => {
     expect(formatPrice("not-a-number")).toBe("--");
   });
 
-  it("uses the current light/dark palette tokens in globals", () => {
+  it("uses the current light palette tokens in globals", () => {
     expect(globalsCss).toContain("--background: #ffffff;");
-    expect(globalsCss).toContain("--background: #090305;");
     expect(globalsCss).toContain("--primary: #b88a24;");
-    expect(globalsCss).toContain("--primary: #e11d48;");
+    expect(globalsCss).not.toContain(".dark");
   });
 
   it("keeps shared form and table primitives bound to semantic design tokens", () => {

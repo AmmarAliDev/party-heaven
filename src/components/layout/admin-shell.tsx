@@ -10,7 +10,6 @@ import { getAdminRoleSummary, getVisibleAdminNavigation } from "@/features/admin
 import { SignOutButton } from "@/features/auth/components/sign-out-button";
 import type { RoleKey } from "@/lib/auth/roles";
 
-import { ThemeToggle } from "../theme-toggle";
 import { Badge } from "../ui/badge";
 import { buttonVariants } from "../ui/button";
 import { PageContainer } from "../ui/page-container";
@@ -73,7 +72,6 @@ export function AdminShell({ children, role, user }: AdminShellProps) {
               </div>
 
               <div className="flex items-center gap-2">
-                <ThemeToggle />
                 <Link href={routes.storefront.home} className={buttonVariants({ variant: "outline", size: "sm" })}>
                   <Store className="size-4" />
                   View storefront
