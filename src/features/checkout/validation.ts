@@ -32,16 +32,21 @@ export const checkoutPayloadSchema = z.object({
   }),
   shippingAddress: z.object({
     addressLine1: z.string().trim().min(5, "Please provide your delivery address.").max(220),
-    addressLine2: z.string().trim().max(220).optional(),
     city: citySchema,
     province: provinceSchema,
     country: z.string().trim().min(2, "Please provide a country for shipping.").max(120),
     postcode: z
-      .string()
-      .trim()
-      .regex(/^\d+$/, "Postal code must contain numbers only.")
-      .min(4, "Please provide a valid postal code.")
-      .max(10),
+      .union([
+        z.literal(""),
+        z
+          .string()
+          .trim()
+          .regex(/^\d+$/, "Postal code must contain numbers only.")
+          .min(4, "Please provide a valid postal code.")
+          .max(10),
+      ])
+      .optional()
+      .transform((value) => (value ? value : undefined)),
   }),
   paymentMethod: z.enum([CHECKOUT_PAYMENT_METHODS.COD]),
   notes: z.string().trim().max(600, "Order notes must be 600 characters or less.").optional(),

@@ -9,6 +9,7 @@ import { SectionErrorState } from "@/components/ui/section-error-state";
 import { SectionHeader } from "@/components/ui/section-header";
 import { buildMetadata } from "@/config/metadata";
 import { routes } from "@/config/routes";
+import { listSavedAddresses } from "@/features/addresses";
 import {
   CART_COOKIE_NAME,
   getCartSummaryForContext,
@@ -16,7 +17,11 @@ import {
   readCartTokenFromCookieValue,
   validateCartStock,
 } from "@/features/cart";
-import { CHECKOUT_SHIPPING_FEE, listCheckoutPaymentMethods } from "@/features/checkout";
+import {
+  CHECKOUT_FIXED_PROVINCE,
+  CHECKOUT_SHIPPING_FEE,
+  listCheckoutPaymentMethods,
+} from "@/features/checkout";
 import { CheckoutPageClient } from "@/features/checkout/components/checkout-page-client";
 
 export const metadata = buildMetadata({
@@ -58,6 +63,11 @@ export default async function CheckoutPage() {
   const stockValidation = validateCartStock(cart);
   const paymentMethods = listCheckoutPaymentMethods();
 
+  // Pre-fill the shipping address (and its phone) from the user's default saved
+  // address so returning customers don't have to retype them.
+  const savedAddresses = session?.user?.id ? await listSavedAddresses(session.user.id) : [];
+  const defaultAddress = savedAddresses.find((address) => address.isDefault) ?? savedAddresses[0] ?? null;
+
   return (
     <PageShell>
       <SectionHeader
@@ -92,10 +102,22 @@ export default async function CheckoutPage() {
         shipping={CHECKOUT_SHIPPING_FEE}
         allowSubmit={stockValidation.ok}
         paymentMethods={paymentMethods}
+        isAuthenticated={Boolean(session?.user?.id)}
+        initialShippingAddress={
+          defaultAddress
+            ? {
+                addressLine1: defaultAddress.addressLine1,
+                city: defaultAddress.city,
+                province: defaultAddress.province ?? CHECKOUT_FIXED_PROVINCE,
+                country: defaultAddress.country,
+                postcode: defaultAddress.postcode ?? "",
+              }
+            : null
+        }
         initialCustomer={{
           fullName: session?.user?.name ?? "",
           email: session?.user?.email ?? "",
-          phone: "",
+          phone: defaultAddress?.phone ?? "",
         }}
       />
     </PageShell>

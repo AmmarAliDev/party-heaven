@@ -1,11 +1,11 @@
 import { MapPin } from "lucide-react";
 
 import { auth } from "@/auth";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { EmptyState } from "@/components/ui/empty-state";
 import { buildMetadata } from "@/config/metadata";
 import { routes } from "@/config/routes";
-import { getPrismaClient } from "@/server/db";
+import { listSavedAddresses } from "@/features/addresses";
+import { AddressBook } from "@/features/addresses/components/address-book";
 
 export const metadata = buildMetadata({
   title: "Account Addresses",
@@ -27,43 +27,7 @@ export default async function AccountAddressesPage() {
     );
   }
 
-  const db = getPrismaClient();
-  const addresses = await db.address.findMany({
-    where: { userId },
-    orderBy: [
-      { isDefault: "desc" },
-      { createdAt: "desc" },
-    ],
-  });
-  type AddressRecord = (typeof addresses)[number];
+  const addresses = await listSavedAddresses(userId);
 
-  if (addresses.length === 0) {
-    return (
-      <EmptyState
-        icon={MapPin}
-        title="No addresses yet"
-        description="Saved addresses will appear here once checkout address management is implemented."
-      />
-    );
-  }
-
-  return (
-    <div className="grid gap-4">
-      {addresses.map((address: AddressRecord) => (
-        <Card key={address.id}>
-          <CardHeader className="pb-3">
-            <CardTitle className="text-base">{address.label || "Address"}</CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-1 text-sm text-muted-foreground">
-            <p>{address.street1}</p>
-            {address.street2 ? <p>{address.street2}</p> : null}
-            <p>
-              {address.city}, {address.country}
-            </p>
-            {address.phone ? <p>Phone: {address.phone}</p> : null}
-          </CardContent>
-        </Card>
-      ))}
-    </div>
-  );
+  return <AddressBook initialAddresses={addresses} />;
 }

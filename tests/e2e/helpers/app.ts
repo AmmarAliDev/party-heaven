@@ -57,7 +57,7 @@ export async function completeGuestCheckout(page: Page) {
   await page.getByLabel(/full name/i).fill(customer.name);
   await page.getByLabel(/email/i).fill(customer.email);
   await page.getByLabel(/phone/i).fill(customer.phone);
-  await page.getByLabel(/address line 1/i).fill(customer.addressLine1);
+  await page.getByLabel(/^address/i).fill(customer.addressLine1);
   await page.getByLabel(/postal code/i).fill(customer.postcode);
   await page.getByLabel(/order notes/i).fill(customer.notes);
   await page.getByRole("radio", { name: /cash on delivery/i }).check();

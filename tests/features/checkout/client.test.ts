@@ -12,7 +12,6 @@ const basePayload = {
   },
   shippingAddress: {
     addressLine1: "123 Main Street",
-    addressLine2: "",
     city: "Karachi",
     province: "Sindh",
     country: "Pakistan",
