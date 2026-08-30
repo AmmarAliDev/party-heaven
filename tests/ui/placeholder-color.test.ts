@@ -1,6 +1,6 @@
 import { readFileSync } from "fs";
 import { resolve } from "path";
-import { describe, it, expect } from "vitest";
+import { describe, expect,it } from "vitest";
 
 describe("global placeholder styles", () => {
   const cssPath = resolve(process.cwd(), "src/app/globals.css");

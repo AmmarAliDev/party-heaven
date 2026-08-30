@@ -8,11 +8,12 @@ import { ProductImageGallery } from "@/features/catalog/components/product-image
 
 vi.mock("next/image", () => ({
   default: function MockNextImage(props: ComponentPropsWithoutRef<"img">) {
-    const { fill: _fill, ...imgProps } = props as ComponentPropsWithoutRef<"img"> & {
+    const { fill, ...imgProps } = props as ComponentPropsWithoutRef<"img"> & {
       fill?: boolean;
     };
+    void fill;
 
-    // eslint-disable-next-line jsx-a11y/alt-text
+    // eslint-disable-next-line jsx-a11y/alt-text, @next/next/no-img-element -- intentional test double for next/image
     return <img {...imgProps} />;
   },
 }));

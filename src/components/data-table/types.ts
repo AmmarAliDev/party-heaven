@@ -1,4 +1,3 @@
-import type { ReactNode } from "react";
 import type {
   ColumnDef,
   OnChangeFn,
@@ -7,6 +6,10 @@ import type {
   RowData,
   SortingState,
 } from "@tanstack/react-table";
+import type { ReactNode } from "react";
+
+// eslint-disable-next-line @typescript-eslint/no-explicit-any -- TanStack Table's value-level column type intentionally uses `any` so typed accessors (`columnHelper.accessor("title", ...)`) remain assignable under `exactOptionalPropertyTypes`. Individual cells narrow the value via `getValue()` / `row.original`.
+export type DataTableColumn<TData extends RowData> = ColumnDef<TData, any>;
 
 export type DataTableEmptyState = {
   title: string;

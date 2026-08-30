@@ -1,6 +1,6 @@
 import { routes } from "@/config/routes";
-
 import { searchPublishedProducts } from "@/server/db/catalog-queries";
+
 import { normalizeCatalogImageUrl } from "./lib/product-image-url";
 import { tokenizeSearchQuery, tokenMatchesText } from "./lib/search-text";
 import type { CatalogProductCard } from "./types";

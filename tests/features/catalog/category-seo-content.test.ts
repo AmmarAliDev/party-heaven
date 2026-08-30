@@ -18,8 +18,6 @@ function makeCategory(overrides: Partial<CatalogCategory> = {}): CatalogCategory
     name: "Home Care",
     slug: "home-care",
     description: "Cleaning, laundry, and restock-friendly home essentials.",
-    seoTitle: undefined,
-    seoDescription: undefined,
     productCount: 12,
     href: "/categories/home-care",
     ...overrides,

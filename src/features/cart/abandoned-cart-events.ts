@@ -24,8 +24,8 @@
 
 import { randomUUID } from "node:crypto";
 
-import { getPrismaClient } from "@/lib/prisma";
 import { createLogger } from "@/lib/logger";
+import { getPrismaClient } from "@/lib/prisma";
 
 const abandonedCartLogger = createLogger("cart.abandoned-cart");
 

@@ -1,16 +1,16 @@
 "use client";
 
-import { Loader2, Sparkles } from "lucide-react";
 import { useMemo, useState } from "react";
+import { Loader2, Sparkles } from "lucide-react";
 import type { UseFormReturn } from "react-hook-form";
 import { useWatch } from "react-hook-form";
 
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-
-import { generateProductSeoContent } from "@/features/admin/products/seo-content-generator";
 import type { ProductSeoContentResult } from "@/features/admin/products/seo-content-generator";
+import { generateProductSeoContent } from "@/features/admin/products/seo-content-generator";
+
 import type { AdminDealCreateInput } from "../validation";
 
 type AdminDealSeoGeneratorProps = {
@@ -122,7 +122,7 @@ export function AdminDealSeoGenerator({ form, categoryName, disabled = false }: 
         {!result && !errorMessage && (
           <div className="rounded-lg border border-dashed p-8 text-center">
             <p className="text-sm text-muted-foreground">
-              Enter a deal title and click "Generate" to see AI suggestions.
+              Enter a deal title and click &ldquo;Generate&rdquo; to see AI suggestions.
             </p>
           </div>
         )}
@@ -140,7 +140,7 @@ export function AdminDealSeoGenerator({ form, categoryName, disabled = false }: 
               <div className="rounded-md border bg-muted/30 p-3">
                 <div className="mb-2 flex items-center gap-2">
                   <Badge variant="secondary">Preview</Badge>
-                  <span className="text-muted-foreground truncate text-xs max-w-[200px]">
+                  <span className="text-muted-foreground truncate text-xs max-w-50">
                     {result.suggestedSlug}
                   </span>
                 </div>

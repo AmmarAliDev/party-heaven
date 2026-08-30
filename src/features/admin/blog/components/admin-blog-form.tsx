@@ -1,6 +1,6 @@
 "use client";
 
-import { z } from "zod";
+import type { z } from "zod";
 
 import { DynamicFormField, useAppForm, useServerActionSubmit } from "@/components/forms";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";

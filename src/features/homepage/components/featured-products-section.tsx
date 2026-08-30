@@ -1,5 +1,6 @@
-import { ArrowRight, ShoppingBag } from "lucide-react";
+import Image from "next/image";
 import Link from "next/link";
+import { ArrowRight, ShoppingBag } from "lucide-react";
 
 import { buttonVariants } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -16,7 +17,6 @@ import { PriceDisplay } from "@/components/ui/price-display";
 import { SectionHeader } from "@/components/ui/section-header";
 import { ProductCardAddToCart } from "@/features/catalog/components/product-card-add-to-cart";
 
-import Image from "next/image";
 import type { FeaturedProductsSection } from "../types";
 import {
   HOMEPAGE_CAROUSEL_ITEM_CLASS,

@@ -1,11 +1,11 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 import { ChevronDown, ChevronUp } from "lucide-react";
+import { z } from "zod";
 
 import { DynamicForm, type DynamicFormFieldConfig, useAppForm, useServerActionSubmit } from "@/components/forms";
 import { useIsMobile } from "@/hooks/use-mobile";
-import { z } from "zod";
 
 import { submitCustomerReviewAction } from "../actions";
 import { customerReviewSchema } from "../validation";
@@ -79,22 +79,13 @@ export function CustomerReviewForm({
   const { submitWithAction } = useServerActionSubmit(form);
 
   // Expansion state: true = visible, false = hidden.
-  // Start expanded (safe for SSR and desktop). The effect below collapses
-  // it once on the first mobile detection, mimicking a "default collapsed on
-  // mobile" without requiring a server-side viewport signal.
-  const [isExpanded, setIsExpanded] = useState(true);
-  const hasAutoCollapsedRef = useRef(false);
+  // The default follows the viewport (expanded on desktop, collapsed on
+  // mobile) via derived state, so no server-side viewport signal or
+  // post-hydration effect is required. Once the user toggles, their explicit
+  // choice is honored until they toggle again.
+  const [expansionChoice, setExpansionChoice] = useState<boolean | null>(null);
   const isMobile = useIsMobile();
-
-  useEffect(() => {
-    // Auto-collapse once on mobile. Using a ref prevents re-collapsing on
-    // every re-render (e.g. when the user manually expands then resizes).
-    
-    if (isMobile && !hasAutoCollapsedRef.current) {
-      setIsExpanded(false);
-      hasAutoCollapsedRef.current = true;
-    }
-  }, [isMobile]);
+  const isExpanded = expansionChoice ?? !isMobile;
 
   useEffect(() => {
     if (!reviewNoticeCode) {
@@ -111,7 +102,7 @@ export function CustomerReviewForm({
   }, [form, productId, returnTo, reviewNoticeCode]);
 
   function toggleExpanded() {
-    setIsExpanded((prev) => !prev);
+    setExpansionChoice((prev) => !(prev ?? !isMobile));
   }
 
   const fields: DynamicFormFieldConfig<CustomerReviewFormValues>[] = [

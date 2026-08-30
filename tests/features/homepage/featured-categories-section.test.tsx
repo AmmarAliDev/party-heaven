@@ -1,8 +1,7 @@
 // @vitest-environment jsdom
 
-import type { ReactNode } from "react";
-
 import { cleanup, render, screen } from "@testing-library/react";
+import type { ReactNode } from "react";
 import { afterEach, describe, expect, it, vi } from "vitest";
 
 vi.mock("@/components/ui/carousel", () => ({
@@ -17,11 +16,11 @@ vi.mock("@/components/ui/carousel", () => ({
   CarouselNext: () => <button type="button">Next slide</button>,
 }));
 
-import { FeaturedCategoriesSectionBlock } from "@/features/homepage/components/featured-categories-section";
 import {
   FEATURED_CATEGORIES_CAROUSEL_ITEM_CLASS,
   FEATURED_CATEGORIES_CAROUSEL_OPTIONS,
 } from "@/features/homepage/components/featured-categories-carousel-config";
+import { FeaturedCategoriesSectionBlock } from "@/features/homepage/components/featured-categories-section";
 import {
   HOMEPAGE_CAROUSEL_ITEM_CLASS,
   HOMEPAGE_CAROUSEL_MAX_ITEMS,

@@ -2,9 +2,9 @@ import { AppError } from "@/lib/errors/app-error";
 import { getPrismaClient } from "@/server/db";
 
 import {
-  buildAdminActivityFeedItem,
   type AdminActivityFeedItem,
   type AuditLogActivityRecord,
+  buildAdminActivityFeedItem,
 } from "./audit-log-feed";
 
 const DEFAULT_ADMIN_ACTIVITY_FEED_LIMIT = 30;

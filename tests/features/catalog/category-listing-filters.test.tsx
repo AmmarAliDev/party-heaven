@@ -88,7 +88,7 @@ describe("CategoryListingFilters mobile sheet behavior", () => {
     render(<CategoryListingFilters listing={makeListing()} />);
 
     await user.click(screen.getByRole("button", { name: /open filters and sorting panel/i }));
-    await user.click(screen.getAllByRole("button", { name: /apply filters/i })[0]);
+    await user.click(screen.getAllByRole("button", { name: /apply filters/i })[0]!);
 
     await waitFor(() => {
       expect(pushMock).toHaveBeenCalledWith(
@@ -120,7 +120,7 @@ describe("CategoryListingFilters mobile sheet behavior", () => {
     );
 
     await user.click(screen.getByRole("button", { name: /open filters and sorting panel/i }));
-    await user.click(screen.getAllByRole("button", { name: /apply filters/i })[0]);
+    await user.click(screen.getAllByRole("button", { name: /apply filters/i })[0]!);
 
     await waitFor(() => {
       expect(pushMock).toHaveBeenCalledWith(

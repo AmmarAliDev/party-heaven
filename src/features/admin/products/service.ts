@@ -448,7 +448,7 @@ async function normalizeRelatedProductIds(
   return matches.map((item) => item.id);
 }
 
-async function writeProductAuditLog(tx: any, input: {
+async function writeProductAuditLog(tx: ProductDbClient, input: {
   action: "product.created" | "product.updated" | "product.deleted";
   actor: AuditActorInput;
   productId: string;
@@ -482,7 +482,7 @@ async function writeProductAuditLog(tx: any, input: {
  * (`product_id IS NOT NULL OR product_variant_id IS NOT NULL`) keeps the row valid.
  */
 async function createImages(
-  tx: any,
+  tx: ProductDbClient,
   productId: string,
   images: AdminProductImageInput[],
   variantRecords: Array<{ id: string }> = [],
@@ -507,7 +507,7 @@ async function createImages(
 }
 
 async function createSpecifications(
-  tx: any,
+  tx: ProductDbClient,
   productId: string,
   specifications: AdminProductSpecificationInput[],
 ) {
@@ -525,7 +525,7 @@ async function createSpecifications(
   });
 }
 
-async function createVariantRecord(tx: any, productId: string, variant: AdminProductVariantRecord) {
+async function createVariantRecord(tx: ProductDbClient, productId: string, variant: AdminProductVariantRecord) {
   const createdVariant = await tx.productVariant.create({
     data: {
       productId,
@@ -557,7 +557,7 @@ async function createVariantRecord(tx: any, productId: string, variant: AdminPro
  * The returned array is used by `createImages` to attach images to variants.
  */
 async function createVariants(
-  tx: any,
+  tx: ProductDbClient,
   productId: string,
   variants: AdminProductVariantRecord[],
 ): Promise<Array<{ id: string }>> {
@@ -578,7 +578,7 @@ async function createVariants(
  * The returned array is used by `createImages` to attach images to variants.
  */
 async function upsertVariants(
-  tx: any,
+  tx: ProductDbClient,
   productId: string,
   variants: AdminProductVariantRecord[],
 ): Promise<Array<{ id: string }>> {

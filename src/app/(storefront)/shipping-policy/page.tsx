@@ -1,7 +1,9 @@
-import { buildMetadata } from "@/config/metadata";
-import { Badge } from "@/components/ui/badge";
+import Link from "next/link";
+
 import { PageShell } from "@/components/layout/page-shell";
+import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
+import { buildMetadata } from "@/config/metadata";
 
 export const metadata = buildMetadata({
   title: "Shipping Policy",
@@ -78,12 +80,12 @@ export default function ShippingPolicyPage() {
         <h2 className="text-xl font-semibold tracking-tight">Order Tracking</h2>
         <p className="text-muted-foreground leading-relaxed">
           Once your order is dispatched, you can monitor its status in{" "}
-          <a
+          <Link
             href="/account/orders"
             className="text-foreground underline underline-offset-4 hover:opacity-80"
           >
             My Orders
-          </a>
+          </Link>
           . If you placed an order as a guest, you can track it using the order reference number
           sent to your email.
         </p>

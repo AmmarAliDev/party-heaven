@@ -270,4 +270,4 @@ export function generateProductSeoContent(input: ProductSeoContentInput): Produc
   };
 }
 
-export type { ProductSeoContentInput, ProductFaqIdea, ProductStructuredSpecificationSuggestion, ProductInternalLinkSuggestion };
+export type { ProductFaqIdea, ProductInternalLinkSuggestion,ProductSeoContentInput, ProductStructuredSpecificationSuggestion };

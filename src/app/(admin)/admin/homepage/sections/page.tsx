@@ -7,9 +7,6 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { buildMetadata } from "@/config/metadata";
 import { routes } from "@/config/routes";
 import { AdminPageHeader } from "@/features/admin/components/admin-page-patterns";
-import { AdminHomepageSectionEditPanel } from "@/features/admin/homepage/components/admin-homepage-section-edit-panel";
-import { AdminHomepageSectionForm } from "@/features/admin/homepage/components/admin-homepage-section-form";
-import { adminHomepageSectionKindValues, type AdminHomepageSectionType } from "@/features/admin/homepage/validation";
 import {
   createAdminHomepageSectionAction,
   getHomepageContentErrorMessage,
@@ -18,6 +15,9 @@ import {
   seedAdminHomepageSectionsAction,
   updateAdminHomepageSectionAction,
 } from "@/features/admin/homepage";
+import { AdminHomepageSectionEditPanel } from "@/features/admin/homepage/components/admin-homepage-section-edit-panel";
+import { AdminHomepageSectionForm } from "@/features/admin/homepage/components/admin-homepage-section-form";
+import { adminHomepageSectionKindValues, type AdminHomepageSectionType } from "@/features/admin/homepage/validation";
 import { requireRouteAccess } from "@/lib/auth/guards";
 import { rbacPermissions } from "@/lib/auth/rbac";
 

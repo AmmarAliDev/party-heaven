@@ -4,6 +4,7 @@
 // Reference: https://authjs.dev/getting-started/typescript
 
 import type { DefaultSession } from "next-auth";
+
 import type { RoleKey } from "@/lib/auth/roles";
 
 declare module "next-auth" {

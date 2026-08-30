@@ -44,12 +44,12 @@ describe("AdminShell component layout and background styling", () => {
     id: "user-1",
     name: "Admin User",
     email: "admin@example.com",
-    role: "ADMIN" as const,
+    role: "SUPER_ADMIN" as const,
   };
 
   it("renders admin shell container and sidebar with bg-background class", () => {
     const { container } = render(
-      <AdminShell role="ADMIN" user={dummyUser}>
+      <AdminShell role="SUPER_ADMIN" user={dummyUser}>
         <div>Admin Content</div>
       </AdminShell>
     );

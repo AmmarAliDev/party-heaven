@@ -23,7 +23,7 @@ vi.mock("@/lib/notify", () => ({
 
 type MockCheckoutResponse = {
   ok: boolean;
-  json: () => Promise<any>;
+  json: () => Promise<unknown>;
 };
 
 describe("checkout form migration", () => {
@@ -49,6 +49,7 @@ describe("checkout form migration", () => {
           id: "cart-1",
           token: "guest-cart-token",
           items: [],
+          dealItems: [],
           itemCount: 1,
           subtotal: 1200,
         }}
@@ -103,6 +104,7 @@ describe("checkout form migration", () => {
           id: "cart-1",
           token: "guest-cart-token",
           items: [],
+          dealItems: [],
           itemCount: 1,
           subtotal: 1200,
         }}
@@ -182,6 +184,7 @@ describe("checkout form migration", () => {
           id: "cart-1",
           token: "guest-cart-token",
           items: [],
+          dealItems: [],
           itemCount: 1,
           subtotal: 1200,
         }}

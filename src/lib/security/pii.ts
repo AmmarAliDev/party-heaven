@@ -32,6 +32,6 @@ export function maskEmail(email: string): string {
  * Removes all characters in the C0 and C1 control ranges.
  */
 export function stripControlChars(value: string): string {
-  // eslint-disable-next-line no-control-regex
+   
   return value.replace(/[\x00-\x1F\x7F-\x9F]/g, "");
 }

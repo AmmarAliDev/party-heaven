@@ -2,15 +2,15 @@
 
 import { headers } from "next/headers";
 
-import { getPrismaClient } from "@/lib/prisma";
-import { createLogger } from "@/lib/logger";
+import { getNotificationService } from "@/features/notifications";
+import { notificationEventTypes } from "@/features/notifications/contracts";
 import { AppError } from "@/lib/errors/app-error";
+import { createLogger } from "@/lib/logger";
+import { getPrismaClient } from "@/lib/prisma";
 import { checkRateLimit } from "@/lib/rate-limit";
 import { assertTrustedOrigin, getClientIp } from "@/lib/security/csrf";
 import { maskEmail, stripControlChars } from "@/lib/security/pii";
 import { validateWithSchema } from "@/lib/security/validation";
-import { getNotificationService } from "@/features/notifications";
-import { notificationEventTypes } from "@/features/notifications/contracts";
 
 import { contactFormSchema, type ContactFormValues } from "./validation";
 

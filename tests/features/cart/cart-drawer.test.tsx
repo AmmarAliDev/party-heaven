@@ -125,8 +125,8 @@ describe("cart drawer", () => {
 
   it("disables checkout when an item exceeds available stock", async () => {
     const cart = createCart();
-    cart.items[0].quantity = 5;
-    cart.items[0].availableQuantity = 2;
+    cart.items[0]!.quantity = 5;
+    cart.items[0]!.availableQuantity = 2;
     mockCartFetch(cart);
 
     const { CartDrawer } = await import("@/features/cart/components/cart-drawer");

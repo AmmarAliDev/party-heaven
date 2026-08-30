@@ -1,8 +1,8 @@
 "use client";
 
-import { ShoppingCart } from "lucide-react";
 import { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
+import { ShoppingCart } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import { routes } from "@/config/routes";

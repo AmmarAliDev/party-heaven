@@ -9,7 +9,7 @@ import { rbacPermissions } from "@/lib/auth/rbac";
 import { captureServerError } from "@/lib/errors/handling";
 import { assertTrustedOrigin } from "@/lib/security/csrf";
 
-import { getDealErrorCode, type DealErrorCode } from "./flash";
+import { type DealErrorCode,getDealErrorCode } from "./flash";
 import { createAdminDeal, deleteAdminDeal, updateAdminDeal } from "./service";
 import { validateAdminDealCreateInput, validateAdminDealUpdateInput } from "./validation";
 

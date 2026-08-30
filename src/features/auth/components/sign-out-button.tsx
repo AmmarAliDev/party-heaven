@@ -1,12 +1,12 @@
 "use client";
 
-import { LogOut } from "lucide-react";
-import { signOut as clientSignOut } from "next-auth/react";
 import { useState } from "react";
+import { signOut as clientSignOut } from "next-auth/react";
+import { LogOut } from "lucide-react";
 import { useFormStatus } from "react-dom";
 
-import { routes } from "@/config/routes";
 import { Button, type ButtonProps } from "@/components/ui/button";
+import { routes } from "@/config/routes";
 import { prepareSignOutAction, signOutAction } from "@/features/auth/actions/sign-out";
 import { notify } from "@/lib/notify";
 import { cn } from "@/lib/utils";

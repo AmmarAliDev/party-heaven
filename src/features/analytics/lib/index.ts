@@ -1,43 +1,24 @@
-import { AnalyticsEvent } from '../types';
+import type { AnalyticsEvent, ProductInfo } from '../types';
 
 declare global {
   interface Window {
-    gtag?: (...args: any[]) => void;
-    dataLayer?: any[];
-    fbq?: (...args: any[]) => void;
+    gtag?: (...args: unknown[]) => void;
+    dataLayer?: unknown[];
+    fbq?: (...args: unknown[]) => void;
   }
 }
 
 /**
  * Normalizes GA4 items payload from internal product info.
  */
-const mapToG4Items = (items: any[]) => {
-  return items.map((item: any) => ({
+const mapToG4Items = (items: ProductInfo[]) => {
+  return items.map((item) => ({
     item_id: item.id,
     item_name: item.name,
     price: item.price,
     item_category: item.category,
     item_brand: item.brand,
     quantity: item.quantity || 1,
-  }));
-};
-
-/**
- * Normalizes Meta Pixel content payload from internal product info.
- * 
- * NOTE: Currently unused. The implementation uses the simpler content_ids approach
- * for Meta Pixel tracking, which is sufficient for standard e-commerce tracking.
- * This function is retained for potential future use if we need to leverage Meta's
- * structured 'contents' parameter for advanced tracking scenarios (e.g., dynamic ads,
- * product catalog integration) which requires the format: [{id, quantity, item_price}].
- * 
- * @see https://developers.facebook.com/docs/meta-pixel/reference#object-properties
- */
-const mapToMetaContents = (items: any[]) => {
-  return items.map((item: any) => ({
-    id: item.id,
-    quantity: item.quantity || 1,
-    item_price: item.price,
   }));
 };
 

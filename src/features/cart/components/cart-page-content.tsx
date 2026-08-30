@@ -10,10 +10,10 @@ import { EmptyState } from "@/components/ui/empty-state";
 import { PriceDisplay } from "@/components/ui/price-display";
 import { SectionErrorState } from "@/components/ui/section-error-state";
 import { routes } from "@/config/routes";
-import { testIds } from "@/lib/test-selectors";
-import { getDisplayVariantLabel } from "@/lib/variant-label";
 import type { CartSummary } from "@/features/cart/types";
 import { validateCartStock } from "@/features/cart/validation";
+import { testIds } from "@/lib/test-selectors";
+import { getDisplayVariantLabel } from "@/lib/variant-label";
 
 import { addCartChangedListener } from "../client-events";
 import { CartItemQuantityControls } from "./cart-item-quantity-controls";

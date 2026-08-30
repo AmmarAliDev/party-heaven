@@ -31,7 +31,7 @@ describe("buildStorefrontCategoryMenu", () => {
       { name: "Personal Care", href: "/categories/personal-care" },
     ]);
 
-    expect(menu.some((item) => item.kind === "party-heaven")).toBe(false);
+    expect(menu.some((item) => item.title === "Party Heaven")).toBe(false);
     expect(menu.map((item) => item.title)).toEqual(["Personal Care", "All Categories"]);
   });
 });

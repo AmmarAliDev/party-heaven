@@ -21,14 +21,6 @@ function getInventoryBadge(quantity: number) {
   return { label: "In stock", variant: "success" as const };
 }
 
-function getReviewSummary(product: CatalogProductCard) {
-  if (product.reviewCount <= 0) {
-    return "No reviews yet";
-  }
-
-  return `${product.averageRating.toFixed(1)} average rating | ${product.reviewCount} ${product.reviewCount === 1 ? "review" : "reviews"}`;
-}
-
 type ProductGridCardProps = {
   product: CatalogProductCard;
   eagerImage?: boolean;

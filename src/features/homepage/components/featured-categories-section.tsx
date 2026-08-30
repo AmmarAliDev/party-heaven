@@ -1,5 +1,6 @@
-import { ArrowRight, Layers } from "lucide-react";
+import Image from "next/image";
 import Link from "next/link";
+import { ArrowRight, Layers } from "lucide-react";
 
 import { buttonVariants } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -15,7 +16,6 @@ import { PageContainer } from "@/components/ui/page-container";
 import { SectionHeader } from "@/components/ui/section-header";
 import { routes } from "@/config/routes";
 
-import Image from "next/image";
 import type { FeaturedCategoriesSection } from "../types";
 import {
   FEATURED_CATEGORIES_CAROUSEL_ITEM_CLASS,

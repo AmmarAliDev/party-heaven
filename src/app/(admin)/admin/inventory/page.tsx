@@ -1,16 +1,17 @@
+import type { ReactNode } from "react";
+
 import { PageShell } from "@/components/layout/page-shell";
 import { Card, CardContent } from "@/components/ui/card";
 import { SectionErrorState } from "@/components/ui/section-error-state";
 import { buildMetadata } from "@/config/metadata";
-import type { ReactNode } from "react";
 import { routes } from "@/config/routes";
-import { updateAdminInventoryAction } from "@/features/admin/inventory/actions";
 import {
   AdminPageHeader,
 } from "@/features/admin/components/admin-page-patterns";
+import { updateAdminInventoryAction } from "@/features/admin/inventory/actions";
 import {
-  AdminInventoryTable,
   type AdminInventoryItem,
+  AdminInventoryTable,
 } from "@/features/admin/inventory/components/admin-inventory-table";
 import {
   getAdminInventoryErrorMessage,

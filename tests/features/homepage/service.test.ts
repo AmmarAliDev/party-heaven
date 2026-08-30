@@ -65,6 +65,7 @@ function buildStorefrontProductRecord(
         url: `https://cdn.example.com/${id}.jpg`,
         alt: `Image ${id}`,
         position: 0,
+        productVariantId: null,
       },
     ],
     specifications: [],
@@ -176,7 +177,6 @@ describe("homepage CMS service", () => {
     expect(result.source).toBe("fallback");
     expect(result.sections.some((section) => section.id === "categories-disabled")).toBe(false);
     expect(result.sections.some((section) => section.id === "deal-disabled")).toBe(false);
-    expect(result.sections.some((section) => section.kind === "hero-banner")).toBe(false);
     expect(result.sections.some((section) => section.kind === "deal-spotlight")).toBe(false);
   });
 
@@ -201,7 +201,6 @@ describe("homepage CMS service", () => {
 
     expect(result.source).toBe("cms");
     expect(result.sections.some((section) => section.id === "banner-banner-1" && section.kind === "announcement-bar")).toBe(true);
-    expect(result.sections.some((section) => section.kind === "hero-banner")).toBe(false);
     expect(result.sections.some((section) => section.kind === "featured-categories")).toBe(true);
     expect(result.sections.some((section) => section.kind === "featured-products")).toBe(true);
   });
@@ -243,7 +242,6 @@ describe("homepage CMS service", () => {
     expect(result.source).toBe("cms");
     expect(result.sections.some((section) => section.id === "banner-banner-2" && section.kind === "announcement-bar")).toBe(true);
     expect(result.sections.some((section) => section.id === "campaign-campaign-1" && section.kind === "deal-spotlight")).toBe(true);
-    expect(result.sections.some((section) => section.kind === "hero-banner")).toBe(false);
     expect(result.sections.some((section) => section.kind === "featured-categories")).toBe(true);
     expect(result.sections.some((section) => section.id === "fallback-deal-spotlight")).toBe(false);
   });
@@ -466,7 +464,6 @@ describe("homepage CMS service", () => {
     ).toBe(true);
 
     // All primary homepage sections must still be present via fallback merging.
-    expect(result.sections.some((section) => section.kind === "hero-banner")).toBe(false);
     expect(result.sections.some((section) => section.kind === "featured-categories")).toBe(true);
     expect(result.sections.some((section) => section.kind === "featured-products")).toBe(true);
 
@@ -495,7 +492,6 @@ describe("homepage CMS service", () => {
 
     expect(result.source).toBe("fallback");
     expect(result.sections.some((section) => section.id === "banner-banner-invalid")).toBe(false);
-    expect(result.sections.some((section) => section.kind === "hero-banner")).toBe(false);
   });
 
   it("keeps homepage stable when banners are removed and no admin content remains", async () => {
@@ -506,7 +502,6 @@ describe("homepage CMS service", () => {
     const result = await getHomepageContent();
 
     expect(result.source).toBe("fallback");
-    expect(result.sections.some((section) => section.kind === "hero-banner")).toBe(false);
     expect(result.sections.some((section) => section.kind === "deal-spotlight")).toBe(false);
     expect(result.sections.some((section) => section.id.startsWith("banner-"))).toBe(false);
     expect(result.sections.some((section) => section.id.startsWith("campaign-"))).toBe(false);

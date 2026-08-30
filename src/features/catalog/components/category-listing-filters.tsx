@@ -1,8 +1,8 @@
 "use client";
 
+import { useEffect, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { useEffect, useState } from "react";
 import { SlidersHorizontal } from "lucide-react";
 import { z } from "zod";
 
@@ -14,7 +14,6 @@ import {
   Sheet,
   SheetClose,
   SheetContent,
-  SheetDescription,
   SheetHeader,
   SheetTitle,
   SheetTrigger,
@@ -88,9 +87,11 @@ type CategoryListingFilterFormProps = {
   slug: string;
   filters: CatalogCategoryListing["filters"];
   fieldIdPrefix: string;
+  /** Called when the form triggers a navigation (reset or previous page), so mobile overlays can close. */
+  onNavigate?: () => void;
 };
 
-function CategoryListingFilterForm({ form, onSubmit, slug, filters, fieldIdPrefix }: CategoryListingFilterFormProps) {
+function CategoryListingFilterForm({ form, onSubmit, slug, filters, fieldIdPrefix, onNavigate }: CategoryListingFilterFormProps) {
   return (
     <form className="space-y-4" noValidate onSubmit={form.handleSubmit(onSubmit)}>
       <FormErrorSummary errors={form.formState.errors} title="Please review the selected filters" />
@@ -179,7 +180,11 @@ function CategoryListingFilterForm({ form, onSubmit, slug, filters, fieldIdPrefi
 
       <div className="flex flex-wrap gap-3">
         <Button type="submit">Apply filters</Button>
-        <Link href={routes.storefront.category(slug)} className={buttonVariants({ variant: "outline" })}>
+        <Link
+          href={routes.storefront.category(slug)}
+          className={buttonVariants({ variant: "outline" })}
+          {...(onNavigate ? { onClick: onNavigate } : {})}
+        >
           Reset
         </Link>
         {(filters.page ?? 1) > 1 ? (
@@ -188,6 +193,7 @@ function CategoryListingFilterForm({ form, onSubmit, slug, filters, fieldIdPrefi
               page: Math.max(1, (filters.page ?? 1) - 1),
             })}
             className={buttonVariants({ variant: "ghost" })}
+            {...(onNavigate ? { onClick: onNavigate } : {})}
           >
             Previous page
           </Link>
@@ -219,18 +225,7 @@ export function CategoryListingFilters({ listing }: { listing: CatalogCategoryLi
     const nextValues = toCategoryListingFilterValues(filters);
     resetDesktopForm(nextValues);
     resetMobileForm(nextValues);
-    setMobileSheetOpen(false);
-  }, [
-    filters.sort,
-    filters.minPrice,
-    filters.maxPrice,
-    filters.availability,
-    filters.rating,
-    filters.discount,
-    filters.attribute,
-    resetDesktopForm,
-    resetMobileForm,
-  ]);
+  }, [filters, resetDesktopForm, resetMobileForm]);
 
   function pushFilters(values: CategoryListingFilterValues) {
     router.push(
@@ -277,6 +272,7 @@ export function CategoryListingFilters({ listing }: { listing: CatalogCategoryLi
                 slug={category.slug}
                 filters={filters}
                 fieldIdPrefix="mobile-catalog-filter"
+                onNavigate={() => setMobileSheetOpen(false)}
               />
 
               <div className="mt-4">

@@ -7,7 +7,7 @@ import { afterEach, describe, expect, it, vi } from "vitest";
 import {
   createDataTableColumnHelper,
   DataTable,
-  type ColumnDef,
+  type DataTableColumn,
 } from "@/components/data-table";
 
 type RowItem = {
@@ -18,7 +18,7 @@ type RowItem = {
 
 const columnHelper = createDataTableColumnHelper<RowItem>();
 
-const columns: ColumnDef<RowItem>[] = [
+const columns: DataTableColumn<RowItem>[] = [
   columnHelper.accessor("name", {
     header: "Product",
     cell: (info) => info.getValue(),

@@ -1,3 +1,4 @@
+import Image from "next/image";
 import Link from "next/link";
 import { ArrowRight } from "lucide-react";
 
@@ -6,7 +7,6 @@ import { Card, CardContent } from "@/components/ui/card";
 import { testIds } from "@/lib/test-selectors";
 
 import type { CatalogCategory } from "../types";
-import Image from "next/image";
 
 type CategoryOverviewCardProps = {
   category: CatalogCategory;

@@ -41,6 +41,7 @@ export function useDataTable<TData extends RowData>({
   const resolvedPagination = pagination?.state ?? internalPagination;
   const resolvedOnPaginationChange = pagination?.onPaginationChange ?? setInternalPagination;
 
+  // eslint-disable-next-line react-hooks/incompatible-library -- TanStack Table's useReactTable is a well-known external hook the React Compiler cannot analyze; the hook is intentionally wrapped for a typed data-table abstraction.
   const table = useReactTable({
     data,
     columns,

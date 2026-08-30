@@ -5,9 +5,9 @@ import { createLogger } from "@/lib/logger";
 import { getPrismaClient } from "@/server/db";
 
 import {
+  type AdminStoreSettingsInput,
   adminStoreSettingsSingletonId,
   defaultAdminStoreSettings,
-  type AdminStoreSettingsInput,
   validateAdminStoreSettingsInput,
 } from "./validation";
 

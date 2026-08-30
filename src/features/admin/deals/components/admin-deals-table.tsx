@@ -1,10 +1,9 @@
 "use client";
 
 import Link from "next/link";
-import { type ColumnDef } from "@tanstack/react-table";
 import { Pencil } from "lucide-react";
 
-import { createDataTableColumnHelper,DataTable } from "@/components/data-table";
+import { createDataTableColumnHelper, DataTable, type DataTableColumn } from "@/components/data-table";
 import { Badge } from "@/components/ui/badge";
 import { buttonVariants } from "@/components/ui/button";
 import { routes } from "@/config/routes";
@@ -20,7 +19,7 @@ const statusBadgeVariantMap: Record<"DRAFT" | "PUBLISHED" | "ARCHIVED", "seconda
   ARCHIVED: "warning",
 };
 
-export const adminDealsTableColumns: ColumnDef<AdminDealListItem, any>[] = [
+export const adminDealsTableColumns: DataTableColumn<AdminDealListItem>[] = [
   columnHelper.accessor("title", {
     id: "deal",
     header: "Deal",
@@ -111,7 +110,7 @@ export function AdminDealsTable({
   emptyTitle = "No deals found",
   emptyDescription = "Create your first deal or adjust the current filters.",
 }: AdminDealsTableProps) {
-  const columns: ColumnDef<AdminDealListItem, any>[] = [
+  const columns: DataTableColumn<AdminDealListItem>[] = [
     ...adminDealsTableColumns,
     columnHelper.display({
       id: "actions",

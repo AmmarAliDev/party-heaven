@@ -1,6 +1,7 @@
-export { DataTable, createDataTableColumnHelper } from "./data-table";
 export type { ColumnDef } from "./data-table";
+export { createDataTableColumnHelper,DataTable } from "./data-table";
 export type {
+  DataTableColumn,
   DataTableEmptyState,
   DataTableErrorState,
   DataTablePaginationOptions,

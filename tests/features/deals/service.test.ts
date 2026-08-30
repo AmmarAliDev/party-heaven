@@ -85,7 +85,7 @@ describe("storefront deals service", () => {
     const deals = await listPublishedDeals();
 
     expect(deals).toHaveLength(1);
-    const deal = deals[0];
+    const deal = deals[0]!;
     expect(deal).toMatchObject({
       slug: "flash-cleaner-deal",
       title: "Flash Cleaner Deal",
@@ -113,9 +113,9 @@ describe("storefront deals service", () => {
       ],
     });
     expect(deal.images).toHaveLength(2);
-    expect(deal.images[0].alt).toBe("Deal one");
+    expect(deal.images[0]!.alt).toBe("Deal one");
     // Second image falls back to the deal title for alt text.
-    expect(deal.images[1].alt).toBe("Flash Cleaner Deal");
+    expect(deal.images[1]!.alt).toBe("Flash Cleaner Deal");
   });
 
   it("flags low stock and out-of-stock deals from the least-available product", async () => {
@@ -278,11 +278,11 @@ describe("storefront deals service", () => {
   it("filters unpublished deals in the listing", async () => {
     prismaMock.deal.findMany.mockResolvedValue([buildDealRecord()]);
 
-    const deals = await listPublishedDeals();
+    await listPublishedDeals();
 
     // The service's where clause is what enforces publish-state; the mock
     // simply returns the record, so assert the query used the right where.
-    const [args] = prismaMock.deal.findMany.mock.calls[0];
+    const [args] = prismaMock.deal.findMany.mock.calls[0]!;
     expect(args.where).toEqual({
       status: "PUBLISHED",
       products: {
@@ -304,7 +304,7 @@ describe("storefront deals service", () => {
     const deals = await listPublishedDealsByIds(["deal-a", "deal-b", "missing"]);
 
     expect(deals.map((deal) => deal.id)).toEqual(["deal-a", "deal-b"]);
-    const [args] = prismaMock.deal.findMany.mock.calls[0];
+    const [args] = prismaMock.deal.findMany.mock.calls[0]!;
     expect(args.where.id.in).toEqual(["deal-a", "deal-b", "missing"]);
   });
 

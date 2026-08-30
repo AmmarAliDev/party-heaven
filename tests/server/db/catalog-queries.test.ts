@@ -80,13 +80,13 @@ describe('catalog searchPublishedProducts query widening', () => {
     const { searchPublishedProducts } = await import('@/server/db/catalog-queries');
 
     await searchPublishedProducts('candle', 8);
-    expect(mockProductFindMany.mock.calls[0][0].take).toBe(32);
+    expect(mockProductFindMany.mock.calls[0]![0]!.take).toBe(32);
 
     await searchPublishedProducts('candle', 1);
-    expect(mockProductFindMany.mock.calls[1][0].take).toBe(24);
+    expect(mockProductFindMany.mock.calls[1]![0]!.take).toBe(24);
 
     await searchPublishedProducts('candle', 100);
-    expect(mockProductFindMany.mock.calls[2][0].take).toBe(60);
+    expect(mockProductFindMany.mock.calls[2]![0]!.take).toBe(60);
   });
 
   it('returns empty for queries with no usable tokens without hitting the DB', async () => {

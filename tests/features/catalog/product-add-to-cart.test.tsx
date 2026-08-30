@@ -4,6 +4,8 @@ import { cleanup, render, screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
+import type * as ClientCartEvents from "@/features/cart/client-events";
+
 const notifySuccessMock = vi.fn();
 const notifyErrorMock = vi.fn();
 const dispatchCartChangedMock = vi.fn();
@@ -83,7 +85,7 @@ vi.mock("@/lib/notify", () => ({
 }));
 
 vi.mock("@/features/cart/client-events", async (importOriginal) => {
-  const actual = await importOriginal<typeof import("@/features/cart/client-events")>();
+  const actual = await importOriginal<typeof ClientCartEvents>();
 
   return {
     ...actual,

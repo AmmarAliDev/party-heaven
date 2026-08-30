@@ -1,12 +1,12 @@
 import { describe, expect, it } from "vitest";
 
+import type { CheckoutPaymentProvider } from "@/features/checkout";
 import {
   CHECKOUT_PAYMENT_METHODS,
   FUTURE_PAYMENT_GATEWAY_CODES,
   getCheckoutPaymentProvider,
   listCheckoutPaymentMethods,
 } from "@/features/checkout";
-import type { CheckoutPaymentProvider } from "@/features/checkout";
 
 // ---------------------------------------------------------------------------
 // Helpers
@@ -168,6 +168,8 @@ describe("CheckoutPaymentProvider contract", () => {
       }),
       handleWebhook: async (_rawBody: string, _signature: string) => {
         // Real implementation: verify HMAC, parse body, return normalized event.
+        void _rawBody;
+        void _signature;
         throw new Error("Stub: not implemented");
       },
     };

@@ -2,12 +2,12 @@
 
 import Link from "next/link";
 import { Pencil } from "lucide-react";
-import { type ColumnDef } from "@tanstack/react-table";
 
-import { DataTable, createDataTableColumnHelper } from "@/components/data-table";
+import { createDataTableColumnHelper, DataTable, type DataTableColumn } from "@/components/data-table";
 import { Badge } from "@/components/ui/badge";
 import { buttonVariants } from "@/components/ui/button";
 import { routes } from "@/config/routes";
+
 import type { AdminProductListItem } from "../service";
 import { DeleteProductButton } from "./delete-product-button";
 
@@ -19,7 +19,7 @@ const statusBadgeVariantMap: Record<"DRAFT" | "PUBLISHED" | "ARCHIVED", "seconda
   ARCHIVED: "warning",
 };
 
-export const adminProductsTableColumns: ColumnDef<AdminProductListItem, any>[] = [
+export const adminProductsTableColumns: DataTableColumn<AdminProductListItem>[] = [
   columnHelper.accessor("title", {
     id: "product",
     header: "Product",
@@ -121,7 +121,7 @@ export function AdminProductsTable({
   emptyTitle = "No products found",
   emptyDescription = "Create your first product or adjust the current filters.",
 }: AdminProductsTableProps) {
-  const columns: ColumnDef<AdminProductListItem, any>[] = [
+  const columns: DataTableColumn<AdminProductListItem>[] = [
     ...adminProductsTableColumns,
     columnHelper.display({
       id: "actions",

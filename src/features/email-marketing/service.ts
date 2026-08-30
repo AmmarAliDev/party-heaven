@@ -23,8 +23,8 @@
 import { createLogger } from "@/lib/logger";
 import { maskEmail } from "@/lib/security/pii";
 
-import { emailSubscriberRepository } from "./repository";
 import { getEmailCampaignProvider } from "./providers/index";
+import { emailSubscriberRepository } from "./repository";
 import type { SubscribeInput, SubscribeResult, UnsubscribeInput, UnsubscribeResult } from "./types";
 import { subscribeInputSchema, unsubscribeTokenSchema } from "./validation";
 

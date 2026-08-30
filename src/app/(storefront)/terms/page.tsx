@@ -1,7 +1,7 @@
-import { buildMetadata } from "@/config/metadata";
-import { Badge } from "@/components/ui/badge";
 import { PageShell } from "@/components/layout/page-shell";
+import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
+import { buildMetadata } from "@/config/metadata";
 
 export const metadata = buildMetadata({
   title: "Terms and Conditions",

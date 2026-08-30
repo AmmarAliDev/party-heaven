@@ -1,10 +1,11 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
-import { subscribeEmail, unsubscribeByToken } from "@/features/email-marketing/service";
+
+import type { EmailCampaignProvider } from "@/features/email-marketing/provider";
 import {
   resetEmailCampaignProvider,
   setEmailCampaignProvider,
 } from "@/features/email-marketing/providers/index";
-import type { EmailCampaignProvider } from "@/features/email-marketing/provider";
+import { subscribeEmail, unsubscribeByToken } from "@/features/email-marketing/service";
 
 // ---------------------------------------------------------------------------
 // Prisma mock — simulates the EmailSubscriber table

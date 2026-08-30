@@ -2,14 +2,15 @@
 
 import { cleanup, render, screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
+import type * as ReactTypes from "react";
 import type { ComponentPropsWithoutRef, ReactNode } from "react";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
+import { RECENT_SEARCHES_STORAGE_KEY } from "@/features/catalog/recent-searches";
 import {
   __resetSearchDialogStateForTests,
   openSearchDialog,
 } from "@/features/catalog/search-dialog-state";
-import { RECENT_SEARCHES_STORAGE_KEY } from "@/features/catalog/recent-searches";
 import type { CatalogProductCard, CatalogSearchResponse } from "@/features/catalog/types";
 
 vi.mock("next/navigation", () => ({
@@ -18,11 +19,12 @@ vi.mock("next/navigation", () => ({
 
 vi.mock("next/image", () => ({
   default: function MockNextImage(props: ComponentPropsWithoutRef<"img">) {
-    const { fill: _fill, ...imgProps } = props as ComponentPropsWithoutRef<"img"> & {
+    const { fill, ...imgProps } = props as ComponentPropsWithoutRef<"img"> & {
       fill?: boolean;
     };
+    void fill;
 
-    // eslint-disable-next-line jsx-a11y/alt-text
+    // eslint-disable-next-line jsx-a11y/alt-text, @next/next/no-img-element -- intentional test double for next/image
     return <img {...imgProps} />;
   },
 }));
@@ -30,7 +32,8 @@ vi.mock("next/image", () => ({
 // Lightweight command-dialog doubles: exercise the search dialog logic (state,
 // debounce, fetch, rendering) without pulling Radix/cmdk into the jsdom suite.
 vi.mock("@/components/ui/command", () => {
-  const React = require("react") as typeof import("react");
+  // eslint-disable-next-line @typescript-eslint/no-require-imports -- vi.mock factories are hoisted above imports, so require is required here.
+  const React = require("react") as typeof ReactTypes;
 
   return {
     CommandDialog: ({
@@ -88,7 +91,7 @@ vi.mock("@/components/ui/command", () => {
       onSelect?: () => void;
       value?: string;
     }) => (
-      <div role="option" data-value={value} onClick={() => onSelect?.()} {...props}>
+      <div role="option" aria-selected={false} data-value={value} onClick={() => onSelect?.()} {...props}>
         {children}
       </div>
     ),
@@ -224,7 +227,7 @@ describe("CatalogSearchCommandDialog", () => {
     fetchMock.mockResolvedValue({
       ok: true,
       json: async () =>
-        mockSearchPayload([makeSearchCard({ imageUrl: undefined, imageLabel: "Face Wash Art" })]),
+        mockSearchPayload([makeSearchCard({ imageLabel: "Face Wash Art" })]),
     });
 
     const { CatalogSearchCommandDialog } = await import(

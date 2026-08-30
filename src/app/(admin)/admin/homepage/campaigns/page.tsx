@@ -7,8 +7,6 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { buildMetadata } from "@/config/metadata";
 import { routes } from "@/config/routes";
 import { AdminPageHeader } from "@/features/admin/components/admin-page-patterns";
-import { AdminDealCampaignForm } from "@/features/admin/homepage/components/admin-deal-campaign-form";
-import { AdminDealCampaignEditPanel } from "@/features/admin/homepage/components/admin-deal-campaign-edit-panel";
 import {
   createAdminDealCampaignAction,
   getHomepageContentErrorMessage,
@@ -16,6 +14,8 @@ import {
   listAdminDealCampaigns,
   updateAdminDealCampaignAction,
 } from "@/features/admin/homepage";
+import { AdminDealCampaignEditPanel } from "@/features/admin/homepage/components/admin-deal-campaign-edit-panel";
+import { AdminDealCampaignForm } from "@/features/admin/homepage/components/admin-deal-campaign-form";
 import { requireRouteAccess } from "@/lib/auth/guards";
 import { rbacPermissions } from "@/lib/auth/rbac";
 

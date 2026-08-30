@@ -17,8 +17,6 @@ import {
 import { FormErrorSummary } from "@/components/ui/form-error-summary";
 import { PriceDisplay } from "@/components/ui/price-display";
 import type { CartSummary } from "@/features/cart/types";
-import { toUserMessage } from "@/lib/errors/error-messages";
-import { testIds } from "@/lib/test-selectors";
 import {
   CHECKOUT_FIXED_PROVINCE,
   CHECKOUT_SUPPORTED_CITY,
@@ -27,7 +25,9 @@ import {
   type CheckoutPaymentMethodDefinition,
   submitCheckoutRequest,
 } from "@/features/checkout";
+import { toUserMessage } from "@/lib/errors/error-messages";
 import { notify } from "@/lib/notify";
+import { testIds } from "@/lib/test-selectors";
 
 type CheckoutPageClientProps = {
   cart: CartSummary;

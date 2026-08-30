@@ -396,7 +396,7 @@ export async function deleteAdminCategory(input: {
     });
   } catch (error) {
     if (error instanceof PrismaClientKnownRequestError && error.code === "P2003") {
-      const meta = (error.meta ?? {}) as any;
+      const meta = (error.meta ?? {}) as Record<string, unknown>;
       const metaStr = JSON.stringify(meta).toLowerCase();
 
       // If the constraint/meta indicates products are involved, keep the

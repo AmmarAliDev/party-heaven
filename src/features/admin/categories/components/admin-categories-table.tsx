@@ -2,12 +2,12 @@
 
 import Link from "next/link";
 import { Pencil } from "lucide-react";
-import { type ColumnDef } from "@tanstack/react-table";
 
-import { DataTable, createDataTableColumnHelper } from "@/components/data-table";
+import { createDataTableColumnHelper, DataTable, type DataTableColumn } from "@/components/data-table";
 import { Badge } from "@/components/ui/badge";
 import { buttonVariants } from "@/components/ui/button";
 import { routes } from "@/config/routes";
+
 import type { AdminCategoryListItem } from "../service";
 import { DeleteCategoryButton } from "./delete-category-button";
 
@@ -25,7 +25,7 @@ const statusLabelMap: Record<"DRAFT" | "PUBLISHED" | "ARCHIVED", string> = {
   ARCHIVED: "Archived",
 };
 
-export const adminCategoriesTableColumns: ColumnDef<AdminCategoryListItem, any>[] = [
+export const adminCategoriesTableColumns: DataTableColumn<AdminCategoryListItem>[] = [
   columnHelper.accessor("name", {
     id: "name",
     header: "Name",
@@ -109,7 +109,7 @@ export function AdminCategoriesTable({
   emptyTitle = "No categories found",
   emptyDescription = "Create your first category or adjust search and filters.",
 }: AdminCategoriesTableProps) {
-  const columns: ColumnDef<AdminCategoryListItem, any>[] = [
+  const columns: DataTableColumn<AdminCategoryListItem>[] = [
     ...adminCategoriesTableColumns,
     columnHelper.display({
       id: "actions",

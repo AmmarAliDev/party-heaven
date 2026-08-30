@@ -7,13 +7,13 @@ import { Button, buttonVariants } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { cn } from "@/lib/utils";
 
+import { uploadAdminImage } from "../client";
 import {
   ADMIN_IMAGE_UPLOAD_ACCEPT,
   ADMIN_IMAGE_UPLOAD_MAX_BYTES,
-  formatImageUploadSize,
   type AdminImageUploadPurpose,
+  formatImageUploadSize,
 } from "../constants";
-import { uploadAdminImage } from "../client";
 
 type AdminImageUploadInputProps = {
   inputId: string;
@@ -80,6 +80,7 @@ export function AdminImageUploadInput({
           <div className="flex h-24 w-24 shrink-0 items-center justify-center overflow-hidden rounded-lg border bg-background text-xs text-muted-foreground">
             {hasValue ? (
               // Plain img keeps admin previews resilient for arbitrary uploaded URLs.
+              // eslint-disable-next-line @next/next/no-img-element -- preview of arbitrary blob URLs; next/image remote config would reject them.
               <img src={trimmedValue} alt="Selected upload preview" className="h-full w-full object-cover" />
             ) : (
               <span className="px-2 text-center">No image yet</span>

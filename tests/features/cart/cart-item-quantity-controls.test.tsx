@@ -1,8 +1,9 @@
 // @vitest-environment jsdom
 
-import { render, screen, fireEvent, waitFor, cleanup } from "@testing-library/react";
+import { cleanup,fireEvent, render, screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
-import { vi, describe, it, expect, beforeEach, afterEach } from "vitest";
+import { afterEach,beforeEach, describe, expect, it, vi } from "vitest";
+
 import { CartItemQuantityControls } from "@/features/cart/components/cart-item-quantity-controls";
 
 // Mock the cart client events
@@ -19,17 +20,16 @@ vi.mock("@/lib/notify", () => ({
 }));
 
 // Import mocked functions after defining the mocks
-import { dispatchCartChanged } from "@/features/cart/client-events";
 import { notify } from "@/lib/notify";
 
 describe("CartItemQuantityControls", () => {
-  const mockFetchResponse = (data: any, ok = true) => {
+  const mockFetchResponse = (data: unknown, ok = true) => {
     global.fetch = vi.fn(() =>
       Promise.resolve({
         ok,
         json: () => Promise.resolve(data),
       }),
-    ) as any;
+    ) as unknown as typeof fetch;
   };
 
   beforeEach(() => {
@@ -294,7 +294,7 @@ describe("CartItemQuantityControls", () => {
     });
 
     it("does not flag input that exceeds allowed max while typing", async () => {
-      global.fetch = vi.fn() as any;
+      global.fetch = vi.fn() as unknown as typeof fetch;
 
       const user = userEvent.setup();
       render(
@@ -321,7 +321,7 @@ describe("CartItemQuantityControls", () => {
     });
 
     it("keeps previous value and does not update for float input on blur", async () => {
-      global.fetch = vi.fn() as any;
+      global.fetch = vi.fn() as unknown as typeof fetch;
 
       render(
         <CartItemQuantityControls
@@ -344,7 +344,7 @@ describe("CartItemQuantityControls", () => {
     });
 
     it("keeps previous value and does not update for non-integer input on blur", async () => {
-      global.fetch = vi.fn() as any;
+      global.fetch = vi.fn() as unknown as typeof fetch;
 
       render(
         <CartItemQuantityControls
@@ -598,7 +598,7 @@ describe("CartItemQuantityControls", () => {
     });
 
     it("does not commit when input equals current quantity", async () => {
-      global.fetch = vi.fn() as any;
+      global.fetch = vi.fn() as unknown as typeof fetch;
 
       const user = userEvent.setup();
       render(
@@ -754,7 +754,7 @@ describe("CartItemQuantityControls", () => {
 
   describe("pending state", () => {
     it("disables all controls while mutation is pending", async () => {
-      let resolveResponse: any;
+      let resolveResponse: ((value: unknown) => void) | undefined;
       const promise = new Promise((resolve) => {
         resolveResponse = resolve;
       });
@@ -764,7 +764,7 @@ describe("CartItemQuantityControls", () => {
           ok: true,
           json: () => promise,
         }),
-      ) as any;
+      ) as unknown as typeof fetch;
 
       const user = userEvent.setup();
       render(
@@ -790,7 +790,7 @@ describe("CartItemQuantityControls", () => {
       expect(plusButton).toBeDisabled();
 
       // Resolve the response
-      resolveResponse({
+      resolveResponse!({
         cart: {
           itemCount: 5,
           items: [

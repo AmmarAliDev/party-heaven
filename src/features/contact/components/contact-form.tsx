@@ -3,13 +3,13 @@
 import { useState } from "react";
 import { AlertCircle, CheckCircle2, Loader2 } from "lucide-react";
 
-import { SchemaForm, type DynamicFormFieldConfig } from "@/components/forms";
+import { type DynamicFormFieldConfig,SchemaForm } from "@/components/forms";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
 import { toUserMessage } from "@/lib/errors/error-messages";
 
-import { contactFormSchema, type ContactFormValues } from "../validation";
 import { submitContactForm } from "../actions";
+import { contactFormSchema, type ContactFormValues } from "../validation";
 
 const fields: DynamicFormFieldConfig<ContactFormValues>[] = [
   {

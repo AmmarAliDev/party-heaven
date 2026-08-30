@@ -10,8 +10,8 @@ import { captureServerError } from "@/lib/errors/handling";
 import { assertTrustedOrigin } from "@/lib/security/csrf";
 
 import {
-  getAdminInventoryErrorCode,
   type AdminInventoryErrorCode,
+  getAdminInventoryErrorCode,
 } from "./flash";
 import { adjustAdminInventory } from "./service";
 import { validateAdminInventoryAdjustmentInput } from "./validation";

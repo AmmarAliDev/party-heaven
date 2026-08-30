@@ -7,9 +7,6 @@ import { PageErrorFallback } from "@/components/ui/page-error-fallback";
 import { SectionHeader } from "@/components/ui/section-header";
 import { buildMetadata } from "@/config/metadata";
 import {
-  toBlogStaticParams,
-} from "@/features/rendering/seo-content-rendering";
-import {
   BlogPostCard,
   BlogPostContent,
   buildBlogPostBreadcrumbJsonLd,
@@ -20,6 +17,9 @@ import {
   getRelatedBlogPosts,
   toBlogMetadataInput,
 } from "@/features/blog";
+import {
+  toBlogStaticParams,
+} from "@/features/rendering/seo-content-rendering";
 
 export const revalidate = 900;
 

@@ -2,7 +2,7 @@ import { expectTypeOf, test } from "vitest";
 
 import {
   createDataTableColumnHelper,
-  type ColumnDef,
+  type DataTableColumn,
   type DataTablePaginationOptions,
 } from "@/components/data-table";
 
@@ -24,9 +24,9 @@ test("createDataTableColumnHelper keeps row typing for accessors", () => {
       header: "Price",
       cell: (info) => info.getValue().toFixed(2),
     }),
-  ] satisfies ColumnDef<ProductRow, unknown>[];
+  ] satisfies DataTableColumn<ProductRow>[];
 
-  expectTypeOf(columns).toMatchTypeOf<ColumnDef<ProductRow, unknown>[]>();
+  expectTypeOf(columns).toMatchTypeOf<DataTableColumn<ProductRow>[]>();
 });
 
 test("pagination options expose typed tanstack pagination contract", () => {

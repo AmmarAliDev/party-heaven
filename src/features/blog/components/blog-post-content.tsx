@@ -1,3 +1,5 @@
+import type { JSX } from "react";
+
 import type { BlogContentBlock } from "../types";
 
 type BlogPostContentProps = {
@@ -17,7 +19,7 @@ export function BlogPostContent({ blocks }: BlogPostContentProps) {
         }
 
         if (block.type === "heading") {
-          const HeadingTag = `h${block.level}` as keyof import("react").JSX.IntrinsicElements;
+          const HeadingTag = `h${block.level}` as keyof JSX.IntrinsicElements;
           return (
             <HeadingTag key={`${block.type}-${index}`} className="text-xl font-semibold tracking-tight sm:text-2xl">
               {block.text}
@@ -40,7 +42,7 @@ export function BlogPostContent({ blocks }: BlogPostContentProps) {
         return (
           <blockquote
             key={`${block.type}-${index}`}
-            className="border-primary/40 bg-muted/50 rounded-[var(--radius)] border-l-4 px-4 py-3 text-sm italic sm:text-base"
+            className="border-primary/40 bg-muted/50 rounded-(--radius) border-l-4 px-4 py-3 text-sm italic sm:text-base"
           >
             {block.text}
           </blockquote>
