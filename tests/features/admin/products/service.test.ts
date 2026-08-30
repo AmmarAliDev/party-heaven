@@ -380,7 +380,7 @@ describe("admin product service", () => {
       description: "Soft tee with multiple sizes",
       status: "PUBLISHED",
       masterSku: "TEE-CLASSIC",
-      seoTitle: "Classic Tee | One Dollar",
+      seoTitle: "Classic Tee | Party Heaven",
       seoDescription: "Soft cotton tee in multiple sizes.",
       seoImageUrl: "https://example.com/tee-seo.jpg",
       metadata: { variantsEnabled: true, relatedProductIds: ["product-9"] },
@@ -456,7 +456,7 @@ describe("admin product service", () => {
         images: [],
         specifications: [],
         relatedProductIds: ["product-9"],
-        seoTitle: "Classic Tee | One Dollar",
+        seoTitle: "Classic Tee | Party Heaven",
         seoDescription: "Soft cotton tee in multiple sizes.",
         seoCanonicalUrl: undefined,
         seoOgTitle: undefined,
@@ -474,7 +474,7 @@ describe("admin product service", () => {
     expect(prismaMock.productVariant.create).toHaveBeenCalledTimes(2);
     expect(prismaMock.inventory.create).toHaveBeenCalledTimes(2);
     expect(created.variantsEnabled).toBe(true);
-    expect(created.seoTitle).toBe("Classic Tee | One Dollar");
+    expect(created.seoTitle).toBe("Classic Tee | Party Heaven");
     expect(created.seoDescription).toBe("Soft cotton tee in multiple sizes.");
     expect(created.seoImageUrl).toBe("https://example.com/tee-seo.jpg");
   });

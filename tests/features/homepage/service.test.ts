@@ -93,7 +93,7 @@ describe("homepage CMS service", () => {
     mockGetCatalogCategories.mockResolvedValue([]);
     mockListAllPublishedProducts.mockResolvedValue([]);
     mockListPublishedProductsByIds.mockResolvedValue([]);
-    // Default: catalog returns an empty listing so One Dollar section gets hydrated with []
+    // Default: catalog returns an empty listing so Party Heaven section gets hydrated with []
     mockGetCatalogCategoryListing.mockResolvedValue({ products: [], totalItems: 0 });
   });
 
@@ -255,7 +255,7 @@ describe("homepage CMS service", () => {
         description: "Direct campaign destination",
         price: 1399,
         compareAt: 1699,
-        targetHref: "/categories/one-dollar/flash-cleaner",
+        targetHref: "/categories/party-heaven/flash-cleaner",
         imageUrl: "https://store.public.blob.vercel-storage.com/admin/content/campaign-targeted.png",
         imageAlt: "Campaign featured product collage",
         active: true,
@@ -273,7 +273,7 @@ describe("homepage CMS service", () => {
       kind: "deal-spotlight",
       price: 1399,
       compareAt: 1699,
-      ctaHref: "/categories/one-dollar/flash-cleaner",
+      ctaHref: "/categories/party-heaven/flash-cleaner",
       image: {
         url: "https://store.public.blob.vercel-storage.com/admin/content/campaign-targeted.png",
         alt: "Campaign featured product collage",
@@ -537,15 +537,15 @@ describe("homepage CMS service", () => {
 
     mockGetCatalogCategories.mockResolvedValue([
       {
-        id: "one-dollar",
-        name: "One Dollar",
-        slug: "one-dollar",
+        id: "party-heaven",
+        name: "Party Heaven",
+        slug: "party-heaven",
         description: "Virtual category",
-        cardImageUrl: "/images/one-dollar.png",
+        cardImageUrl: "/images/party-heaven.png",
         seoTitle: undefined,
         seoDescription: undefined,
         productCount: 4,
-        href: "/categories/one-dollar",
+        href: "/categories/party-heaven",
       },
       {
         id: "category-home-care",
@@ -672,18 +672,18 @@ describe("homepage CMS service", () => {
     expect(categorySection?.categories[0]).not.toHaveProperty("imageUrl");
   });
 
-  it("hydrates One Dollar section with live catalog products", async () => {
+  it("hydrates Party Heaven section with live catalog products", async () => {
     prismaMock.homePageSection.findMany.mockResolvedValue([
       {
-        id: "section-one-dollar",
-        key: "one-dollar-deals",
-        title: "One Dollar deals",
-        type: "one-dollar",
+        id: "section-party-heaven",
+        key: "party-heaven-deals",
+        title: "Party Heaven deals",
+        type: "party-heaven",
         content: {
           description: "Best value picks",
-          ctaLabel: "View all One Dollar deals",
-          ctaHref: "/categories/one-dollar",
-          placeholderMessage: "No One Dollar products right now.",
+          ctaLabel: "View all Party Heaven deals",
+          ctaHref: "/categories/party-heaven",
+          placeholderMessage: "No Party Heaven products right now.",
         },
         meta: { enabled: true },
         position: 25,
@@ -716,33 +716,33 @@ describe("homepage CMS service", () => {
     });
 
     const result = await getHomepageContent();
-    const oneDollarSection = result.sections.find((section) => section.kind === "one-dollar");
+    const partyHeavenSection = result.sections.find((section) => section.kind === "party-heaven");
 
-    expect(oneDollarSection).toMatchObject({
-      kind: "one-dollar",
-      title: "One Dollar deals",
+    expect(partyHeavenSection).toMatchObject({
+      kind: "party-heaven",
+      title: "Party Heaven deals",
       products: [
         {
           id: "prod-1",
           name: "Cheap Soap",
           price: 250,
           compareAt: 350,
-          badge: "One Dollar",
+          badge: "Party Heaven",
         },
       ],
     });
   });
 
-  it("renders One Dollar section empty state gracefully when catalog fetch fails", async () => {
+  it("renders Party Heaven section empty state gracefully when catalog fetch fails", async () => {
     prismaMock.homePageSection.findMany.mockResolvedValue([
       {
-        id: "section-one-dollar",
-        key: "one-dollar-deals",
-        title: "One Dollar deals",
-        type: "one-dollar",
+        id: "section-party-heaven",
+        key: "party-heaven-deals",
+        title: "Party Heaven deals",
+        type: "party-heaven",
         content: {
           ctaLabel: "View all",
-          ctaHref: "/categories/one-dollar",
+          ctaHref: "/categories/party-heaven",
           placeholderMessage: "No products right now.",
         },
         meta: { enabled: true },
@@ -756,11 +756,11 @@ describe("homepage CMS service", () => {
     mockGetCatalogCategoryListing.mockRejectedValue(new Error("Catalog DB unavailable"));
 
     const result = await getHomepageContent();
-    const oneDollarSection = result.sections.find((section) => section.kind === "one-dollar");
+    const partyHeavenSection = result.sections.find((section) => section.kind === "party-heaven");
 
     // Section must still be present; products array will be empty (not hydrated)
-    expect(oneDollarSection).toMatchObject({
-      kind: "one-dollar",
+    expect(partyHeavenSection).toMatchObject({
+      kind: "party-heaven",
       products: [],
     });
   });

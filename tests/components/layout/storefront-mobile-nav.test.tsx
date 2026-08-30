@@ -84,7 +84,7 @@ describe("StorefrontMobileNav", () => {
     await openDrawer();
 
     // Categories now live on the desktop navbar / mobile bottom nav, not the drawer.
-    expect(screen.queryByText("One Dollar")).not.toBeInTheDocument();
+    expect(screen.queryByText("Party Heaven")).not.toBeInTheDocument();
     expect(screen.queryByText("All Categories")).not.toBeInTheDocument();
   });
 

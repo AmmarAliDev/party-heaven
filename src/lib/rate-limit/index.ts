@@ -160,7 +160,7 @@ class UpstashRateLimitStore implements RateLimitStore {
       redis: this.redis,
       limiter: Ratelimit.slidingWindow(limit, `${seconds} s`),
       analytics: false,
-      prefix: "one-dollar:ratelimit",
+      prefix: "party-heaven:ratelimit",
     });
 
     this.limiters.set(cacheKey, ratelimit);

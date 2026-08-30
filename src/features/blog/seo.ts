@@ -14,7 +14,7 @@ export function buildBlogListingJsonLd(posts: BlogListingItem[]) {
   return {
     "@context": "https://schema.org",
     "@type": "CollectionPage",
-    name: "One Dollar Blog",
+    name: "Party Heaven Blog",
     url: toAbsoluteUrl("/blog"),
     inLanguage: "en",
     mainEntity: {
@@ -48,11 +48,11 @@ export function buildBlogPostJsonLd(post: BlogPost) {
     ...(imageSource ? { image: [toAbsoluteUrl(imageSource)] } : {}),
     author: {
       "@type": "Organization",
-      name: "One Dollar",
+      name: "Party Heaven",
     },
     publisher: {
       "@type": "Organization",
-      name: "One Dollar",
+      name: "Party Heaven",
     },
   };
 }

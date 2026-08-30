@@ -13,7 +13,7 @@ export const metadata = buildMetadata({
   title: "Blog",
   path: "/blog",
   description:
-    "Read practical shopping, budget, and household planning guides from the One Dollar team.",
+    "Read practical shopping, budget, and household planning guides from the Party Heaven team.",
 });
 
 export default async function BlogListingPage() {

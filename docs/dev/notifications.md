@@ -42,7 +42,7 @@ SMTP_SECURE=false
 SMTP_USER=<your-mailtrap-inbox-username>
 SMTP_PASSWORD=<your-mailtrap-inbox-password>
 SMTP_FROM_EMAIL=no-reply@dev.example.com
-SMTP_FROM_NAME="One Dollar Dev"
+SMTP_FROM_NAME="Party Heaven Dev"
 ```
 
 ### Option 3: Enable Telegram Bot Alerts
@@ -72,7 +72,7 @@ SMTP_SECURE=false
 SMTP_USER=apikey
 SMTP_PASSWORD=<your-sendgrid-api-key>
 SMTP_FROM_EMAIL=orders@store.com
-SMTP_FROM_NAME="One Dollar Store"
+SMTP_FROM_NAME="Party Heaven Store"
 ```
 
 ### Telegram Bot for Live Alerts

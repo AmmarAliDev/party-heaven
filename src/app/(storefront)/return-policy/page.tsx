@@ -6,7 +6,7 @@ import { notFound } from "next/navigation";
 export const metadata = buildMetadata({
   title: "Return Policy",
   path: "/return-policy",
-  description: "Return policy information for One Dollar customers.",
+  description: "Return policy information for Party Heaven customers.",
 });
 
 export default function ReturnPolicyPage() {

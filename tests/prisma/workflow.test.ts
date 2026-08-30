@@ -12,7 +12,7 @@ describe('Prisma workflow helpers', () => {
     const { buildPrismaProcessEnv } = await loadWorkflowHelpers();
     const env = buildPrismaProcessEnv(
       {
-        DATABASE_URL: 'postgresql://postgres:postgres@localhost:5432/one_dollar_dev?schema=public',
+        DATABASE_URL: 'postgresql://postgres:postgres@localhost:5432/party_heaven_dev?schema=public',
       },
       isolatedCwd,
     );
@@ -24,7 +24,7 @@ describe('Prisma workflow helpers', () => {
     const { getMigrateDevSafetyCheck } = await loadWorkflowHelpers();
     const result = getMigrateDevSafetyCheck(
       {
-        DATABASE_URL: 'postgresql://postgres:postgres@localhost:5432/one_dollar_dev?schema=public',
+        DATABASE_URL: 'postgresql://postgres:postgres@localhost:5432/party_heaven_dev?schema=public',
       },
       isolatedCwd,
     );

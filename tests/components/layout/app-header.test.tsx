@@ -40,12 +40,12 @@ import { AppHeader } from "@/components/layout/app-header";
 
 const categories = [
   {
-    id: "one-dollar",
-    name: "One Dollar",
-    slug: "one-dollar",
-    description: "Virtual one dollar category",
+    id: "party-heaven",
+    name: "Party Heaven",
+    slug: "party-heaven",
+    description: "Virtual party heaven category",
     productCount: 4,
-    href: "/categories/one-dollar",
+    href: "/categories/party-heaven",
   },
   {
     id: "home-care",
@@ -147,9 +147,9 @@ describe("AppHeader storefront navigation", () => {
 
     const nav = storefrontNav();
 
-    // Direct category links: One Dollar first, then alphabetically up to the cap (NAVBAR_DIRECT_CATEGORY_LIMIT = 6).
+    // Direct category links: Party Heaven first, then alphabetically up to the cap (NAVBAR_DIRECT_CATEGORY_LIMIT = 6).
     for (const [title, href] of [
-      ["One Dollar", "/categories/one-dollar"],
+      ["Party Heaven", "/categories/party-heaven"],
       ["Baby Care", "/categories/baby-care"],
       ["Cleaning Supplies", "/categories/cleaning-supplies"],
       ["Grocery", "/categories/grocery"],

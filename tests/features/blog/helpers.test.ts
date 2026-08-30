@@ -36,7 +36,7 @@ const blogRows = [
     coverImageHeight: 630,
     status: "PUBLISHED",
     publishedAt: new Date("2026-04-16T09:30:00.000Z"),
-    seoTitle: "Weekly Budget Grocery Basket Guide | One Dollar Blog",
+    seoTitle: "Weekly Budget Grocery Basket Guide | Party Heaven Blog",
     seoDescription:
       "Learn a practical weekly grocery basket strategy for Karachi households, including staple planning, spend caps, and waste reduction tips.",
     seoCanonicalUrl: null,
@@ -63,7 +63,7 @@ const blogRows = [
     coverImageHeight: 630,
     status: "PUBLISHED",
     publishedAt: new Date("2026-04-18T11:00:00.000Z"),
-    seoTitle: "Home Restock Routine Checklist | One Dollar Blog",
+    seoTitle: "Home Restock Routine Checklist | Party Heaven Blog",
     seoDescription:
       "Create a dependable restock checklist for home and personal care essentials with practical thresholds and reorder triggers.",
     seoCanonicalUrl: null,
@@ -151,7 +151,7 @@ describe("blog helpers", () => {
     expect(post).toBeTruthy();
 
     const metadataInput = toBlogMetadataInput(post!);
-    expect(metadataInput.title).toBe("Weekly Budget Grocery Basket Guide | One Dollar Blog");
+    expect(metadataInput.title).toBe("Weekly Budget Grocery Basket Guide | Party Heaven Blog");
     expect(metadataInput.path).toBe("/blog/weekly-budget-grocery-basket-karachi");
     expect(metadataInput.openGraphImage).toBe("/blog/budget-basket.svg");
     expect(metadataInput.noIndex).toBe(false);

@@ -12,7 +12,7 @@ This project now uses a section-based homepage foundation backed by admin-manage
 
 - `announcement-bar`
 - `featured-categories`
-- `one-dollar` *(hydrated at runtime from the live catalog)*
+- `party-heaven` *(hydrated at runtime from the live catalog)*
 - `featured-products`
 - `deal-spotlight`
 
@@ -90,7 +90,7 @@ Sections are classified as either **overlay** (additive, promotional) or **prima
 | `deal-spotlight` | Overlay | Promotional deal block; additive regardless of how it was created (admin section or deal campaign) |
 | `featured-categories` | Primary | Core homepage structure |
 | `featured-products` | Primary | Core homepage structure |
-| `one-dollar` | Primary | Core homepage structure |
+| `party-heaven` | Primary | Core homepage structure |
 
 **Rule**: resolver composition is additive by section kind. Enabled CMS records are always included, and fallback sections are merged only for kinds not explicitly configured in CMS.
 
@@ -104,7 +104,7 @@ Sections are classified as either **overlay** (additive, promotional) or **prima
 
 - Sections are sorted by `displayOrder` first, then by static kind order:
   1. `announcement-bar`
-  2. `one-dollar`
+  2. `party-heaven`
   3. `featured-categories`
   4. `featured-products`
   5. `deal-spotlight`
@@ -142,7 +142,7 @@ Config lives in `src/features/homepage/components/homepage-carousel-config.ts`.
 
 - Shown automatically when `items.length > HOMEPAGE_CAROUSEL_MAX_ITEMS`.
 - Shown when the section payload supplies an explicit `viewAllHref`.
-- For `one-dollar` sections the CTA is always shown (links to the live One Dollar catalog).
+- For `party-heaven` sections the CTA is always shown (links to the live Party Heaven catalog).
 - Hidden when items fit within the cap and no explicit link is configured.
 
 **Navigation button behavior**
@@ -156,7 +156,7 @@ Config lives in `src/features/homepage/components/homepage-carousel-config.ts`.
 |---|---|---|
 | `featured-categories` | `FeaturedCategoriesSectionBlock` | `viewAllHref` prop or `routes.storefront.categories` |
 | `featured-products` | `FeaturedProductsSectionBlock` | `viewAllHref` prop (optional) |
-| `one-dollar` | `OneDollarSectionBlock` | `section.ctaHref` (rendered only when deals are available) |
+| `party-heaven` | `PartyHeavenSectionBlock` | `section.ctaHref` (rendered only when deals are available) |
 
 ## Service Layer
 
@@ -169,9 +169,9 @@ Config lives in `src/features/homepage/components/homepage-carousel-config.ts`.
 
 Some section kinds carry live data that is never stored in CMS:
 
-- **`featured-categories`** — `categories[]` is now hydrated from the live Prisma-backed catalog via `getCatalogCategories()` and then normalized into the shared homepage/category card shape before render. The virtual `one-dollar` category is intentionally excluded here because it already has a dedicated homepage section. If the catalog read fails or returns no publishable categories, the storefront keeps the section shell and falls back to the stored/manual category array instead of rendering a broken homepage.
+- **`featured-categories`** — `categories[]` is now hydrated from the live Prisma-backed catalog via `getCatalogCategories()` and then normalized into the shared homepage/category card shape before render. The virtual `party-heaven` category is intentionally excluded here because it already has a dedicated homepage section. If the catalog read fails or returns no publishable categories, the storefront keeps the section shell and falls back to the stored/manual category array instead of rendering a broken homepage.
 - **`featured-products`** — `products[]` is hydrated at runtime from live catalog data by `resolveHomepageFeaturedProducts()`: it ranks published products by summed order quantity across `CONFIRMED`/`PACKED`/`SHIPPED`/`DELIVERED` orders (most-sold first), backfills from recent published catalog products, then fills any remaining slots from the stored fallback array — resolving up to `HOMEPAGE_FEATURED_PRODUCTS_LIMIT = 5` cards so the carousel fills its widest 5-up `2xl` row (the extra item simply scrolls into view on smaller viewports).
-- **`one-dollar`** — `products[]` is always `[]` when stored. `hydrateOneDollarSections()` in `service.ts` calls `getCatalogCategoryListing({ slug: "one-dollar", ... })` and populates up to 8 product cards before the final payload is passed to the page. Hydration now also maps optional `slug` and `images[]` for image-first card rendering. The section is **hidden entirely when no qualifying products (active deals) are available** — `OneDollarSectionBlock` renders `null` when its product list is empty, so the homepage never shows a deals section (or its placeholder copy) with nothing to offer. If the catalog fetch fails, the section is likewise hidden and the rest of the page renders normally.
+- **`party-heaven`** — `products[]` is always `[]` when stored. `hydratePartyHeavenSections()` in `service.ts` calls `getCatalogCategoryListing({ slug: "party-heaven", ... })` and populates up to 8 product cards before the final payload is passed to the page. Hydration now also maps optional `slug` and `images[]` for image-first card rendering. The section is **hidden entirely when no qualifying products (active deals) are available** — `PartyHeavenSectionBlock` renders `null` when its product list is empty, so the homepage never shows a deals section (or its placeholder copy) with nothing to offer. If the catalog fetch fails, the section is likewise hidden and the rest of the page renders normally.
 
 Implementation notes:
 

@@ -2,7 +2,7 @@ import { describe, expect, it } from 'vitest';
 
 import {
   createProductionCatalogData,
-  ONE_DOLLAR_MAX_PRICE_PKR,
+  PARTY_HEAVEN_MAX_PRICE_PKR,
 } from '../../prisma/production-catalog-data.js';
 
 const forbiddenCopyPattern = /\bdev(?:elopment)?\b|\bdemo\b/i;
@@ -62,16 +62,16 @@ describe('production catalog data generator', () => {
     }
   });
 
-  it('keeps One Dollar storefront eligibility present alongside higher-value catalog items', () => {
+  it('keeps Party Heaven storefront eligibility present alongside higher-value catalog items', () => {
     const dataset = createProductionCatalogData();
 
     for (const entry of dataset.categoryProducts) {
       const prices = entry.products.map((product) => product.variant.price);
-      expect(prices.some((price) => price <= ONE_DOLLAR_MAX_PRICE_PKR)).toBe(true);
-      expect(prices.some((price) => price > ONE_DOLLAR_MAX_PRICE_PKR)).toBe(true);
+      expect(prices.some((price) => price <= PARTY_HEAVEN_MAX_PRICE_PKR)).toBe(true);
+      expect(prices.some((price) => price > PARTY_HEAVEN_MAX_PRICE_PKR)).toBe(true);
     }
 
-    expect(dataset.totals.oneDollarEligibleProducts).toBeGreaterThan(0);
+    expect(dataset.totals.partyHeavenEligibleProducts).toBeGreaterThan(0);
     expect(dataset.totals.products).toBe(
       dataset.categoryProducts.reduce((sum, entry) => sum + entry.products.length, 0),
     );

@@ -3,25 +3,25 @@ import { describe, it, expect, vi } from "vitest";
 import { resolveCanonicalUrl, generateSlug, isValidSlug } from "@/lib/seo/slug";
 
 vi.mock("@/config/env", () => ({
-  env: { appUrl: "https://onedollar.local" },
+  env: { appUrl: "https://partyheaven.local" },
 }));
 
 describe("SEO - Canonical URL", () => {
   it("resolves naked path to full url", () => {
-    expect(resolveCanonicalUrl("/test")).toBe("https://onedollar.local/test");
+    expect(resolveCanonicalUrl("/test")).toBe("https://partyheaven.local/test");
   });
 
   it("adds leading slash if missing", () => {
-    expect(resolveCanonicalUrl("test/path")).toBe("https://onedollar.local/test/path");
+    expect(resolveCanonicalUrl("test/path")).toBe("https://partyheaven.local/test/path");
   });
 
   it("removes trailing slashes", () => {
-    expect(resolveCanonicalUrl("/test/")).toBe("https://onedollar.local/test");
+    expect(resolveCanonicalUrl("/test/")).toBe("https://partyheaven.local/test");
   });
 
   it("returns base url for missing or root path", () => {
-    expect(resolveCanonicalUrl()).toBe("https://onedollar.local");
-    expect(resolveCanonicalUrl("/")).toBe("https://onedollar.local");
+    expect(resolveCanonicalUrl()).toBe("https://partyheaven.local");
+    expect(resolveCanonicalUrl("/")).toBe("https://partyheaven.local");
   });
 
   it("returns external URL as is if provided", () => {

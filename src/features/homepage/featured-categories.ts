@@ -1,5 +1,5 @@
 import { normalizeCatalogImageUrl } from "@/features/catalog/lib/product-image-url";
-import { ONE_DOLLAR_CATEGORY_SLUG } from "@/features/catalog/one-dollar";
+import { PARTY_HEAVEN_CATEGORY_SLUG } from "@/features/catalog/party-heaven";
 import type { CatalogCategory } from "@/features/catalog/types";
 
 import type { FeaturedCategoryItem } from "./types";
@@ -66,6 +66,6 @@ export function mapCatalogCategoriesToFeaturedCategoryItems(
   categories: readonly CatalogCategory[],
 ): FeaturedCategoryItem[] {
   return categories
-    .filter((category) => category.slug !== ONE_DOLLAR_CATEGORY_SLUG)
+    .filter((category) => category.slug !== PARTY_HEAVEN_CATEGORY_SLUG)
     .map((category) => toFeaturedCategoryItem(category));
 }

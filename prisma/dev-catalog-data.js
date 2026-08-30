@@ -1,4 +1,4 @@
-const ONE_DOLLAR_MAX_PRICE_PKR = 280;
+const PARTY_HEAVEN_MAX_PRICE_PKR = 280;
 
 const CATEGORY_KEYS = [
   'HomeDecor',
@@ -89,10 +89,10 @@ function createCategoryRecord(categoryKey, categoryIndex) {
     name: categoryName,
     slug: categorySlug,
     description: `${categoryName} picks curated for local development demos and UI testing.`,
-    seoTitle: `${categoryName} Demo Collection | One Dollar`,
+    seoTitle: `${categoryName} Demo Collection | Party Heaven`,
     seoDescription: `Browse ${categoryName} demo products with varied pricing and realistic merchandising data for local and dev verification.`,
     seoCanonicalUrl: `/categories/${categorySlug}`,
-    seoOgTitle: `${categoryName} Deals - One Dollar Demo`,
+    seoOgTitle: `${categoryName} Deals - Party Heaven Demo`,
     seoOgDescription: `Development demo catalog for ${categoryName} with SEO-ready content and pricing variation.`,
     seoImageUrl: buildCategoryImageUrl(categorySlug),
     seoSchemaNotes: 'DEV_DEMO_CATEGORY',
@@ -105,7 +105,7 @@ function createProductRecord(input) {
   const productSlug = `${input.category.slug}-${input.productOrdinal}-${slugify(input.topic)}`;
   const productName = `${input.category.name} ${input.topic}`;
   const price = productPriceForIndex(input.productIndex);
-  const isOneDollarEligible = price <= ONE_DOLLAR_MAX_PRICE_PKR;
+  const isPartyHeavenEligible = price <= PARTY_HEAVEN_MAX_PRICE_PKR;
 
   return {
     name: productName,
@@ -113,7 +113,7 @@ function createProductRecord(input) {
     shortDescription: `${input.topic} for ${input.category.name} showcases in development environments.`,
     description: `${productName} is seeded for local and dev environments to validate product cards, category listings, and admin catalog workflows with realistic copy.`,
     status: 'PUBLISHED',
-    seoTitle: `${productName} | ${input.category.name} | One Dollar`,
+    seoTitle: `${productName} | ${input.category.name} | Party Heaven`,
     seoDescription: `Demo product in ${input.category.name}. Price: Rs. ${price}. Useful for validating storefront rendering and SEO behavior.`,
     seoCanonicalUrl: `/categories/${input.category.slug}/${productSlug}`,
     seoOgTitle: `${productName} - Demo Listing`,
@@ -129,7 +129,7 @@ function createProductRecord(input) {
       source: 'dev-catalog-populator',
       categoryKey: input.category.key,
       seededAtVersion: 1,
-      oneDollarEligible: isOneDollarEligible,
+      partyHeavenEligible: isPartyHeavenEligible,
     },
     images: buildProductImageUrls({
       categorySlug: input.category.slug,
@@ -173,8 +173,8 @@ function createDeterministicDevCatalogData() {
   });
 
   const allProducts = categoryProducts.flatMap((entry) => entry.products);
-  const oneDollarEligibleCount = allProducts.filter((product) =>
-    product.variant.price <= ONE_DOLLAR_MAX_PRICE_PKR,
+  const partyHeavenEligibleCount = allProducts.filter((product) =>
+    product.variant.price <= PARTY_HEAVEN_MAX_PRICE_PKR,
   ).length;
 
   return {
@@ -183,13 +183,13 @@ function createDeterministicDevCatalogData() {
     totals: {
       categories: categories.length,
       products: allProducts.length,
-      oneDollarEligibleProducts: oneDollarEligibleCount,
+      partyHeavenEligibleProducts: partyHeavenEligibleCount,
     },
   };
 }
 
 module.exports = {
   CATEGORY_KEYS,
-  ONE_DOLLAR_MAX_PRICE_PKR,
+  PARTY_HEAVEN_MAX_PRICE_PKR,
   createDeterministicDevCatalogData,
 };

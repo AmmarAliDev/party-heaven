@@ -80,13 +80,13 @@ export const createProductService = defineService(({ db }) => {
 Root cause in this codebase was not Prisma client duplication: singleton reuse in `src/server/db/client.ts` was already correct. Pool starvation came from repeated heavyweight catalog reads in hot render paths:
 
 - related-products flow used full PDP lookup (`getPublishedProductBySlug`) only to read id/category/metadata
-- category/navigation One Dollar badge computation loaded full published product records just to count eligible products
+- category/navigation Party Heaven badge computation loaded full published product records just to count eligible products
 - product-route metadata used full product detail lookup
 
 Implemented fixes:
 
 - Added lightweight cached product context query (`getPublishedProductContextBySlug`) for metadata/related-product routing paths
-- Added lightweight cached One Dollar count query (`countPublishedOneDollarProducts`) that reads only one ordered variant per product instead of full product detail payloads
+- Added lightweight cached Party Heaven count query (`countPublishedPartyHeavenProducts`) that reads only one ordered variant per product instead of full product detail payloads
 - Updated catalog service and PDP metadata flow to consume these lightweight paths
 - Added deployment/runtime safety checks for hosted URLs so pooled runtime configuration mistakes fail early with clear messages
 

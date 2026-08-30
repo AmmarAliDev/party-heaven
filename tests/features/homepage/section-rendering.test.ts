@@ -14,7 +14,7 @@ describe("homepage section rendering", () => {
     expect(result.source).toBe("fallback");
     expect(result.sections.length).toBeGreaterThan(0);
     expect(result.sections.map((section) => section.kind)).toEqual([
-      "one-dollar",
+      "party-heaven",
       "featured-categories",
       "featured-products",
     ]);
@@ -65,7 +65,7 @@ describe("homepage section rendering", () => {
     expect(result.source).toBe("cms");
     expect(result.sections.map((section) => section.id)).toEqual([
       "cms-banner",
-      "fallback-one-dollar",
+      "fallback-party-heaven",
       "cms-categories",
       "cms-deal",
     ]);
@@ -75,12 +75,12 @@ describe("homepage section rendering", () => {
   it("keeps homepage composition stable when admin adds a single primary section", () => {
     const cmsSections: HomepageSection[] = [
       {
-        id: "cms-one-dollar",
-        kind: "one-dollar",
-        title: "One Dollar picks",
+        id: "cms-party-heaven",
+        kind: "party-heaven",
+        title: "Party Heaven picks",
         products: [],
         ctaLabel: "View all",
-        ctaHref: "/categories/one-dollar",
+        ctaHref: "/categories/party-heaven",
         placeholderMessage: "No products right now.",
         displayOrder: 25,
       },
@@ -89,12 +89,12 @@ describe("homepage section rendering", () => {
     const result = resolveHomepageSections(cmsSections);
 
     expect(result.source).toBe("cms");
-    expect(result.sections.some((section) => section.id === "cms-one-dollar" && section.kind === "one-dollar")).toBe(true);
+    expect(result.sections.some((section) => section.id === "cms-party-heaven" && section.kind === "party-heaven")).toBe(true);
     expect(result.sections.some((section) => section.kind === "featured-categories")).toBe(true);
     expect(result.sections.some((section) => section.kind === "featured-products")).toBe(true);
     expect(result.sections.some((section) => section.kind === "hero-banner")).toBe(false);
     expect(result.sections.some((section) => section.kind === "blog-highlights")).toBe(false);
-    expect(result.sections.filter((section) => section.kind === "one-dollar")).toHaveLength(1);
+    expect(result.sections.filter((section) => section.kind === "party-heaven")).toHaveLength(1);
   });
 
   it("composes multiple section types without duplicating configured kinds", () => {
@@ -127,7 +127,7 @@ describe("homepage section rendering", () => {
     expect(result.source).toBe("cms");
     expect(result.sections.map((section) => section.id)).toEqual([
       "cms-banner",
-      "fallback-one-dollar",
+      "fallback-party-heaven",
       "cms-categories",
       "cms-products",
     ]);

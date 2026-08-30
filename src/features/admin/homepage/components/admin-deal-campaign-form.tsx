@@ -81,7 +81,7 @@ const campaignFields: DynamicFormFieldConfig<AdminDealCampaignFormValues>[] = [
     name: "targetHref",
     type: "text",
     label: "Target link",
-    placeholder: "/categories/one-dollar/flash-cleaner",
+    placeholder: "/categories/party-heaven/flash-cleaner",
     description: "Optional explicit destination. Falls back to the first linked campaign product.",
     containerClassName: "md:col-span-2",
   },

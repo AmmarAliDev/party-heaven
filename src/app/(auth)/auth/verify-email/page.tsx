@@ -9,7 +9,7 @@ import { verifyEmailByToken } from "@/features/auth/email-verification";
 export const metadata = buildMetadata({
   title: "Verify Email",
   path: "/auth/verify-email",
-  description: "Verify your One Dollar account email.",
+  description: "Verify your Party Heaven account email.",
 });
 
 type VerifyEmailPageProps = {

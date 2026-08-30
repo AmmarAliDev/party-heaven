@@ -41,7 +41,7 @@ export function AdminShell({ children, role, user }: AdminShellProps) {
             <Badge variant="info">Admin workspace</Badge>
             <div>
               <Link href={routes.admin.dashboard} className="text-lg font-semibold tracking-tight">
-                One Dollar Ops
+                Party Heaven Ops
               </Link>
               <p className="text-muted-foreground text-sm">
                 Friendly operations panel for day-to-day store management.

@@ -2,7 +2,7 @@
 
 ## Purpose
 
-`One Dollar` is a production-minded, single-vendor e-commerce app for Pakistan (Karachi-first launch scope), implemented as one Next.js codebase for storefront, admin, and auth experiences.
+`Party Heaven` is a production-minded, single-vendor e-commerce app for Pakistan (Karachi-first launch scope), implemented as one Next.js codebase for storefront, admin, and auth experiences.
 
 This file is a continuity index for AI-assisted work. For implementation details, use the linked AI docs below as the source of truth.
 

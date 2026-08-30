@@ -32,9 +32,9 @@ describe("admin settings form", () => {
         returnTo="/admin/settings"
         initialValues={{
           id: "default",
-          storeName: "One Dollar",
+          storeName: "Party Heaven",
           storeTagline: "",
-          supportEmail: "support@onedollar.pk",
+          supportEmail: "support@partyheaven.co",
           supportPhone: "",
           supportWhatsapp: "",
           supportHours: "Mon-Sat, 9:00 AM to 6:00 PM",
@@ -65,9 +65,9 @@ describe("admin settings form", () => {
         returnTo="/admin/settings"
         initialValues={{
           id: "default",
-          storeName: "One Dollar",
+          storeName: "Party Heaven",
           storeTagline: "",
-          supportEmail: "support@onedollar.pk",
+          supportEmail: "support@partyheaven.co",
           supportPhone: "",
           supportWhatsapp: "",
           supportHours: "Mon-Sat, 9:00 AM to 6:00 PM",
@@ -83,9 +83,9 @@ describe("admin settings form", () => {
     );
 
     await user.clear(screen.getByLabelText(/^Store name/i));
-    await user.type(screen.getByLabelText(/^Store name/i), "One Dollar Store");
+    await user.type(screen.getByLabelText(/^Store name/i), "Party Heaven Store");
     await user.clear(screen.getByLabelText(/^Support email/i));
-    await user.type(screen.getByLabelText(/^Support email/i), "help@onedollar.pk");
+    await user.type(screen.getByLabelText(/^Support email/i), "help@partyheaven.co");
     await user.clear(screen.getByLabelText(/^Flat shipping fee/i));
     await user.type(screen.getByLabelText(/^Flat shipping fee/i), "300");
     await user.clear(screen.getByLabelText(/^Free-shipping threshold/i));
@@ -101,8 +101,8 @@ describe("admin settings form", () => {
     const formData = getSubmittedFormData(actionMock);
     expect(readFormData(formData)).toMatchObject({
       returnTo: "/admin/settings",
-      storeName: "One Dollar Store",
-      supportEmail: "help@onedollar.pk",
+      storeName: "Party Heaven Store",
+      supportEmail: "help@partyheaven.co",
       shippingFlatRate: "300",
       shippingFreeThreshold: "4500",
     });

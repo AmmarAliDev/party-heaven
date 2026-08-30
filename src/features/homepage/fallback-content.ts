@@ -1,5 +1,5 @@
 import { routes } from "@/config/routes";
-import { ONE_DOLLAR_CATEGORY_SLUG, ONE_DOLLAR_MAX_PRICE_PKR } from "@/features/catalog/one-dollar";
+import { PARTY_HEAVEN_CATEGORY_SLUG, PARTY_HEAVEN_MAX_PRICE_PKR } from "@/features/catalog/party-heaven";
 
 import type { HomepageSection } from "./types";
 
@@ -36,18 +36,18 @@ export function buildHomepageFallbackSections(): HomepageSection[] {
       ],
     },
     {
-      // One Dollar section: products are hydrated at runtime from the catalog.
+      // Party Heaven section: products are hydrated at runtime from the catalog.
       // This fallback defines the section shell; real products are injected by
-      // hydrateOneDollarSection() in the homepage service.
-      id: "fallback-one-dollar",
-      kind: "one-dollar",
-      title: "One Dollar deals",
-      description: `Products priced at Rs. ${ONE_DOLLAR_MAX_PRICE_PKR} or less — the best value picks across all categories.`,
+      // hydratePartyHeavenSections() in the homepage service.
+      id: "fallback-party-heaven",
+      kind: "party-heaven",
+      title: "Party Heaven deals",
+      description: `Products priced at Rs. ${PARTY_HEAVEN_MAX_PRICE_PKR} or less — the best value picks across all categories.`,
       displayOrder: 20,
       products: [],
-      ctaLabel: "View all One Dollar deals",
-      ctaHref: routes.storefront.category(ONE_DOLLAR_CATEGORY_SLUG),
-      placeholderMessage: "No One Dollar products are available right now. Check back soon for fresh picks.",
+      ctaLabel: "View all Party Heaven deals",
+      ctaHref: routes.storefront.category(PARTY_HEAVEN_CATEGORY_SLUG),
+      placeholderMessage: "No Party Heaven products are available right now. Check back soon for fresh picks.",
     },
     {
       id: "fallback-featured-products",

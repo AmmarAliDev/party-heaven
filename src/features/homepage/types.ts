@@ -3,7 +3,7 @@ import type { CatalogCategory } from "@/features/catalog/types";
 export type HomepageSectionKind =
   | "announcement-bar"
   | "featured-categories"
-  | "one-dollar"
+  | "party-heaven"
   | "featured-products"
   | "deal-spotlight";
 
@@ -71,30 +71,30 @@ export type FeaturedProductsSection = {
 };
 
 /**
- * One Dollar section — displays auto-hydrated catalog products priced at or
- * below ONE_DOLLAR_MAX_PRICE_PKR. Products are never stored in CMS; they are
+ * Party Heaven section — displays auto-hydrated catalog products priced at or
+ * below PARTY_HEAVEN_MAX_PRICE_PKR. Products are never stored in CMS; they are
  * resolved at runtime from the published catalog.
  *
  * Admin configures: title, description, ctaLabel, ctaHref, placeholderMessage.
  */
-export type OneDollarSection = {
+export type PartyHeavenSection = {
   id: string;
-  kind: "one-dollar";
+  kind: "party-heaven";
   enabled?: boolean;
   displayOrder?: number;
   title: string;
   description?: string;
   /**
-   * Products hydrated from the live catalog (price ≤ ONE_DOLLAR_MAX_PRICE_PKR).
+   * Products hydrated from the live catalog (price ≤ PARTY_HEAVEN_MAX_PRICE_PKR).
    * Empty array until hydration runs; the component renders a placeholder state
    * when this is empty.
    */
   products: FeaturedProductItem[];
-  /** Label for the "View all" CTA linking to the One Dollar category. */
+  /** Label for the "View all" CTA linking to the Party Heaven category. */
   ctaLabel: string;
-  /** Href for the "View all" CTA (typically /categories/one-dollar). */
+  /** Href for the "View all" CTA (typically /categories/party-heaven). */
   ctaHref: string;
-  /** Shown when no One Dollar products are available in the catalog. */
+  /** Shown when no Party Heaven products are available in the catalog. */
   placeholderMessage: string;
 };
 
@@ -119,7 +119,7 @@ export type DealSpotlightSection = {
 export type HomepageSection =
   | AnnouncementBarSection
   | FeaturedCategoriesSection
-  | OneDollarSection
+  | PartyHeavenSection
   | FeaturedProductsSection
   | DealSpotlightSection;
 

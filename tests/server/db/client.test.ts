@@ -8,7 +8,7 @@ describe('database client', () => {
   beforeEach(() => {
     vi.resetModules();
     process.env.NODE_ENV = 'test';
-    process.env.DATABASE_URL = 'postgresql://postgres:postgres@localhost:5432/one_dollar_test?schema=public';
+    process.env.DATABASE_URL = 'postgresql://postgres:postgres@localhost:5432/party_heaven_test?schema=public';
     process.env.POSTGRES_URL_NON_POOLING = process.env.DATABASE_URL;
   });
 

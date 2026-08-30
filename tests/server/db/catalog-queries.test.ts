@@ -22,7 +22,7 @@ vi.mock('@/server/db', () => ({
   }),
 }));
 
-describe('catalog queries one-dollar count', () => {
+describe('catalog queries party-heaven count', () => {
   beforeEach(() => {
     vi.resetModules();
     mockQueryRaw.mockReset();
@@ -32,8 +32,8 @@ describe('catalog queries one-dollar count', () => {
   it('uses SQL-side count result when raw query succeeds', async () => {
     mockQueryRaw.mockResolvedValue([{ count: 7 }]);
 
-    const { countPublishedOneDollarProducts } = await import('@/server/db/catalog-queries');
-    const total = await countPublishedOneDollarProducts();
+    const { countPublishedPartyHeavenProducts } = await import('@/server/db/catalog-queries');
+    const total = await countPublishedPartyHeavenProducts();
 
     expect(total).toBe(7);
     expect(mockProductFindMany).not.toHaveBeenCalled();
@@ -48,8 +48,8 @@ describe('catalog queries one-dollar count', () => {
       { variants: [] },
     ]);
 
-    const { countPublishedOneDollarProducts } = await import('@/server/db/catalog-queries');
-    const total = await countPublishedOneDollarProducts();
+    const { countPublishedPartyHeavenProducts } = await import('@/server/db/catalog-queries');
+    const total = await countPublishedPartyHeavenProducts();
 
     expect(total).toBe(2);
     expect(mockProductFindMany).toHaveBeenCalledOnce();
@@ -58,8 +58,8 @@ describe('catalog queries one-dollar count', () => {
   it('supports bigint count values from SQL drivers', async () => {
     mockQueryRaw.mockResolvedValue([{ count: 3n }]);
 
-    const { countPublishedOneDollarProducts } = await import('@/server/db/catalog-queries');
-    const total = await countPublishedOneDollarProducts();
+    const { countPublishedPartyHeavenProducts } = await import('@/server/db/catalog-queries');
+    const total = await countPublishedPartyHeavenProducts();
 
     expect(total).toBe(3);
   });

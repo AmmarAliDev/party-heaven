@@ -28,16 +28,16 @@ describe("admin store settings service", () => {
     const result = await loadAdminStoreSettings();
 
     expect(result.hasPersistedSettings).toBe(false);
-    expect(result.settings.storeName).toBe("One Dollar");
-    expect(result.settings.supportEmail).toBe("support@onedollar.pk");
+    expect(result.settings.storeName).toBe("Party Heaven");
+    expect(result.settings.supportEmail).toBe("support@partyheaven.co");
   });
 
   it("returns persisted settings when singleton row exists", async () => {
     prismaMock.storeSettings.findUnique.mockResolvedValue({
       id: "default",
-      storeName: "One Dollar Express",
+      storeName: "Party Heaven Express",
       storeTagline: "Fast city delivery",
-      supportEmail: "care@onedollar.pk",
+      supportEmail: "care@partyheaven.co",
       supportPhone: "+92 300 0000000",
       supportWhatsapp: null,
       supportHours: "Mon-Sat, 9:00 AM to 6:00 PM",
@@ -53,16 +53,16 @@ describe("admin store settings service", () => {
     const result = await loadAdminStoreSettings();
 
     expect(result.hasPersistedSettings).toBe(true);
-    expect(result.settings.storeName).toBe("One Dollar Express");
+    expect(result.settings.storeName).toBe("Party Heaven Express");
     expect(result.settings.shippingFreeThreshold).toBe(4000);
   });
 
   it("persists singleton settings and writes audit log", async () => {
     prismaMock.storeSettings.upsert.mockResolvedValue({
       id: "default",
-      storeName: "One Dollar",
+      storeName: "Party Heaven",
       storeTagline: null,
-      supportEmail: "support@onedollar.pk",
+      supportEmail: "support@partyheaven.co",
       supportPhone: null,
       supportWhatsapp: null,
       supportHours: "Mon-Sat, 9:00 AM to 6:00 PM",
@@ -77,9 +77,9 @@ describe("admin store settings service", () => {
 
     const saved = await saveAdminStoreSettings({
       data: {
-        storeName: "One Dollar",
+        storeName: "Party Heaven",
         storeTagline: undefined,
-        supportEmail: "support@onedollar.pk",
+        supportEmail: "support@partyheaven.co",
         supportPhone: undefined,
         supportWhatsapp: undefined,
         supportHours: "Mon-Sat, 9:00 AM to 6:00 PM",
@@ -110,6 +110,6 @@ describe("admin store settings service", () => {
         }),
       }),
     );
-    expect(saved.storeName).toBe("One Dollar");
+    expect(saved.storeName).toBe("Party Heaven");
   });
 });

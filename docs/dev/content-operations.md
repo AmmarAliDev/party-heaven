@@ -100,7 +100,7 @@ Changes appear on the storefront within the next request (no stale cache window)
 
 Operational pages:
 
-- **Sections:** `/admin/homepage/sections` (hero banner, deal spotlight, featured categories/products, announcement, blog highlights, one-dollar shell)
+- **Sections:** `/admin/homepage/sections` (hero banner, deal spotlight, featured categories/products, announcement, blog highlights, party-heaven shell)
 - **Banners:** `/admin/homepage/banners` (announcement-style promos)
 - **Deal campaigns:** `/admin/homepage/campaigns` (scheduled campaign overlays)
 

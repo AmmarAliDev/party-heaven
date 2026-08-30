@@ -1,4 +1,4 @@
-export const RECENT_SEARCHES_STORAGE_KEY = "one-dollar:storefront:recent-searches";
+export const RECENT_SEARCHES_STORAGE_KEY = "party-heaven:storefront:recent-searches";
 export const RECENT_SEARCHES_MAX_ITEMS = 8;
 
 function normalizeRecentSearchQuery(query: string): string {

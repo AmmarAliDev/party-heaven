@@ -2,7 +2,7 @@ import { describe, expect, it } from 'vitest';
 
 import {
   CATEGORY_KEYS,
-  ONE_DOLLAR_MAX_PRICE_PKR,
+  PARTY_HEAVEN_MAX_PRICE_PKR,
   createDeterministicDevCatalogData,
 } from '../../prisma/dev-catalog-data.js';
 
@@ -37,19 +37,19 @@ describe('dev catalog data generator', () => {
     }
   });
 
-  it('ensures each category has at least one One Dollar eligible product and one above threshold', () => {
+  it('ensures each category has at least one Party Heaven eligible product and one above threshold', () => {
     const dataset = createDeterministicDevCatalogData();
 
     for (const entry of dataset.categoryProducts) {
       const prices = entry.products.map((product) => product.variant.price);
-      const hasEligible = prices.some((price) => price <= ONE_DOLLAR_MAX_PRICE_PKR);
-      const hasAboveThreshold = prices.some((price) => price > ONE_DOLLAR_MAX_PRICE_PKR);
+      const hasEligible = prices.some((price) => price <= PARTY_HEAVEN_MAX_PRICE_PKR);
+      const hasAboveThreshold = prices.some((price) => price > PARTY_HEAVEN_MAX_PRICE_PKR);
 
       expect(hasEligible).toBe(true);
       expect(hasAboveThreshold).toBe(true);
     }
 
-    expect(dataset.totals.oneDollarEligibleProducts).toBeGreaterThan(0);
+    expect(dataset.totals.partyHeavenEligibleProducts).toBeGreaterThan(0);
     expect(dataset.totals.products).toBe(
       dataset.categoryProducts.reduce((sum, entry) => sum + entry.products.length, 0),
     );

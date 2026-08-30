@@ -3,7 +3,7 @@ import type { HomepageContentResult, HomepageSection, HomepageSectionKind } from
 
 const SECTION_RENDER_ORDER: HomepageSectionKind[] = [
   "announcement-bar",
-  "one-dollar",
+  "party-heaven",
   "featured-categories",
   "featured-products",
   "deal-spotlight",

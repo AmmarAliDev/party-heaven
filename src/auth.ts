@@ -1,5 +1,5 @@
 /**
- * Auth.js (NextAuth) v5 configuration — One Dollar e-commerce app.
+ * Auth.js (NextAuth) v5 configuration — Party Heaven e-commerce app.
  *
  * Strategy: JWT sessions (works seamlessly across credentials + OAuth).
  * The PrismaAdapter stores OAuth Account links and User records in the DB,

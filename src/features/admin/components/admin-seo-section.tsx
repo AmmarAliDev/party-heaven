@@ -160,7 +160,7 @@ export function AdminSeoSection<TFieldValues extends FieldValues>({
               name: seoTitleField,
               type: "text",
               label: "Meta title",
-              placeholder: "Daily Face Wash | One Dollar",
+              placeholder: "Daily Face Wash | Party Heaven",
               description: "Aim for 50–70 characters so the result stays readable in search.",
             }}
           />

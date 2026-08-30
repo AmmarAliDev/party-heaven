@@ -88,7 +88,7 @@ What it does:
 - creates deterministic product sets (4 to 8 products per category)
 - creates one default variant per product with mixed pricing and inventory
 - writes category/product SEO fields and demo image URLs
-- guarantees One Dollar-eligible products (`<= Rs. 280`) inside every category so the virtual One Dollar storefront category can be verified
+- guarantees Party Heaven-eligible products (`<= Rs. 280`) inside every category so the virtual Party Heaven storefront category can be verified
 
 Safety behavior:
 
@@ -111,7 +111,7 @@ What it does:
 - upserts production-ready categories with SEO titles, descriptions, OG fields, canonical URLs, and category card images
 - upserts published products with real merchandising copy, dimensions, metadata, image URLs, default variant pricing, and stock
 - replaces product-level image and specification rows so reruns stay deterministic instead of duplicating catalog content
-- preserves One Dollar virtual-category eligibility by keeping a mix of products priced at `<= Rs. 280` alongside higher-ticket catalog items
+- preserves Party Heaven virtual-category eligibility by keeping a mix of products priced at `<= Rs. 280` alongside higher-ticket catalog items
 
 Safety behavior:
 
@@ -224,7 +224,7 @@ Keep application queries behind `src/server/db` and feature-level repositories i
 
 - If you see Prisma `P2024` (`Timed out fetching a new connection from the connection pool`), first verify:
 	- runtime URL strategy above is correct
-	- catalog/product render paths are using lightweight query helpers where available (`getPublishedProductContextBySlug`, `countPublishedOneDollarProducts`)
+	- catalog/product render paths are using lightweight query helpers where available (`getPublishedProductContextBySlug`, `countPublishedPartyHeavenProducts`)
 
 ## Code Quality Workflow
 

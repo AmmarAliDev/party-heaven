@@ -23,7 +23,7 @@ describe("admin product validation", () => {
       images: [{ url: "https://example.com/face-wash.jpg", alt: "Bottle on sink" }],
       specifications: [{ key: "Size", value: "200ml" }],
       relatedProductIds: ["product-2"],
-      seoTitle: "Daily Face Wash | One Dollar",
+      seoTitle: "Daily Face Wash | Party Heaven",
       seoDescription: "Gentle cleanser for fresh daily skincare.",
       seoImageUrl: "https://example.com/seo-face-wash.jpg",
     });

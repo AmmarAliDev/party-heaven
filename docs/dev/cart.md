@@ -18,7 +18,7 @@ The Prisma schema already includes:
 
 How it is used now:
 
-- Guest carts are resolved by `Cart.token` and persisted in an HTTP-only cookie (`one-dollar-cart`)
+- Guest carts are resolved by `Cart.token` and persisted in an HTTP-only cookie (`party-heaven-cart`)
 - Authenticated carts are resolved by `userId` + `status=ACTIVE`
 - Guest cart token resolution is strictly guest-scoped (`userId=null`) so a token that belongs to an authenticated cart can never resolve into guest context
 - ACTIVE carts are given a token so the frontend can keep continuity across guest/auth transitions; guest carts moving to `ABANDONED` have their token removed
@@ -90,7 +90,7 @@ Stock is validated in two places:
 - `CartItemSummary` carries `imageUrl`/`imageAlt` populated by the cart service (variant image first, then product image, both ordered by `position`; `null` when none exist)
 - Header cart trigger (desktop) and mobile cart button both open the shared right-side cart drawer (shadcn `Drawer`) instead of the old mini-cart dropdown; the drawer contains line items with `CartItemQuantityControls` (adjust/remove) and a footer with subtotal, `View full cart`, and `Checkout`. The mobile-only bottom navigation bar (`src/components/layout/mobile-bottom-nav.tsx`) also opens the same drawer from its Cart action (with a live item-count badge).
 - The homepage (`src/app/page.tsx`) lives OUTSIDE the `(storefront)` route group and duplicates the storefront shell (AppHeader/main/AppFooter), so it ALSO mounts `<CartDrawer />` and `<MobileBottomNav />` — without them the drawer state opens but no panel renders, and the mobile bottom nav is missing, until navigating to a `(storefront)` page
-- Product card `Add to Cart` buttons (category grid, search results, related products, homepage featured-products/one-dollar carousels) call `POST /api/cart` with `productSlug` + quantity 1, then open the cart drawer; the PDP keeps its existing in-cart quantity-controls UX. No success toast is shown on add anywhere (silent add-to-cart).
+- Product card `Add to Cart` buttons (category grid, search results, related products, homepage featured-products/party-heaven carousels) call `POST /api/cart` with `productSlug` + quantity 1, then open the cart drawer; the PDP keeps its existing in-cart quantity-controls UX. No success toast is shown on add anywhere (silent add-to-cart).
 - Homepage featured products prefer real catalog products (with slugs, so add-to-cart works) over placeholder fallback content — `resolveHomepageFeaturedProducts` backfills from recent published products BEFORE the CMS/fallback items
 - The cart drawer refreshes from `GET /api/cart` when opened with no local cart data, and otherwise stays in sync via `cart:changed` events
 - Header mobile cart button now shows the same total cart item count via shared client state

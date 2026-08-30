@@ -42,7 +42,7 @@ export type ProductSeoContentResult = {
   suggestedSlug: string;
 };
 
-const BRAND_SUFFIX = "One Dollar Pakistan";
+const BRAND_SUFFIX = "Party Heaven Pakistan";
 
 function collapseWhitespace(value: string | null | undefined) {
   return `${value ?? ""}`.replace(/\s+/g, " ").trim();
@@ -169,7 +169,7 @@ function buildStructuredSpecificationSuggestions(specs: ProductSpecificationInpu
   const baselineSuggestions: ProductStructuredSpecificationSuggestion[] = [
     {
       key: "Brand",
-      suggestedValue: "One Dollar or supplier brand name",
+      suggestedValue: "Party Heaven or supplier brand name",
       reason: "Improves Product schema clarity and trust signals.",
     },
     {

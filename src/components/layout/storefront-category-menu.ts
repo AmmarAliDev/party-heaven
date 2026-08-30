@@ -1,5 +1,5 @@
 import { routes } from "@/config/routes";
-import { ONE_DOLLAR_CATEGORY_SLUG } from "@/features/catalog/one-dollar";
+import { PARTY_HEAVEN_CATEGORY_SLUG } from "@/features/catalog/party-heaven";
 
 type CategoryMenuInput = {
   name: string;
@@ -9,10 +9,10 @@ type CategoryMenuInput = {
 export type StorefrontCategoryMenuItem = {
   title: string;
   href: string;
-  kind: "one-dollar" | "category" | "all-categories";
+  kind: "party-heaven" | "category" | "all-categories";
 };
 
-const ONE_DOLLAR_LABEL = "One Dollar";
+const PARTY_HEAVEN_LABEL = "Party Heaven";
 
 function normalizeLabel(value: string) {
   return value.trim().toLocaleLowerCase("en-US");
@@ -21,19 +21,19 @@ function normalizeLabel(value: string) {
 export function buildStorefrontCategoryMenu(
   categories: readonly CategoryMenuInput[],
 ): StorefrontCategoryMenuItem[] {
-  const oneDollarCategory = categories.find(
-    (category) => normalizeLabel(category.name) === normalizeLabel(ONE_DOLLAR_LABEL),
+  const partyHeavenCategory = categories.find(
+    (category) => normalizeLabel(category.name) === normalizeLabel(PARTY_HEAVEN_LABEL),
   );
 
   const otherCategories = categories
-    .filter((category) => normalizeLabel(category.name) !== normalizeLabel(ONE_DOLLAR_LABEL))
+    .filter((category) => normalizeLabel(category.name) !== normalizeLabel(PARTY_HEAVEN_LABEL))
     .sort((left, right) => left.name.localeCompare(right.name, "en", { sensitivity: "base" }));
 
   return [
     {
-      title: ONE_DOLLAR_LABEL,
-      href: oneDollarCategory?.href ?? routes.storefront.category(ONE_DOLLAR_CATEGORY_SLUG),
-      kind: "one-dollar",
+      title: PARTY_HEAVEN_LABEL,
+      href: partyHeavenCategory?.href ?? routes.storefront.category(PARTY_HEAVEN_CATEGORY_SLUG),
+      kind: "party-heaven",
     },
     ...otherCategories.map((category) => ({
       title: category.name,

@@ -2,7 +2,7 @@ import type { NextResponse } from "next/server";
 
 import { AppError } from "@/lib/errors/app-error";
 
-export const CART_COOKIE_NAME = "one-dollar-cart";
+export const CART_COOKIE_NAME = "party-heaven-cart";
 const CART_COOKIE_MAX_AGE_SECONDS = 60 * 60 * 24 * 30;
 
 type CartCookieShape = {

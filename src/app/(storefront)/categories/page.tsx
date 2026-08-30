@@ -13,7 +13,7 @@ export const metadata = buildMetadata({
   title: "Categories",
   path: "/categories",
   description:
-    "Browse our product categories to find deals and items you love — all at one-dollar prices.",
+    "Browse our product categories to find deals and items you love — all at Party Heaven prices.",
 });
 
 export default async function CategoriesPage() {

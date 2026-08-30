@@ -7,7 +7,7 @@ Use this as the quick implementation map for future AI prompts. Each section des
 ## Storefront and Catalog
 
 - Homepage with section-based rendering and admin-manageable content resolution; featured categories section uses a responsive shadcn-compatible carousel with empty-state fallback
-- Homepage `one-dollar` deals section is gated: it renders only when active deals exist (hydrated products priced ≤ `ONE_DOLLAR_MAX_PRICE_PKR`); with no active deals the section is hidden entirely rather than showing an empty/placeholder state
+- Homepage `party-heaven` deals section is gated: it renders only when active deals exist (hydrated products priced ≤ `PARTY_HEAVEN_MAX_PRICE_PKR`); with no active deals the section is hidden entirely rather than showing an empty/placeholder state
 - Mobile-only fixed bottom navigation bar (`MobileBottomNav`): Collections (`/categories`), Search (opens search dialog), Cart (opens cart drawer with live count badge), Home (`/`), and Profile (`/account/profile`) — icon-above-label, active-route highlighting, mounted in the `(storefront)` layout and root homepage
 - Homepage featured item contracts now support optional media fields (`slug`, category `cardImageUrl`, product `images[]`) with backward-compatible fallbacks to placeholder cards when media is absent
 - Homepage featured-products section is now sales-driven: it ranks products by summed `OrderItem.quantity` across `CONFIRMED`/`PACKED`/`SHIPPED`/`DELIVERED` orders, filters through published storefront visibility rules, and fills sparse-data gaps from recent published catalog products first (so cards keep add-to-cart), then stored fallback picks
@@ -26,7 +26,7 @@ Use this as the quick implementation map for future AI prompts. Each section des
 - Guest cart token persistence with guest-to-auth merge
 - Live cart operations and stock validation endpoints
 - Right-side cart drawer (shadcn `Drawer`/vaul) opened by header trigger, mobile cart button, and product-card add-to-cart buttons; line items show thumbnails (`CartItemThumbnail`) and quantity controls; mounted in the `(storefront)` layout and on the root homepage
-- Product-card `Add to Cart` buttons on catalog grids, related products, and homepage featured-products/one-dollar carousels post to `POST /api/cart` and open the drawer; the PDP adds silently (no success toast)
+- Product-card `Add to Cart` buttons on catalog grids, related products, and homepage featured-products/party-heaven carousels post to `POST /api/cart` and open the drawer; the PDP adds silently (no success toast)
 - Cart success mutations are silent app-wide (add, quantity update, remove show no success toast); failed mutations still surface user-friendly error toasts
 - Checkout flow with Karachi-only shipping validation and fixed shipping fee calculations
 - COD payment provider active through pluggable checkout payment contract

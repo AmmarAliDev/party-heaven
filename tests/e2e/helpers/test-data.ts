@@ -9,7 +9,7 @@ export const e2eCatalog = {
 
 export const e2eAdmin = {
   name: "E2E Admin",
-  email: "admin.e2e@one-dollar.local",
+  email: "admin.e2e@party-heaven.local",
   password: "AdminPass123!",
 } as const;
 
