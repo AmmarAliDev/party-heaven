@@ -2,9 +2,8 @@
 
 import Link from "next/link";
 import { Pencil } from "lucide-react";
-import { type ColumnDef } from "@tanstack/react-table";
 
-import { DataTable, createDataTableColumnHelper } from "@/components/data-table";
+import { createDataTableColumnHelper, DataTable, type DataTableColumn } from "@/components/data-table";
 import { Badge } from "@/components/ui/badge";
 import { buttonVariants } from "@/components/ui/button";
 import { routes } from "@/config/routes";
@@ -26,7 +25,7 @@ const statusLabelMap: Record<"DRAFT" | "PUBLISHED" | "ARCHIVED", string> = {
   ARCHIVED: "Archived",
 };
 
-export const adminBlogTableColumns: ColumnDef<AdminBlogListItem, any>[] = [
+export const adminBlogTableColumns: DataTableColumn<AdminBlogListItem>[] = [
   columnHelper.accessor("title", {
     id: "title",
     header: "Title",
@@ -114,7 +113,7 @@ export function AdminBlogTable({
   emptyTitle = "No blog posts found",
   emptyDescription = "Create your first article or adjust the current filters.",
 }: AdminBlogTableProps) {
-  const columns: ColumnDef<AdminBlogListItem, any>[] = [
+  const columns: DataTableColumn<AdminBlogListItem>[] = [
     ...adminBlogTableColumns,
     columnHelper.display({
       id: "actions",

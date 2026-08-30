@@ -9,12 +9,13 @@ import type { CatalogProductCard } from "@/features/catalog/types";
 
 vi.mock("next/image", () => ({
   default: function MockNextImage(props: ComponentPropsWithoutRef<"img">) {
-    const { fill: _fill, ...imgProps } = props as ComponentPropsWithoutRef<"img"> & {
+    const { fill, ...imgProps } = props as ComponentPropsWithoutRef<"img"> & {
       fill?: boolean;
     };
+    void fill;
 
     // Render a plain img in tests so we can simulate load/error behavior.
-    // eslint-disable-next-line jsx-a11y/alt-text
+    // eslint-disable-next-line jsx-a11y/alt-text, @next/next/no-img-element -- intentional test double for next/image
     return <img {...imgProps} />;
   },
 }));
@@ -76,7 +77,9 @@ describe("ProductGridCard media behavior", () => {
   });
 
   it("falls back to gradient placeholder when image URL is missing", () => {
-    render(<ProductGridCard product={makeProduct({ imageUrl: undefined })} />);
+    const product = makeProduct();
+    delete product.imageUrl;
+    render(<ProductGridCard product={product} />);
 
     const placeholder = screen.getByRole("img", { name: /daily face wash image placeholder/i });
     expect(placeholder).toBeInTheDocument();

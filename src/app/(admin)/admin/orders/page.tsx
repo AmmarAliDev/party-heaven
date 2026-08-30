@@ -17,7 +17,6 @@ import {
 } from "@/features/admin/orders";
 import { AdminOrderFiltersForm } from "@/features/admin/orders/components/admin-order-filters-form";
 import { AdminOrdersTable } from "@/features/admin/orders/components/admin-orders-table";
-import { testIds } from "@/lib/test-selectors";
 import { requireRouteAccess } from "@/lib/auth/guards";
 import { rbacPermissions } from "@/lib/auth/rbac";
 

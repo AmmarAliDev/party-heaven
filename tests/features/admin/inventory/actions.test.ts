@@ -31,8 +31,8 @@ vi.mock("@/features/admin/inventory/service", () => ({
 }));
 
 import { routes } from "@/config/routes";
-import { rbacPermissions } from "@/lib/auth/rbac";
 import { updateAdminInventoryAction } from "@/features/admin/inventory/actions";
+import { rbacPermissions } from "@/lib/auth/rbac";
 
 describe("updateAdminInventoryAction", () => {
   beforeEach(() => {

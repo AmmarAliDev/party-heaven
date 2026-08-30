@@ -16,7 +16,6 @@
  */
 
 import { headers } from "next/headers";
-import { RoleKey } from "@/lib/auth/roles";
 
 import { env } from "@/config/env";
 import { routes } from "@/config/routes";
@@ -28,6 +27,7 @@ import {
   createEmailVerificationTokenPair,
 } from "@/lib/auth/email-verification-token";
 import { hashPassword } from "@/lib/auth/password";
+import { RoleKey } from "@/lib/auth/roles";
 import { toActionErrorState } from "@/lib/errors/handling";
 import { logger } from "@/lib/logger";
 import { checkRateLimit } from "@/lib/rate-limit";

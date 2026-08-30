@@ -1,13 +1,3 @@
-export {
-  parseLoyaltyPointsMutationInput,
-  parseReferralConversionInput,
-  parseReferralVisitInput,
-  parseWalletLedgerEntryInput,
-  rewardsErrorCodes,
-  rewardsFail,
-  rewardsOk,
-} from "./contracts";
-
 export type {
   LoyaltyPointsBalance,
   LoyaltyPointsMutationInput,
@@ -30,4 +20,13 @@ export type {
   WalletLedgerEntryInput,
   WalletLedgerPage,
   WalletLedgerService,
+} from "./contracts";
+export {
+  parseLoyaltyPointsMutationInput,
+  parseReferralConversionInput,
+  parseReferralVisitInput,
+  parseWalletLedgerEntryInput,
+  rewardsErrorCodes,
+  rewardsFail,
+  rewardsOk,
 } from "./contracts";

@@ -1,9 +1,10 @@
-import { NextRequest, NextResponse } from "next/server";
+import type { NextRequest} from "next/server";
+import { NextResponse } from "next/server";
 
 import { subscribeEmail } from "@/features/email-marketing";
 import { createRouteHandlerErrorResponse } from "@/lib/errors/handling";
-import { assertTrustedRouteHandlerRequest } from "@/lib/security/csrf";
 import { checkRateLimit } from "@/lib/rate-limit";
+import { assertTrustedRouteHandlerRequest } from "@/lib/security/csrf";
 
 /**
  * POST /api/email/subscribe

@@ -438,7 +438,7 @@ function buildMutationError(error: unknown): AppError | null {
   return null;
 }
 
-async function writeDealAuditLog(tx: any, input: {
+async function writeDealAuditLog(tx: DealDbClient, input: {
   action: "deal.created" | "deal.updated" | "deal.deleted";
   actor: AuditActorInput;
   dealId: string;
@@ -612,7 +612,7 @@ async function normalizeRelatedDealIds(
   return matches.map((item) => item.id);
 }
 
-async function createDealImages(tx: any, dealId: string, images: AdminDealImageInput[] | undefined) {
+async function createDealImages(tx: DealDbClient, dealId: string, images: AdminDealImageInput[] | undefined) {
   if (!images || images.length === 0) {
     return;
   }
@@ -627,7 +627,7 @@ async function createDealImages(tx: any, dealId: string, images: AdminDealImageI
   });
 }
 
-async function createDealProducts(tx: any, dealId: string, products: AdminDealProductInput[] | undefined) {
+async function createDealProducts(tx: DealDbClient, dealId: string, products: AdminDealProductInput[] | undefined) {
   if (!products || products.length === 0) {
     return;
   }
@@ -643,7 +643,7 @@ async function createDealProducts(tx: any, dealId: string, products: AdminDealPr
   });
 }
 
-async function createDealSpecifications(tx: any, dealId: string, specifications: AdminDealSpecificationInput[] | undefined) {
+async function createDealSpecifications(tx: DealDbClient, dealId: string, specifications: AdminDealSpecificationInput[] | undefined) {
   if (!specifications || specifications.length === 0) {
     return;
   }

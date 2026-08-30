@@ -1,8 +1,7 @@
 // @vitest-environment jsdom
 
-import type { ReactNode } from "react";
-
 import { cleanup, render, screen } from "@testing-library/react";
+import type { ReactNode } from "react";
 import { afterEach, describe, expect, it, vi } from "vitest";
 
 vi.mock("@/components/ui/carousel", () => ({
@@ -19,7 +18,7 @@ vi.mock("@/components/ui/carousel", () => ({
 
 import { FeaturedProductsSectionBlock } from "@/features/homepage/components/featured-products-section";
 import { HOMEPAGE_CAROUSEL_MAX_ITEMS } from "@/features/homepage/components/homepage-carousel-config";
-import type { FeaturedProductsSection, FeaturedProductItem } from "@/features/homepage/types";
+import type { FeaturedProductItem,FeaturedProductsSection } from "@/features/homepage/types";
 
 function buildProduct(id: string): FeaturedProductItem {
   return { id, name: `Product ${id}`, href: `/products/${id}`, price: 100 };

@@ -70,7 +70,7 @@ describe("CategoryOverviewCard media behavior", () => {
   });
 
   it("renders a fallback visual when no category image exists", () => {
-    render(<CategoryOverviewCard category={makeCategory({ cardImageUrl: undefined })} />);
+    render(<CategoryOverviewCard category={makeCategory()} />);
 
     expect(document.querySelector('[data-testid="storefront-category-card-image-home-care"]')).toBeNull();
     expect(document.querySelector('[data-testid="storefront-category-card-fallback-home-care"]')).toBeInTheDocument();

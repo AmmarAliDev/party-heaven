@@ -1,8 +1,9 @@
 import type { Metadata } from "next";
 
+import { resolveCanonicalUrl } from "@/lib/seo/slug";
+
 import { env } from "./env";
 import { siteConfig } from "./site";
-import { resolveCanonicalUrl } from "@/lib/seo/slug";
 
 export type BuildMetadataOptions = {
   title?: string | undefined;

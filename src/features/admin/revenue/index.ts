@@ -1,3 +1,8 @@
+export {
+  buildRevenueRecentPeriodRanges,
+  getRecentPeriodDateRange,
+  type RevenueRecentPeriodKey,
+} from "./date-ranges";
 export type {
   AdminRevenueOrderTotalsSummary,
   AdminRevenuePeriodSummary,
@@ -9,8 +14,3 @@ export {
   getAdminRevenueReport,
   isAdminRevenueReportEmpty,
 } from "./service";
-export {
-  buildRevenueRecentPeriodRanges,
-  getRecentPeriodDateRange,
-  type RevenueRecentPeriodKey,
-} from "./date-ranges";

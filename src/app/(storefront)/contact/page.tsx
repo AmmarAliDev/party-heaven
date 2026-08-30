@@ -1,6 +1,6 @@
-import { ContactForm } from "@/features/contact";
-import { buildMetadata } from "@/config/metadata";
 import { PageShell } from "@/components/layout/page-shell";
+import { buildMetadata } from "@/config/metadata";
+import { ContactForm } from "@/features/contact";
 
 export const metadata = buildMetadata({
   title: "Contact Us",

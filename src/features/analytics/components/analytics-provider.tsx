@@ -1,9 +1,11 @@
 'use client';
 
-import Script from 'next/script';
+import { Suspense,useEffect, useRef } from 'react';
 import { usePathname, useSearchParams } from 'next/navigation';
-import { useEffect, useRef, Suspense } from 'react';
+import Script from 'next/script';
+
 import { env } from '@/config/env';
+
 import { trackEvent } from '../lib';
 
 function PageViewTracker() {

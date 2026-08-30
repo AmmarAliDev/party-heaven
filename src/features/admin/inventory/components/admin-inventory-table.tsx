@@ -1,8 +1,7 @@
 ﻿"use client";
 
-import { type ColumnDef } from "@tanstack/react-table";
+import { createDataTableColumnHelper, DataTable, type DataTableColumn } from "@/components/data-table";
 
-import { DataTable, createDataTableColumnHelper } from "@/components/data-table";
 import { InventoryAdjustmentForm } from "./inventory-adjustment-form";
 
 const columnHelper = createDataTableColumnHelper<AdminInventoryItem>();
@@ -18,7 +17,7 @@ export type AdminInventoryItem = {
   updatedAt: string;
 };
 
-export const adminInventoryTableColumns: ColumnDef<AdminInventoryItem, any>[] = [
+export const adminInventoryTableColumns: DataTableColumn<AdminInventoryItem>[] = [
   columnHelper.accessor("productName", {
     header: "Product",
     cell: (info) => {
@@ -85,7 +84,7 @@ export function AdminInventoryTable({
   emptyTitle = "No low-stock alerts",
   emptyDescription = "Inventory alerts will appear here as product stock drops.",
 }: AdminInventoryTableProps) {
-  const columns: ColumnDef<AdminInventoryItem, any>[] = [
+  const columns: DataTableColumn<AdminInventoryItem>[] = [
     ...adminInventoryTableColumns,
     ...(canAdjust && updateAction
       ? [

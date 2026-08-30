@@ -1,6 +1,6 @@
-import { describe, it, expect, vi } from "vitest";
+import { describe, expect, it, vi } from "vitest";
 
-import { resolveCanonicalUrl, generateSlug, isValidSlug } from "@/lib/seo/slug";
+import { generateSlug, isValidSlug,resolveCanonicalUrl } from "@/lib/seo/slug";
 
 vi.mock("@/config/env", () => ({
   env: { appUrl: "https://partyheaven.local" },

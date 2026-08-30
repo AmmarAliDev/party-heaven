@@ -23,7 +23,7 @@ export function DealSpecifications({ specifications }: DealSpecificationsProps) 
         </h2>
       </div>
 
-      <div className="overflow-hidden rounded-[var(--radius-card)] border border-border/70">
+      <div className="overflow-hidden rounded-xl border border-border/70">
         <dl className="divide-y divide-border/70">
           {specifications.map((spec, index) => (
             <div

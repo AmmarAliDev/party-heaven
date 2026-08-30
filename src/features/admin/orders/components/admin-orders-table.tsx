@@ -2,19 +2,19 @@
 
 import Link from "next/link";
 import { ArrowRight } from "lucide-react";
-import { type ColumnDef } from "@tanstack/react-table";
 
-import { DataTable, createDataTableColumnHelper } from "@/components/data-table";
+import { createDataTableColumnHelper, DataTable, type DataTableColumn } from "@/components/data-table";
 import { Badge } from "@/components/ui/badge";
 import { buttonVariants } from "@/components/ui/button";
 import { PriceDisplay } from "@/components/ui/price-display";
 import { routes } from "@/config/routes";
 import { getOrderStatusVariant } from "@/features/orders/status";
+
 import type { AdminOrderListItem } from "../service";
 
 const columnHelper = createDataTableColumnHelper<AdminOrderListItem>();
 
-export const adminOrdersTableColumns: ColumnDef<AdminOrderListItem, any>[] = [
+export const adminOrdersTableColumns: DataTableColumn<AdminOrderListItem>[] = [
   columnHelper.accessor("orderNumber", {
     id: "order",
     header: "Order",

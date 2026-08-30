@@ -80,7 +80,13 @@ function makeVariantProductRecord() {
     createdAt: new Date("2025-01-01"),
     updatedAt: new Date("2025-01-01"),
     category: { id: "cat-hc", name: "Home Care", slug: "home-care" },
-    images: [],
+    images: [] as Array<{
+      id: string;
+      url: string;
+      alt: string | null;
+      position: number;
+      productVariantId?: string;
+    }>,
     specifications: [],
     variants: [
       {
@@ -113,7 +119,16 @@ function makeVariantProductRecord() {
         isDefault: false,
         inventory: { quantity: 8 },
       },
-    ],
+    ] as Array<{
+      id: string;
+      title: string | null;
+      sku: string | null;
+      options: Record<string, string> | null;
+      price: number;
+      compareAtPrice: number | null;
+      isDefault: boolean;
+      inventory: { quantity: number };
+    }>,
     reviews: [],
   };
 }

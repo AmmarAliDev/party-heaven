@@ -2,8 +2,8 @@ import { describe, expect, it } from 'vitest';
 
 import {
   CATEGORY_KEYS,
-  PARTY_HEAVEN_MAX_PRICE_PKR,
   createDeterministicDevCatalogData,
+  PARTY_HEAVEN_MAX_PRICE_PKR,
 } from '../../prisma/dev-catalog-data.js';
 
 describe('dev catalog data generator', () => {

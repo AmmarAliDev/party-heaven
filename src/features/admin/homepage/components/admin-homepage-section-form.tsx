@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect } from "react";
-import { z } from "zod";
+import type { z } from "zod";
 
 import { DynamicForm, type DynamicFormFieldConfig, useAppForm, useServerActionSubmit } from "@/components/forms";
 import { Button } from "@/components/ui/button";

@@ -15,7 +15,6 @@ vi.mock("@/server/db", () => ({
   getPrismaClient: () => prismaMock,
 }));
 
-import { AppError } from "@/lib/errors/app-error";
 import { adjustAdminInventory } from "@/features/admin/inventory/service";
 
 describe("admin inventory service", () => {
@@ -133,7 +132,7 @@ describe("admin inventory service", () => {
           actorRole: "SUPER_ADMIN",
         },
       }),
-    ).rejects.toMatchObject<AppError>({
+    ).rejects.toMatchObject({
       code: "INVENTORY_INVALID_QUANTITY",
     });
 
@@ -173,7 +172,7 @@ describe("admin inventory service", () => {
           actorRole: "SUPER_ADMIN",
         },
       }),
-    ).rejects.toMatchObject<AppError>({
+    ).rejects.toMatchObject({
       code: "INVENTORY_UPDATE_CONFLICT",
     });
 

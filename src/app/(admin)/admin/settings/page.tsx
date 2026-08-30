@@ -5,7 +5,6 @@ import { routes } from "@/config/routes";
 import {
   AdminPageHeader,
 } from "@/features/admin/components/admin-page-patterns";
-import { AdminSettingsForm } from "@/features/admin/settings/components/admin-settings-form";
 import {
   type AdminStoreSettingsLoadResult,
   defaultAdminStoreSettings,
@@ -14,6 +13,7 @@ import {
   loadAdminStoreSettings,
   saveAdminStoreSettingsAction,
 } from "@/features/admin/settings";
+import { AdminSettingsForm } from "@/features/admin/settings/components/admin-settings-form";
 import { requireRouteAccess } from "@/lib/auth/guards";
 import { rbacPermissions } from "@/lib/auth/rbac";
 import { captureServerError } from "@/lib/errors/handling";

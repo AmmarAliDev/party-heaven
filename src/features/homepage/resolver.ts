@@ -23,10 +23,6 @@ const PRIMARY_SECTION_KINDS: ReadonlySet<HomepageSectionKind> = new Set(
   SECTION_RENDER_ORDER.filter((kind) => !OVERLAY_SECTION_KINDS.has(kind)),
 );
 
-function isOverlaySection(section: HomepageSection) {
-  return OVERLAY_SECTION_KINDS.has(section.kind);
-}
-
 function composeSectionsWithFallback(cmsSections: HomepageSection[], enabledCmsSections: HomepageSection[]): HomepageSection[] {
   const configuredKinds = new Set(cmsSections.map((section) => section.kind));
 

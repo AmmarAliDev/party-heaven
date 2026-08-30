@@ -8,10 +8,10 @@ import { FormErrorSummary } from "@/components/ui/form-error-summary";
 import { InlineSpinner } from "@/components/ui/inline-spinner";
 import {
   forgotPasswordAction,
-  forgotPasswordSuccessMessage,
   type ForgotPasswordActionState,
+  forgotPasswordSuccessMessage,
 } from "@/features/auth/actions/forgot-password";
-import { forgotPasswordValidator, type ForgotPasswordInput } from "@/features/auth/validators";
+import { type ForgotPasswordInput,forgotPasswordValidator } from "@/features/auth/validators";
 
 export function ForgotPasswordForm() {
   const [state, dispatch, isPending] = useActionState<ForgotPasswordActionState | null, FormData>(

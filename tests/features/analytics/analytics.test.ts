@@ -1,7 +1,8 @@
 // @vitest-environment jsdom
-import { describe, it, expect, vi, beforeEach } from 'vitest';
+import { beforeEach,describe, expect, it, vi } from 'vitest';
+
 import { trackEvent } from '@/features/analytics/lib';
-import { AnalyticsEvent } from '@/features/analytics/types';
+import type { AnalyticsEvent } from '@/features/analytics/types';
 
 describe('Analytics trackEvent', () => {
   beforeEach(() => {

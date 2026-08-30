@@ -5,8 +5,8 @@ import { getPrismaClient } from "@/server/db";
 
 import {
   buildRevenueRecentPeriodRanges,
-  type RevenueRecentPeriodRange,
   type RevenueRecentPeriodKey,
+  type RevenueRecentPeriodRange,
 } from "./date-ranges";
 
 const REVENUE_INCLUDED_REFUND_STATUSES: RefundStatus[] = ["NONE", "REVERSED"];

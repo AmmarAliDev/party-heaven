@@ -1,7 +1,8 @@
+import { notFound } from "next/navigation";
+
 import { StaticPagePlaceholder } from "@/components/layout/static-page-placeholder";
 import { buildMetadata } from "@/config/metadata";
 import { shouldRenderGuardedSurface } from "@/config/production-visibility";
-import { notFound } from "next/navigation";
 
 export const metadata = buildMetadata({
   title: "Return Policy",

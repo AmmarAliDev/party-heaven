@@ -1,15 +1,12 @@
-import Link from "next/link";
-
 import { PageShell } from "@/components/layout/page-shell";
-import { buttonVariants } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { buildMetadata } from "@/config/metadata";
 import { routes } from "@/config/routes";
 import { listAdminCategories } from "@/features/admin/categories";
 import { createAdminCategoryAction } from "@/features/admin/categories/actions";
+import { AdminCategoriesTable } from "@/features/admin/categories/components/admin-categories-table";
 import { AdminCategoryFiltersForm } from "@/features/admin/categories/components/admin-category-filters-form";
 import { AdminCategoryForm } from "@/features/admin/categories/components/admin-category-form";
-import { AdminCategoriesTable } from "@/features/admin/categories/components/admin-categories-table";
 import { getCategoryErrorMessage, getCategoryNoticeMessage } from "@/features/admin/categories/flash";
 import { AdminPageHeader } from "@/features/admin/components/admin-page-patterns";
 import { requireRouteAccess } from "@/lib/auth/guards";

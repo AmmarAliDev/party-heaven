@@ -16,10 +16,9 @@ vi.mock("../../src/server/db/client", () => ({
   getPrismaClient: vi.fn(),
 }));
 
-import { getPrismaClient } from "../../src/server/db/client";
-
 // Import the handler after mocks are set up.
 import { GET } from "../../src/app/api/health/route";
+import { getPrismaClient } from "../../src/server/db/client";
 
 // ---------------------------------------------------------------------------
 // Helpers

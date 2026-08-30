@@ -18,8 +18,8 @@
  * storefront fully reads from the database. See docs/ai/open-tasks.md.
  */
 
-import type { CatalogCategory } from "@/features/catalog/types";
 import { routes } from "@/config/routes";
+import type { CatalogCategory } from "@/features/catalog/types";
 
 // ---------------------------------------------------------------------------
 // Public types

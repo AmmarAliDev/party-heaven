@@ -1,9 +1,9 @@
 import { describe, expect, it } from "vitest";
 
 import {
+  getReviewStatusLabel,
   isReviewModerationStatus,
   isReviewVisibleOnStorefront,
-  getReviewStatusLabel,
   reviewModerationStatuses,
 } from "@/lib/reviews/moderation";
 

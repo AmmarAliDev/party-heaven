@@ -11,8 +11,8 @@ import { InlineSpinner } from "@/components/ui/inline-spinner";
 import { Label } from "@/components/ui/label";
 import { routes } from "@/config/routes";
 import { signInAction, type SignInActionState } from "@/features/auth/actions/sign-in";
-import { testIds } from "@/lib/test-selectors";
 import { signInValidator } from "@/features/auth/validators";
+import { testIds } from "@/lib/test-selectors";
 
 type SignInFormProps = {
   redirectTo?: string;

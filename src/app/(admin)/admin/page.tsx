@@ -8,14 +8,14 @@ import { EmptyState } from "@/components/ui/empty-state";
 import { SectionErrorState } from "@/components/ui/section-error-state";
 import { buildMetadata } from "@/config/metadata";
 import { routes } from "@/config/routes";
-import { getAdminDashboardMetrics } from "@/features/admin/dashboard";
 import {
   AdminPageHeader,
   AdminTablePattern,
 } from "@/features/admin/components/admin-page-patterns";
-import { toUserMessage } from "@/lib/errors/error-messages";
+import { getAdminDashboardMetrics } from "@/features/admin/dashboard";
 import { formatPrice } from "@/lib/currency";
 import type { AppError } from "@/lib/errors/app-error";
+import { toUserMessage } from "@/lib/errors/error-messages";
 
 export const metadata = buildMetadata({
   title: "Admin Dashboard",

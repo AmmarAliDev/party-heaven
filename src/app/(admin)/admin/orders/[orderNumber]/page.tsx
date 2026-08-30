@@ -33,9 +33,9 @@ import {
 } from "@/features/admin/orders/actions";
 import { AdminOrderSubmitButton } from "@/features/admin/orders/components/admin-order-submit-button";
 import { buildOrderInvoiceUrl, getOrderStatusVariant } from "@/features/orders";
-import { testIds } from "@/lib/test-selectors";
 import { requireRouteAccess } from "@/lib/auth/guards";
 import { hasPermission, rbacPermissions } from "@/lib/auth/rbac";
+import { testIds } from "@/lib/test-selectors";
 
 type AdminOrderDetailPageProps = {
   params: Promise<{ orderNumber: string }>;

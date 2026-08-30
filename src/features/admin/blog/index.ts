@@ -11,6 +11,7 @@ export {
   listAdminBlogPosts,
   updateAdminBlogPost,
 } from "./service";
+export type { AdminBlogCreateInput, AdminBlogUpdateInput } from "./validation";
 export {
   adminBlogCreateSchema,
   adminBlogMutationSchema,
@@ -19,4 +20,3 @@ export {
   validateAdminBlogCreateInput,
   validateAdminBlogUpdateInput,
 } from "./validation";
-export type { AdminBlogCreateInput, AdminBlogUpdateInput } from "./validation";

@@ -32,7 +32,7 @@ export function DealGallery({ deal }: DealGalleryProps) {
 
   if (!active) {
     return (
-      <div className="flex min-h-[320px] w-full items-center justify-center rounded-[var(--radius-card)] border bg-linear-to-br from-slate-100 via-slate-200 to-slate-100 text-sm font-medium uppercase tracking-[0.16em] text-slate-600">
+      <div className="flex min-h-80 w-full items-center justify-center rounded-xl border bg-linear-to-br from-slate-100 via-slate-200 to-slate-100 text-sm font-medium uppercase tracking-[0.16em] text-slate-600">
         Deal preview
       </div>
     );
@@ -41,7 +41,7 @@ export function DealGallery({ deal }: DealGalleryProps) {
   return (
     <div className="flex flex-col gap-3 sm:flex-row-reverse">
       {/* Main image */}
-      <div className="relative min-h-[320px] flex-1 overflow-hidden rounded-[var(--radius-card)] shadow-[var(--shadow-soft)]">
+      <div className="relative min-h-80 flex-1 overflow-hidden rounded-xl shadow-(--shadow-soft)">
         <Image
           src={active.url}
           alt={active.alt}

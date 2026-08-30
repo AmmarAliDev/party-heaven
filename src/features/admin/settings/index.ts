@@ -11,9 +11,9 @@ export {
   saveAdminStoreSettings,
 } from "./service";
 export {
-  adminStoreSettingsSingletonId,
-  adminStoreSettingsSchema,
   type AdminStoreSettingsInput,
+  adminStoreSettingsSchema,
+  adminStoreSettingsSingletonId,
   defaultAdminStoreSettings,
   validateAdminStoreSettingsInput,
 } from "./validation";

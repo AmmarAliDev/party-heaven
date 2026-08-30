@@ -56,8 +56,8 @@ describe("ProductRelatedGrid component", () => {
 
     const links = screen.getAllByRole("link");
     expect(links).toHaveLength(2);
-    expect(links[0]).toHaveAttribute("href", "/categories/decorations/snow-spray-large");
-    expect(links[1]).toHaveAttribute("href", "/categories/decorations/party-popper");
+    expect(links[0]!).toHaveAttribute("href", "/categories/decorations/snow-spray-large");
+    expect(links[1]!).toHaveAttribute("href", "/categories/decorations/party-popper");
 
     expect(screen.getByText("Snow Spray Large")).toBeInTheDocument();
     expect(screen.getByText("Party Popper")).toBeInTheDocument();
@@ -66,7 +66,7 @@ describe("ProductRelatedGrid component", () => {
     const articles = screen.getAllByRole("article");
     expect(articles).toHaveLength(2);
 
-    const firstBgDiv = articles[0].querySelector("div[aria-hidden]");
+    const firstBgDiv = articles[0]!.querySelector("div[aria-hidden]");
     expect(firstBgDiv).toHaveStyle({
       backgroundImage: "url(https://example.com/snow.jpg)",
       backgroundSize: "cover",

@@ -18,8 +18,6 @@ describe("homepage section rendering", () => {
       "featured-products",
       "featured-deals",
     ]);
-    expect(result.sections.some((section) => section.kind === "hero-banner")).toBe(false);
-    expect(result.sections.some((section) => section.kind === "blog-highlights")).toBe(false);
   });
 
   it("renders CMS sections in deterministic order, merges missing fallback kinds, and respects disabled configured kinds", () => {
@@ -92,8 +90,6 @@ describe("homepage section rendering", () => {
     expect(result.sections.some((section) => section.id === "cms-featured-deals" && section.kind === "featured-deals")).toBe(true);
     expect(result.sections.some((section) => section.kind === "featured-categories")).toBe(true);
     expect(result.sections.some((section) => section.kind === "featured-products")).toBe(true);
-    expect(result.sections.some((section) => section.kind === "hero-banner")).toBe(false);
-    expect(result.sections.some((section) => section.kind === "blog-highlights")).toBe(false);
     expect(result.sections.filter((section) => section.kind === "featured-deals")).toHaveLength(1);
   });
 
@@ -131,7 +127,6 @@ describe("homepage section rendering", () => {
       "cms-products",
       "fallback-featured-deals",
     ]);
-    expect(result.sections.some((section) => section.kind === "hero-banner")).toBe(false);
   });
 
   it("keeps fallback primary sections when CMS provides only announcement bars", () => {
@@ -150,8 +145,6 @@ describe("homepage section rendering", () => {
     expect(result.source).toBe("cms");
     expect(result.sections.some((section) => section.id === "cms-banner")).toBe(true);
     expect(result.sections.some((section) => section.kind === "featured-products")).toBe(true);
-    expect(result.sections.some((section) => section.kind === "hero-banner")).toBe(false);
-    expect(result.sections.some((section) => section.kind === "blog-highlights")).toBe(false);
   });
 
   it("keeps fallback primary sections when CMS provides only campaign overlays", () => {
@@ -175,7 +168,6 @@ describe("homepage section rendering", () => {
     expect(result.source).toBe("cms");
     expect(result.sections.some((section) => section.id === "campaign-abc123")).toBe(true);
     expect(result.sections.some((section) => section.kind === "featured-products")).toBe(true);
-    expect(result.sections.some((section) => section.kind === "hero-banner")).toBe(false);
     expect(result.sections.some((section) => section.id === "fallback-deal-spotlight")).toBe(false);
   });
 

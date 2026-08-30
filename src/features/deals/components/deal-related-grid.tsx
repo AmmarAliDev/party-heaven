@@ -22,7 +22,7 @@ export function DealRelatedGrid({ deals }: DealRelatedGridProps) {
       </div>
 
       {deals.length === 0 ? (
-        <p className="text-muted-foreground rounded-(--radius-card) border border-dashed border-border/70 px-4 py-5 text-sm">
+        <p className="text-muted-foreground rounded-xl border border-dashed border-border/70 px-4 py-5 text-sm">
           No related deals are available right now.
         </p>
       ) : (

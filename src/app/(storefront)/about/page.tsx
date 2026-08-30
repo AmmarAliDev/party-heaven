@@ -1,8 +1,8 @@
+import { PageShell } from "@/components/layout/page-shell";
+import { Badge } from "@/components/ui/badge";
+import { Separator } from "@/components/ui/separator";
 import { buildMetadata } from "@/config/metadata";
 import { shouldRenderGuardedSurface } from "@/config/production-visibility";
-import { Badge } from "@/components/ui/badge";
-import { PageShell } from "@/components/layout/page-shell";
-import { Separator } from "@/components/ui/separator";
 
 export const metadata = buildMetadata({
   title: "About Us",

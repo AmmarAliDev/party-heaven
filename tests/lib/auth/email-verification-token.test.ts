@@ -1,9 +1,9 @@
 import { describe, expect, it } from "vitest";
 
 import {
-  EMAIL_VERIFICATION_TOKEN_TTL_MS,
   buildEmailVerificationUrl,
   createEmailVerificationTokenPair,
+  EMAIL_VERIFICATION_TOKEN_TTL_MS,
   hashEmailVerificationToken,
   isEmailVerificationTokenExpired,
 } from "@/lib/auth/email-verification-token";

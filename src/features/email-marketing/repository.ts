@@ -1,7 +1,7 @@
 import { randomUUID } from "node:crypto";
 
-import { PrismaClientKnownRequestError } from "@prisma/client/runtime/library";
 import type { Prisma } from "@prisma/client";
+import { PrismaClientKnownRequestError } from "@prisma/client/runtime/library";
 
 import type { DatabaseExecutor } from "@/server/db";
 import { defineRepository } from "@/server/db";

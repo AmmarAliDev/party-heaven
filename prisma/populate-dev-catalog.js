@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-require-imports -- CommonJS script executed directly with `node`; the package is not ESM. */
 const { PrismaClient } = require('@prisma/client');
 const { createDeterministicDevCatalogData } = require('./dev-catalog-data');
 

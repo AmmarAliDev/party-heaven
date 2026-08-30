@@ -1,11 +1,11 @@
 import { describe, expect, it } from "vitest";
 
 import {
-  PASSWORD_RESET_TOKEN_TTL_MS,
   buildPasswordResetUrl,
   createPasswordResetTokenPair,
   hashPasswordResetToken,
   isPasswordResetTokenExpired,
+  PASSWORD_RESET_TOKEN_TTL_MS,
 } from "@/lib/auth/password-reset-token";
 
 describe("password reset token utilities", () => {

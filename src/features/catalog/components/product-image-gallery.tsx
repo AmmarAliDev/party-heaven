@@ -126,7 +126,7 @@ export function ProductImageGallery({
     <div className="flex flex-col gap-3 sm:flex-row-reverse">
       {/* Main image */}
       {active.url ? (
-        <div className="relative min-h-[320px] flex-1 overflow-hidden rounded-[var(--radius-card)] shadow-[var(--shadow-soft)]">
+        <div className="relative min-h-80 flex-1 overflow-hidden rounded-xl shadow-(--shadow-soft)">
           <Image
             src={active.url}
             alt={active.label}
@@ -142,7 +142,7 @@ export function ProductImageGallery({
           role="img"
           aria-label={`${productName} - ${active.label}`}
           className={cn(
-            "flex min-h-[320px] flex-1 items-end bg-gradient-to-br p-8 rounded-[var(--radius-card)] shadow-[var(--shadow-soft)]",
+            "flex min-h-80 flex-1 items-end bg-linear-to-br p-8 rounded-xl shadow-(--shadow-soft)",
             toneBg[active.tone],
           )}
         >
@@ -166,7 +166,7 @@ export function ProductImageGallery({
               title={img.variantLabel}
               className={cn(
                 "relative aspect-square flex-1 overflow-hidden sm:flex-none sm:w-20 sm:h-20 rounded-lg border-2 transition-all",
-                img.url ? "bg-muted" : cn("bg-gradient-to-br", toneBg[img.tone]),
+                img.url ? "bg-muted" : cn("bg-linear-to-br", toneBg[img.tone]),
                 img.id === activeId
                   ? "border-primary ring-2 ring-primary/30"
                   : "border-border/60 hover:border-primary/50",

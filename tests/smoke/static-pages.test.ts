@@ -17,10 +17,10 @@ import { describe, expect, it } from "vitest";
 // The metadata objects are plain JS objects so they are safe to import in a Node test environment.
 import AboutPage, { metadata as aboutMeta } from "@/app/(storefront)/about/page";
 import PrivacyPage, { metadata as privacyMeta } from "@/app/(storefront)/privacy/page";
-import TermsPage, { metadata as termsMeta } from "@/app/(storefront)/terms/page";
 import ShippingPolicyPage, {
   metadata as shippingMeta,
 } from "@/app/(storefront)/shipping-policy/page";
+import TermsPage, { metadata as termsMeta } from "@/app/(storefront)/terms/page";
 
 describe("static informational pages — metadata", () => {
   it("/about has a meaningful title and description", () => {

@@ -18,9 +18,16 @@ describe("add-to-cart toast payload", () => {
     expect(payload.title).toBe("Surface Cleaner added to cart");
     expect(payload.description).toBe("Cart updated.");
     expect(payload.options.duration).toBe(ADD_TO_CART_TOAST_DURATION_MS);
-    expect(payload.options.action?.label).toBe("Proceed to Checkout");
 
-    payload.options.action?.onClick({} as never);
+    // sonner's `action` is a loose ReactNode union; the builder stores a
+    // { label, onClick } object, so narrow it for the assertions.
+    const action = payload.options.action as
+      | { label?: string; onClick?: (event: unknown) => void }
+      | undefined;
+
+    expect(action?.label).toBe("Proceed to Checkout");
+
+    action?.onClick?.({} as never);
     expect(onProceedToCheckout).toHaveBeenCalledTimes(1);
   });
 

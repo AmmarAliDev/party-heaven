@@ -1,5 +1,5 @@
-import { toast } from "sonner";
 import type { ExternalToast } from "sonner";
+import { toast } from "sonner";
 
 type ToastDescription = string | undefined;
 type ToastOptions = ExternalToast | undefined;

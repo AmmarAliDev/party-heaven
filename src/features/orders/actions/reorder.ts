@@ -5,7 +5,7 @@ import { reorderFromOrder } from "@/features/orders/service";
 import { AppError } from "@/lib/errors/app-error";
 import { assertTrustedOrigin } from "@/lib/security/csrf";
 
-import type { ReorderActionIssue, ReorderActionState } from "./reorder-types";
+import type { ReorderActionState } from "./reorder-types";
 
 export async function reorderOrderAction(
   _prev: ReorderActionState,

@@ -1,5 +1,6 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
+import type { AdminDealCreateInput } from "@/features/admin/deals/validation";
 import { AppError } from "@/lib/errors/app-error";
 
 const prismaMock = vi.hoisted(() => ({
@@ -83,21 +84,6 @@ function buildProduct(overrides: Record<string, unknown> = {}) {
   };
 }
 
-function buildFormProduct(overrides: Record<string, unknown> = {}) {
-  return {
-    productId: "product-1",
-    productName: "Flash Cleaner",
-    productSlug: "flash-cleaner",
-    variantId: null,
-    variantTitle: null,
-    quantity: 2,
-    availableStock: 10,
-    price: 500,
-    compareAtPrice: null,
-    ...overrides,
-  };
-}
-
 function buildDealFormRow(overrides: Record<string, unknown> = {}) {
   return {
     id: "deal-1",
@@ -131,6 +117,32 @@ function buildDealFormRow(overrides: Record<string, unknown> = {}) {
       },
     ],
     specifications: [],
+    ...overrides,
+  };
+}
+
+function buildDealFormInput(overrides: Partial<AdminDealCreateInput> = {}): AdminDealCreateInput {
+  return {
+    title: "Flash Cleaner Deal",
+    slug: "flash-cleaner-deal",
+    shortDescription: "Two for one clean",
+    description: "A longer deal description",
+    status: "PUBLISHED",
+    categoryId: "category-1",
+    price: 950,
+    comparePrice: 1200,
+    products: [{ productId: "product-1", variantId: undefined, quantity: 2 }],
+    images: [],
+    specifications: [],
+    relatedDealIds: [],
+    seoTitle: undefined,
+    seoDescription: undefined,
+    seoCanonicalUrl: undefined,
+    seoOgTitle: undefined,
+    seoOgDescription: undefined,
+    seoImageUrl: undefined,
+    seoNoIndex: false,
+    seoSchemaNotes: undefined,
     ...overrides,
   };
 }
@@ -178,15 +190,10 @@ describe("admin deal service", () => {
     await expect(
       createAdminDeal({
         actor: ACTOR,
-        data: {
-          title: "Flash Cleaner Deal",
-          slug: "flash-cleaner-deal",
-          status: "PUBLISHED",
-          categoryId: "category-1",
+        data: buildDealFormInput({
           price: 950,
           products: [{ productId: "product-1", variantId: undefined, quantity: 11 }],
-          images: [],
-        },
+        }),
       }),
     ).rejects.toMatchObject({ code: "DEAL_STOCK_EXCEEDED" });
 
@@ -224,15 +231,10 @@ describe("admin deal service", () => {
 
     const created = await createAdminDeal({
       actor: ACTOR,
-      data: {
-        title: "Flash Cleaner Deal",
-        slug: "flash-cleaner-deal",
-        status: "PUBLISHED",
-        categoryId: "category-1",
-        price: 950,
+      data: buildDealFormInput({
         products: [{ productId: "product-1", variantId: "variant-2", quantity: 2 }],
         images: [{ url: "https://example.com/deal.jpg", alt: "Deal image" }],
-      },
+      }),
     });
 
     expect(created.products[0]?.variantId).toBe("variant-2");
@@ -257,15 +259,14 @@ describe("admin deal service", () => {
     await expect(
       createAdminDeal({
         actor: ACTOR,
-        data: {
+        data: buildDealFormInput({
           title: "Bad Deal",
           slug: "bad-deal",
           status: "DRAFT",
           categoryId: "category-2",
           price: 100,
           products: [{ productId: "product-1", variantId: undefined, quantity: 1 }],
-          images: [],
-        },
+        }),
       }),
     ).rejects.toMatchObject({ code: "DEAL_PRODUCT_CATEGORY_MISMATCH" });
   });
@@ -277,15 +278,13 @@ describe("admin deal service", () => {
     await expect(
       createAdminDeal({
         actor: ACTOR,
-        data: {
+        data: buildDealFormInput({
           title: "Bad Variant Deal",
           slug: "bad-variant-deal",
           status: "DRAFT",
-          categoryId: "category-1",
           price: 100,
           products: [{ productId: "product-1", variantId: "variant-999", quantity: 1 }],
-          images: [],
-        },
+        }),
       }),
     ).rejects.toMatchObject({ code: "DEAL_VARIANT_INVALID" });
   });
@@ -339,14 +338,11 @@ describe("admin deal service", () => {
       actor: ACTOR,
       data: {
         id: "deal-1",
-        title: "Flash Cleaner Deal",
-        slug: "flash-cleaner-deal",
-        status: "PUBLISHED",
-        categoryId: "category-1",
-        price: 950,
-        products: [{ productId: "product-1", variantId: undefined, quantity: 1 }],
-        images: [{ url: "https://example.com/new.jpg", alt: "New" }],
-        specifications: [{ key: "Included", value: "Bundle" }],
+        ...buildDealFormInput({
+          products: [{ productId: "product-1", variantId: undefined, quantity: 1 }],
+          images: [{ url: "https://example.com/new.jpg", alt: "New" }],
+          specifications: [{ key: "Included", value: "Bundle" }],
+        }),
       },
     });
 

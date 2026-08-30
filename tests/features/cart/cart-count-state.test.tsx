@@ -3,11 +3,11 @@
 import { cleanup, render, screen, waitFor } from "@testing-library/react";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
-import { dispatchCartChanged } from "@/features/cart/client-events";
 import {
   __resetGlobalCartCountStateForTests,
   useCartCountState,
 } from "@/features/cart/cart-count-state";
+import { dispatchCartChanged } from "@/features/cart/client-events";
 
 function CartCountProbe() {
   const { itemCount, pending } = useCartCountState();

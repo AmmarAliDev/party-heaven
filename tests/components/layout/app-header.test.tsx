@@ -155,7 +155,7 @@ describe("AppHeader storefront navigation", () => {
       ["Grocery", "/categories/grocery"],
       ["Home Care", "/categories/home-care"],
       ["Kitchen & Dining", "/categories/kitchen-dining"],
-    ]) {
+    ] as const) {
       const link = within(nav).getByRole("link", { name: title });
       expect(link).toHaveAttribute("href", href);
     }

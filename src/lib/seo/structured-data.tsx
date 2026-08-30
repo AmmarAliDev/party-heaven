@@ -1,5 +1,5 @@
-import { siteConfig } from "@/config/site";
 import { env } from "@/config/env";
+import { siteConfig } from "@/config/site";
 
 export function generateOrganizationJsonLd() {
   const baseUrl = env.appUrl.endsWith("/") ? env.appUrl.slice(0, -1) : env.appUrl;
@@ -113,7 +113,7 @@ export function generateArticleJsonLd({
   };
 }
 
-export function StructuredData({ data }: { data: Record<string, any> }) {
+export function StructuredData({ data }: { data: Record<string, unknown> }) {
   return (
     <script
       type="application/ld+json"

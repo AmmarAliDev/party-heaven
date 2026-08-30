@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 
-import { isProductionRuntime, shouldRenderGuardedSurface, type ProductionGuardSurface } from "@/config/production-visibility";
+import { isProductionRuntime, type ProductionGuardSurface,shouldRenderGuardedSurface } from "@/config/production-visibility";
 
 const allGuardedSurfaces: ProductionGuardSurface[] = [
   "homepageFallbackIndicator",

@@ -12,10 +12,10 @@
  */
 
 import { redirect } from "next/navigation";
-import type { RoleKey } from "@/lib/auth/roles";
 
 import { auth } from "@/auth";
 import { routes } from "@/config/routes";
+import type { RoleKey } from "@/lib/auth/roles";
 
 import {
   hasAnyPermission as roleHasAnyPermission,
