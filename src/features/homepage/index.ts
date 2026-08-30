@@ -5,11 +5,12 @@ export type {
   AnnouncementBarSection,
   DealSpotlightSection,
   FeaturedCategoriesSection,
+  FeaturedDealItem,
+  FeaturedDealsSection,
   FeaturedProductItem,
   FeaturedProductsSection,
   HomepageContent,
   HomepageContentResult,
   HomepageSection,
   HomepageSectionKind,
-  PartyHeavenSection,
 } from "./types";

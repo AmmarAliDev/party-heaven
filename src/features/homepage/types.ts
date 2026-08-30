@@ -3,7 +3,7 @@ import type { CatalogCategory } from "@/features/catalog/types";
 export type HomepageSectionKind =
   | "announcement-bar"
   | "featured-categories"
-  | "party-heaven"
+  | "featured-deals"
   | "featured-products"
   | "deal-spotlight";
 
@@ -71,30 +71,45 @@ export type FeaturedProductsSection = {
 };
 
 /**
- * Party Heaven section — displays auto-hydrated catalog products priced at or
- * below PARTY_HEAVEN_MAX_PRICE_PKR. Products are never stored in CMS; they are
- * resolved at runtime from the published catalog.
- *
- * Admin configures: title, description, ctaLabel, ctaHref, placeholderMessage.
+ * Featured Deals section — displays admin-managed deals (see the Deals admin
+ * feature). Deals link an existing catalog product (optionally one variant)
+ * to deal-specific media and a bundle quantity. The section is hydrated at
+ * runtime from the published deals; the shell (title, description, CTA,
+ * placeholder) is admin-configurable.
  */
-export type PartyHeavenSection = {
+export type FeaturedDealItem = {
   id: string;
-  kind: "party-heaven";
+  slug: string;
+  title: string;
+  href: string;
+  price: number;
+  compareAt?: number;
+  imageUrl?: string;
+  imageAlt?: string;
+  /** Compact subtitle built from the included product names (e.g. "A + B +1 more"). */
+  productSummary: string;
+  /** Number of products included in the deal. */
+  itemCount: number;
+  isAvailable: boolean;
+};
+
+export type FeaturedDealsSection = {
+  id: string;
+  kind: "featured-deals";
   enabled?: boolean;
   displayOrder?: number;
   title: string;
   description?: string;
   /**
-   * Products hydrated from the live catalog (price ≤ PARTY_HEAVEN_MAX_PRICE_PKR).
-   * Empty array until hydration runs; the component renders a placeholder state
-   * when this is empty.
+   * Deals hydrated from the live Deal records (status PUBLISHED). Empty until
+   * hydration runs; the component hides the section when this is empty.
    */
-  products: FeaturedProductItem[];
-  /** Label for the "View all" CTA linking to the Party Heaven category. */
+  deals: FeaturedDealItem[];
+  /** Label for the "View all" CTA linking to the deals listing. */
   ctaLabel: string;
-  /** Href for the "View all" CTA (typically /categories/party-heaven). */
+  /** Href for the "View all" CTA (typically /deals). */
   ctaHref: string;
-  /** Shown when no Party Heaven products are available in the catalog. */
+  /** Shown when no deals are available in the catalog. */
   placeholderMessage: string;
 };
 
@@ -119,7 +134,7 @@ export type DealSpotlightSection = {
 export type HomepageSection =
   | AnnouncementBarSection
   | FeaturedCategoriesSection
-  | PartyHeavenSection
+  | FeaturedDealsSection
   | FeaturedProductsSection
   | DealSpotlightSection;
 

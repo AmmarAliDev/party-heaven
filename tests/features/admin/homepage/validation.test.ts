@@ -71,7 +71,7 @@ describe("admin homepage content validation", () => {
       description: "Limited-time savings",
       price: 1499,
       compareAt: 1899,
-      targetHref: "/categories/party-heaven",
+      targetHref: "/categories/grocery/flash-cleaner",
       imageUrl: "https://store.public.blob.vercel-storage.com/admin/content/campaign-deal.png",
       imageAlt: "Campaign spotlight deal image",
       startsAt: "2026-04-20T08:00:00.000Z",

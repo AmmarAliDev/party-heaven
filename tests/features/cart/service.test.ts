@@ -79,6 +79,7 @@ describe("cart service helpers", () => {
           imageAlt: null,
         },
       ],
+      dealItems: [],
     };
 
     const result = validateCartStock(cart);

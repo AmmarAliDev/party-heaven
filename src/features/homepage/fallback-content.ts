@@ -1,5 +1,4 @@
 import { routes } from "@/config/routes";
-import { PARTY_HEAVEN_CATEGORY_SLUG, PARTY_HEAVEN_MAX_PRICE_PKR } from "@/features/catalog/party-heaven";
 
 import type { HomepageSection } from "./types";
 
@@ -34,20 +33,6 @@ export function buildHomepageFallbackSections(): HomepageSection[] {
           href: routes.storefront.category("personal-care"),
         },
       ],
-    },
-    {
-      // Party Heaven section: products are hydrated at runtime from the catalog.
-      // This fallback defines the section shell; real products are injected by
-      // hydratePartyHeavenSections() in the homepage service.
-      id: "fallback-party-heaven",
-      kind: "party-heaven",
-      title: "Party Heaven deals",
-      description: `Products priced at Rs. ${PARTY_HEAVEN_MAX_PRICE_PKR} or less — the best value picks across all categories.`,
-      displayOrder: 20,
-      products: [],
-      ctaLabel: "View all Party Heaven deals",
-      ctaHref: routes.storefront.category(PARTY_HEAVEN_CATEGORY_SLUG),
-      placeholderMessage: "No Party Heaven products are available right now. Check back soon for fresh picks.",
     },
     {
       id: "fallback-featured-products",
@@ -89,6 +74,20 @@ export function buildHomepageFallbackSections(): HomepageSection[] {
           compareAt: 649,
         },
       ],
+    },
+    {
+      // Featured Deals section: deals are hydrated at runtime from the
+      // published Deal records by hydrateFeaturedDealsSections() in the
+      // homepage service. Rendered AFTER Featured products.
+      id: "fallback-featured-deals",
+      kind: "featured-deals",
+      title: "Featured Deals",
+      description: "Hand-picked deals curated from the catalog by the team.",
+      displayOrder: 35,
+      deals: [],
+      ctaLabel: "View all Featured Deals",
+      ctaHref: routes.storefront.deals,
+      placeholderMessage: "No Featured Deals are available right now. Check back soon for fresh picks.",
     },
     // {
     //   id: "fallback-deal-spotlight",

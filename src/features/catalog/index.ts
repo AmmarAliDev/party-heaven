@@ -20,13 +20,6 @@ export {
   buildCategoryListingSearchParams,
   parseCatalogSearchParams,
 } from "./filters";
-export {
-  createPartyHeavenVirtualCategory,
-  isPartyHeavenCategorySlug,
-  PARTY_HEAVEN_CATEGORY_LABEL,
-  PARTY_HEAVEN_CATEGORY_SLUG,
-  PARTY_HEAVEN_MAX_PRICE_PKR,
-} from "./party-heaven";
 export { POPULAR_SEARCHES, POPULAR_SEARCHES_MAX_ITEMS } from "./popular-searches";
 export {
   closeSearchDialog,

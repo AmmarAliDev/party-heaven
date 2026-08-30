@@ -15,14 +15,12 @@ import { getProductBySlug, getRelatedProducts } from "@/features/catalog";
 const mockGetPublishedProductBySlug = vi.fn();
 const mockGetPublishedProductContextBySlug = vi.fn().mockResolvedValue(null);
 const mockGetRelatedPublishedProducts = vi.fn();
-const mockCountPublishedPartyHeavenProducts = vi.fn().mockResolvedValue(0);
 
 vi.mock("@/server/db/catalog-queries", () => ({
   listPublishedCategories: vi.fn().mockResolvedValue([]),
   getPublishedCategoryBySlug: vi.fn().mockResolvedValue(null),
   listPublishedProductsByCategory: vi.fn().mockResolvedValue([]),
   listPublishedProductsByIds: vi.fn().mockResolvedValue([]),
-  countPublishedPartyHeavenProducts: (...args: unknown[]) => mockCountPublishedPartyHeavenProducts(...args),
   getPublishedProductContextBySlug: (...args: unknown[]) => mockGetPublishedProductContextBySlug(...args),
   getPublishedProductBySlug: (...args: unknown[]) => mockGetPublishedProductBySlug(...args),
   getRelatedPublishedProducts: (...args: unknown[]) => mockGetRelatedPublishedProducts(...args),

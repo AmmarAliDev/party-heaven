@@ -39,7 +39,7 @@ export function CartPageContent({ initialCart }: CartPageContentProps) {
     [cart],
   );
 
-  if (!cart || cart.items.length === 0) {
+  if (!cart || (cart.items.length === 0 && cart.dealItems.length === 0)) {
     return (
       <EmptyState
         align="center"
@@ -78,6 +78,72 @@ export function CartPageContent({ initialCart }: CartPageContentProps) {
 
       <div className="grid gap-6 lg:grid-cols-[minmax(0,1fr)_20rem]">
         <div className="space-y-3">
+          {cart.dealItems.map((item) => {
+            const hasStockIssue = item.quantity > item.availableQuantity;
+
+            return (
+              <Card key={item.id}>
+                <CardContent className="flex gap-2 sm:gap-4 p-5">
+                  <CartItemThumbnail
+                    productName={item.title}
+                    imageUrl={item.imageUrl}
+                    imageAlt={item.imageAlt}
+                    href={item.href}
+                    className="size-24 sm:size-32"
+                  />
+
+                  <div className="min-w-0 flex-1 space-y-3">
+                    <div className="flex flex-col gap-2 sm:flex-row sm:items-start sm:justify-between">
+                      <div className="space-y-1">
+                        <Link
+                          href={item.href}
+                          className="hover:text-primary text-base font-semibold tracking-tight"
+                        >
+                          {item.title}
+                        </Link>
+                        <p className="text-muted-foreground text-sm">
+                          {item.productSummary} · {item.itemCount}{" "}
+                          {item.itemCount === 1 ? "product" : "products"}
+                        </p>
+                        <p className="text-muted-foreground text-sm">SKU: {item.sku}</p>
+                        <p className="text-muted-foreground text-xs">
+                          In stock: {item.availableQuantity} bundle
+                          {item.availableQuantity === 1 ? "" : "s"}
+                        </p>
+                      </div>
+
+                      <PriceDisplay
+                        amount={item.unitPrice}
+                        {...(typeof item.compareAtPrice === "number"
+                          ? { compareAt: item.compareAtPrice }
+                          : {})}
+                        size="sm"
+                      />
+                    </div>
+
+                    {hasStockIssue ? (
+                      <p className="text-destructive inline-flex items-center gap-1 text-xs">
+                        <AlertTriangle className="size-3.5" aria-hidden="true" />
+                        Requested quantity exceeds available bundles.
+                      </p>
+                    ) : null}
+
+                    <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+                      <CartItemQuantityControls
+                        cartItemId={item.id}
+                        dealCartItemId={item.id}
+                        productName={item.title}
+                        quantity={item.quantity}
+                        availableQuantity={item.availableQuantity}
+                      />
+
+                      <span className="flex gap-1">Total:{" "} <PriceDisplay amount={item.lineSubtotal} size="sm" /></span>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+            );
+          })}
           {cart.items.map((item) => {
             const hasStockIssue = item.quantity > item.availableQuantity;
             const variantLabel = getDisplayVariantLabel(item.optionLabel);

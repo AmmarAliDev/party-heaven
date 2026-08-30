@@ -20,8 +20,8 @@ describe("homepage fallback content", () => {
 
     expect(sections.map((section) => section.kind)).toEqual([
       "featured-categories",
-      "party-heaven",
       "featured-products",
+      "featured-deals",
     ]);
   });
 });

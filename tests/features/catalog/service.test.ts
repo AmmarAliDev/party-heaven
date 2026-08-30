@@ -105,7 +105,6 @@ const mockListPublishedCategories = vi.fn();
 const mockGetPublishedCategoryBySlug = vi.fn();
 const mockListPublishedProductsByCategory = vi.fn();
 const mockListAllPublishedProducts = vi.fn();
-const mockCountPublishedPartyHeavenProducts = vi.fn().mockResolvedValue(0);
 const mockGetPublishedProductContextBySlug = vi.fn().mockResolvedValue(null);
 
 vi.mock("@/server/db/catalog-queries", () => ({
@@ -113,7 +112,6 @@ vi.mock("@/server/db/catalog-queries", () => ({
   getPublishedCategoryBySlug: (...args: unknown[]) => mockGetPublishedCategoryBySlug(...args),
   listPublishedProductsByCategory: (...args: unknown[]) => mockListPublishedProductsByCategory(...args),
   listAllPublishedProducts: (...args: unknown[]) => mockListAllPublishedProducts(...args),
-  countPublishedPartyHeavenProducts: (...args: unknown[]) => mockCountPublishedPartyHeavenProducts(...args),
   getPublishedProductContextBySlug: (...args: unknown[]) => mockGetPublishedProductContextBySlug(...args),
   listPublishedProductsByIds: vi.fn().mockResolvedValue([]),
   getPublishedProductBySlug: vi.fn().mockResolvedValue(null),
@@ -263,24 +261,6 @@ describe("catalog listing service", () => {
 
     expect(listing?.filteredProductCount).toBe(0);
     expect(listing?.products).toHaveLength(0);
-  });
-
-  it("builds Party Heaven listing from derived <= 280 Rs. membership", async () => {
-    mockListAllPublishedProducts.mockResolvedValue([
-      makeProductRecord({ id: "p1", slug: "eligible-100", price: 100 }),
-      makeProductRecord({ id: "p2", slug: "eligible-280", price: 280 }),
-      makeProductRecord({ id: "p3", slug: "excluded-281", price: 281 }),
-    ]);
-
-    const listing = await getCatalogCategoryListing({ slug: "party-heaven" });
-
-    expect(listing).not.toBeNull();
-    expect(listing?.category.slug).toBe("party-heaven");
-    expect(listing?.totalProductCount).toBe(2);
-    expect(listing?.products.map((product) => product.slug)).toEqual([
-      "eligible-100",
-      "eligible-280",
-    ]);
   });
 
   it("uses the first variant image as the card cover when no product-level image exists", async () => {

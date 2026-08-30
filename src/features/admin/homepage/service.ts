@@ -4,7 +4,7 @@ import { PrismaClientKnownRequestError } from "@prisma/client/runtime/library";
 import { routes } from "@/config/routes";
 import { normalizeCatalogImageUrl } from "@/features/catalog/lib/product-image-url";
 import { HOMEPAGE_FALLBACK_SECTIONS } from "@/features/homepage/fallback-content";
-import type { AnnouncementBarSection, DealSpotlightSection, HomepageContent, HomepageSection, PartyHeavenSection } from "@/features/homepage/types";
+import type { AnnouncementBarSection, DealSpotlightSection, FeaturedDealsSection, HomepageContent, HomepageSection } from "@/features/homepage/types";
 import { logAdminAction } from "@/lib/audit/admin-actions";
 import { AppError } from "@/lib/errors/app-error";
 import { createLogger } from "@/lib/logger";
@@ -474,8 +474,8 @@ export async function seedAdminHomepageSections({ actor }: { actor: AuditActorIn
               href: section.href,
               label: section.label,
             };
-          case "party-heaven":
-            // Products are hydrated at runtime — only persist CMS-configurable shell fields.
+          case "featured-deals":
+            // Deals are hydrated at runtime — only persist CMS-configurable shell fields.
             return {
               description: section.description,
               ctaLabel: section.ctaLabel,
@@ -990,9 +990,10 @@ function mapSectionRecordToStorefrontSection(record: HomePageSectionRow, referen
         ...(content.image ? { image: content.image } : {}),
       };
     }
-    case "party-heaven": {
-      // Products are never stored in CMS — they are hydrated at runtime from
-      // the live catalog by hydratePartyHeavenSections() in the homepage service.
+    case "featured-deals": {
+      // Deals are never stored in CMS — they are hydrated at runtime from the
+      // published Deal records by hydrateFeaturedDealsSections() in the
+      // homepage service.
       const content = parsed.data.content as {
         description?: string;
         ctaLabel: string;
@@ -1001,14 +1002,14 @@ function mapSectionRecordToStorefrontSection(record: HomePageSectionRow, referen
       };
       return {
         ...base,
-        kind: "party-heaven",
+        kind: "featured-deals",
         title: parsed.data.title,
         ...(content.description ? { description: content.description } : {}),
-        products: [],
+        deals: [],
         ctaLabel: content.ctaLabel,
         ctaHref: content.ctaHref,
         placeholderMessage: content.placeholderMessage,
-      } satisfies PartyHeavenSection;
+      } satisfies FeaturedDealsSection;
     }
     default:
       return null;

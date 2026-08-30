@@ -36,7 +36,7 @@ export default async function CheckoutPage() {
     mergeGuestIntoUser: Boolean(session?.user?.id && guestToken),
   });
 
-  if (!cart || cart.items.length === 0) {
+  if (!cart || (cart.items.length === 0 && cart.dealItems.length === 0)) {
     return (
       <PageShell className="items-center justify-center">
         <EmptyState

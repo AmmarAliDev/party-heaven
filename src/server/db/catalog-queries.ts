@@ -24,14 +24,11 @@ import { unstable_cache } from "next/cache";
 import type { Prisma } from "@prisma/client";
 
 import { expandSearchQuery } from "@/features/catalog/lib/search-text";
-import { createLogger } from "@/lib/logger";
 import { getPrismaClient } from "@/server/db";
 
 const CATALOG_CACHE_REVALIDATE_SECONDS = 900;
 const PRISMA_POOL_TIMEOUT_ERROR_CODE = "P2024";
 const PRISMA_POOL_TIMEOUT_MAX_ATTEMPTS = 2;
-const PARTY_HEAVEN_MAX_PRICE_PKR = 280;
-const catalogQueriesLogger = createLogger("catalog-queries");
 
 // Search candidate pooling: the DB query intentionally fetches a larger
 // candidate pool than the final result limit so the search adapter can rank by
@@ -427,92 +424,6 @@ export const listAllPublishedProducts = unstable_cache(
   },
 );
 
-/**
- * Counts Party Heaven eligible published products using only one selected
- * variant per product (default variant first, then oldest variant fallback).
- *
- * This avoids loading full product cards just to compute the virtual
- * category count used by global navigation and category badges.
- */
-async function _countPublishedPartyHeavenProductsImpl() {
-  const db = getPrismaClient();
-  try {
-    const result = await db.$queryRaw<Array<{ count: bigint | number }>>`
-      SELECT COUNT(*)::int AS "count"
-      FROM "Product" AS p
-      INNER JOIN "Category" AS c ON c."id" = p."category_id"
-      INNER JOIN LATERAL (
-        SELECT pv."price"
-        FROM "ProductVariant" AS pv
-        WHERE pv."product_id" = p."id"
-        ORDER BY pv."is_default" DESC, pv."created_at" ASC
-        LIMIT 1
-      ) AS selected_variant ON TRUE
-      WHERE p."status" = 'PUBLISHED'
-        AND c."status" = 'PUBLISHED'
-        AND selected_variant."price" <= ${PARTY_HEAVEN_MAX_PRICE_PKR}
-    `;
-
-    const countValue = result[0]?.count;
-
-    if (typeof countValue === "number") {
-      return Number.isFinite(countValue) && countValue >= 0 ? countValue : 0;
-    }
-
-    if (typeof countValue === "bigint") {
-      return countValue >= BigInt(0) ? Number(countValue) : 0;
-    }
-
-    return 0;
-  } catch (error) {
-    catalogQueriesLogger.warn("raw party-heaven count failed; using fallback query", {
-      code: "CATALOG_PARTY_HEAVEN_COUNT_RAW_QUERY_FAILED",
-      error,
-    });
-
-    // Fallback preserves storefront behavior even if raw SQL fails in a
-    // constrained runtime while still keeping this path safe.
-    const products = await db.product.findMany({
-      where: {
-        status: "PUBLISHED",
-        category: {
-          status: "PUBLISHED",
-        },
-        variants: {
-          some: {},
-        },
-      },
-      select: {
-        variants: {
-          orderBy: [{ isDefault: "desc" as const }, { createdAt: "asc" as const }],
-          take: 1,
-          select: {
-            price: true,
-          },
-        },
-      },
-    });
-
-    return products.reduce((total, product) => {
-      const price = product.variants[0]?.price;
-
-      if (typeof price !== "number") {
-        return total;
-      }
-
-      return price <= PARTY_HEAVEN_MAX_PRICE_PKR ? total + 1 : total;
-    }, 0);
-  }
-}
-
-export const countPublishedPartyHeavenProducts = unstable_cache(
-  _countPublishedPartyHeavenProductsImpl,
-  ["storefront:published-products-party-heaven-count"],
-  {
-    revalidate: CATALOG_CACHE_REVALIDATE_SECONDS,
-    tags: [CATALOG_CACHE_TAGS.products],
-  },
-);
 
 /**
  * Lightweight published-product context used by render paths that do not need

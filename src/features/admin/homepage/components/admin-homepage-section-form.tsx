@@ -50,7 +50,7 @@ const typeOptions = adminHomepageSectionKindValues.map((value) => ({
 const sectionContentGuidance: Record<AdminHomepageSectionType, string> = {
   "announcement-bar": "Fields: message, href?, label?",
   "featured-categories": "Fields: description?, categories[]",
-  "party-heaven": "Fields: description?, ctaLabel, ctaHref, placeholderMessage",
+  "featured-deals": "Fields: description?, ctaLabel, ctaHref, placeholderMessage",
   "featured-products": "Fields: description?, products[]",
   "deal-spotlight": "Fields: description, dealLabel, price, compareAt, ctaLabel, ctaHref, image? { url, alt }",
 };

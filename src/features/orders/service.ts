@@ -53,8 +53,56 @@ type OrderCart = Prisma.CartGetPayload<{
         };
       };
     };
+    dealItems: {
+      orderBy: {
+        createdAt: "asc";
+      };
+      include: {
+        deal: {
+          include: {
+            products: {
+              orderBy: {
+                position: "asc";
+              };
+              select: {
+                productVariantId: true;
+                quantity: true;
+                product: {
+                  select: {
+                    id: true;
+                    name: true;
+                    slug: true;
+                    status: true;
+                    variants: {
+                      orderBy: [{ isDefault: "desc" }, { createdAt: "asc" }];
+                      select: {
+                        id: true;
+                        title: true;
+                        sku: true;
+                        isDefault: true;
+                        price: true;
+                        inventory: {
+                          select: {
+                            id: true;
+                            quantity: true;
+                            reserved: true;
+                            safetyStock: true;
+                          };
+                        };
+                      };
+                    };
+                  };
+                };
+              };
+            };
+          };
+        };
+      };
+    };
   };
 }>;
+
+type OrderDealProductRow = OrderCart["dealItems"][number]["deal"]["products"][number];
 
 type OrderLookup = Prisma.OrderGetPayload<{
   include: {
@@ -136,6 +184,68 @@ async function resolveCartForOrder(
     );
   }
 
+  const orderCartInclude = {
+    items: {
+      orderBy: {
+        createdAt: "asc",
+      },
+      include: {
+        productVariant: {
+          include: {
+            inventory: true,
+            product: true,
+          },
+        },
+      },
+    },
+    dealItems: {
+      orderBy: {
+        createdAt: "asc",
+      },
+      include: {
+        deal: {
+          include: {
+            products: {
+              orderBy: {
+                position: "asc",
+              },
+              select: {
+                productVariantId: true,
+                quantity: true,
+                product: {
+                  select: {
+                    id: true,
+                    name: true,
+                    slug: true,
+                    status: true,
+                    variants: {
+                      orderBy: [{ isDefault: "desc" }, { createdAt: "asc" }],
+                      select: {
+                        id: true,
+                        title: true,
+                        sku: true,
+                        isDefault: true,
+                        price: true,
+                        inventory: {
+                          select: {
+                            id: true,
+                            quantity: true,
+                            reserved: true,
+                            safetyStock: true,
+                          },
+                        },
+                      },
+                    },
+                  },
+                },
+              },
+            },
+          },
+        },
+      },
+    },
+  } satisfies Prisma.CartInclude;
+
   let cart: OrderCart | null;
 
   if (input.context.userId) {
@@ -147,21 +257,7 @@ async function resolveCartForOrder(
       orderBy: {
         updatedAt: "desc",
       },
-      include: {
-        items: {
-          orderBy: {
-            createdAt: "asc",
-          },
-          include: {
-            productVariant: {
-              include: {
-                inventory: true,
-                product: true,
-              },
-            },
-          },
-        },
-      },
+      include: orderCartInclude,
     });
   } else {
     if (!input.context.guestToken) {
@@ -180,25 +276,11 @@ async function resolveCartForOrder(
       orderBy: {
         updatedAt: "desc",
       },
-      include: {
-        items: {
-          orderBy: {
-            createdAt: "asc",
-          },
-          include: {
-            productVariant: {
-              include: {
-                inventory: true,
-                product: true,
-              },
-            },
-          },
-        },
-      },
+      include: orderCartInclude,
     });
   }
 
-  if (!cart || cart.items.length === 0) {
+  if (!cart || (cart.items.length === 0 && cart.dealItems.length === 0)) {
     throw new AppError("Checkout requested with empty cart.", "CHECKOUT_CART_EMPTY", {
       statusCode: 400,
       userMessage: "Your cart is empty. Add products before checkout.",
@@ -215,22 +297,113 @@ async function resolveCartForOrder(
   return cart;
 }
 
-async function decrementInventoryForOrder(cart: OrderCart, transaction: DatabaseExecutor) {
+/**
+ * Resolves the effective variant for a deal's included product at order time
+ * (linked variant, else the product's default/first variant).
+ */
+function resolveOrderDealVariant(row: OrderDealProductRow) {
+  const linkedVariantId = row.productVariantId ?? null;
+  const defaultVariant =
+    row.product.variants.find((variant) => variant.isDefault) ?? row.product.variants[0] ?? null;
+
+  if (linkedVariantId) {
+    return row.product.variants.find((variant) => variant.id === linkedVariantId) ?? defaultVariant;
+  }
+
+  return defaultVariant;
+}
+
+type OrderLine = {
+  productId: string;
+  productName: string;
+  variantTitle: string | null;
+  sku: string | null;
+  unitPrice: number;
+  quantity: number;
+  inventory: { id: string; quantity: number; reserved: number; safetyStock: number } | null;
+};
+
+/**
+ * Expands a cart into order lines. Regular product lines map 1:1. Deal bundle
+ * lines expand into one order line per included product (quantity = deal line
+ * quantity × per-deal product quantity, unit price = the product's current
+ * variant price). Returns:
+ * - `subtotal`: product snapshot subtotal + deal snapshot subtotal (the amount
+ *   the customer actually pays before shipping).
+ * - `discount`: the difference between the expanded deal "regular" value and
+ *   the deal snapshot subtotal, so order math stays consistent.
+ */
+function buildOrderLinesFromCart(cart: OrderCart) {
+  const lines: OrderLine[] = [];
+  let productSubtotal = 0;
+  let dealSubtotal = 0;
+  let dealRegularValue = 0;
+
   for (const item of cart.items) {
-    const inventory = item.productVariant.inventory;
+    lines.push({
+      productId: item.productVariant.productId,
+      productName: item.productVariant.product.name,
+      variantTitle: item.productVariant.title,
+      sku: item.productVariant.sku,
+      unitPrice: item.unitPrice,
+      quantity: item.quantity,
+      inventory: item.productVariant.inventory,
+    });
+    productSubtotal += item.unitPrice * item.quantity;
+  }
+
+  for (const dealItem of cart.dealItems) {
+    dealSubtotal += dealItem.unitPrice * dealItem.quantity;
+
+    for (const row of dealItem.deal.products) {
+      if (row.product.status !== "PUBLISHED") {
+        continue;
+      }
+
+      const variant = resolveOrderDealVariant(row);
+      if (!variant) {
+        continue;
+      }
+
+      const quantity = dealItem.quantity * row.quantity;
+      lines.push({
+        productId: row.product.id,
+        productName: row.product.name,
+        variantTitle: variant.title,
+        sku: variant.sku,
+        unitPrice: variant.price,
+        quantity,
+        inventory: variant.inventory,
+      });
+      dealRegularValue += variant.price * quantity;
+    }
+  }
+
+  const discount = Math.max(0, dealRegularValue - dealSubtotal);
+
+  return {
+    lines,
+    subtotal: productSubtotal + dealSubtotal,
+    discount,
+  };
+}
+
+async function decrementInventoryForOrder(lines: OrderLine[], transaction: DatabaseExecutor) {
+  for (const line of lines) {
+    const inventory = line.inventory;
 
     if (!inventory) {
       continue;
     }
 
     const availableQuantity = getAvailableInventoryQuantity(inventory);
-    if (availableQuantity < item.quantity) {
+    if (availableQuantity < line.quantity) {
       throw new AppError(
-        `Order placement blocked by stock for SKU ${item.productVariant.sku ?? item.productVariant.id}.`,
+        `Order placement blocked by stock for SKU ${line.sku ?? line.productId}.`,
         "ORDER_STOCK_INSUFFICIENT",
         {
           statusCode: 409,
-          userMessage: `${item.productVariant.product.name} no longer has enough stock. Please update your cart and try again.`,
+          userMessage: `${line.productName} no longer has enough stock. Please update your cart and try again.`,
         },
       );
     }
@@ -241,23 +414,23 @@ async function decrementInventoryForOrder(cart: OrderCart, transaction: Database
         reserved: inventory.reserved,
         safetyStock: inventory.safetyStock,
         quantity: {
-          gte: item.quantity + inventory.reserved + inventory.safetyStock,
+          gte: line.quantity + inventory.reserved + inventory.safetyStock,
         },
       },
       data: {
         quantity: {
-          decrement: item.quantity,
+          decrement: line.quantity,
         },
       },
     });
 
     if (updateResult.count !== 1) {
       throw new AppError(
-        `Inventory update lost race for SKU ${item.productVariant.sku ?? item.productVariant.id}.`,
+        `Inventory update lost race for SKU ${line.sku ?? line.productId}.`,
         "ORDER_STOCK_CONFLICT",
         {
           statusCode: 409,
-          userMessage: `${item.productVariant.product.name} changed while your order was being placed. Please retry checkout.`,
+          userMessage: `${line.productName} changed while your order was being placed. Please retry checkout.`,
         },
       );
     }
@@ -546,14 +719,13 @@ export async function placeOrderFromCheckout(input: PlaceOrderInput): Promise<Pl
       const result = await runWithTransaction(
         async (transaction) => {
           const cart = await resolveCartForOrder(input, transaction);
-          totalQuantity = cart.items.reduce((sum, item) => sum + item.quantity, 0);
-          const totals = calculateCheckoutTotals(
-            cart.items.reduce((sum, item) => sum + item.quantity * item.unitPrice, 0),
-          );
+          const { lines, subtotal, discount } = buildOrderLinesFromCart(cart);
+          totalQuantity = lines.reduce((sum, line) => sum + line.quantity, 0);
+          const totals = calculateCheckoutTotals(subtotal);
 
           // Decrement inventory BEFORE payment authorization to avoid orphaned authorizations
           // If inventory decrement fails, payment won't be authorized
-          await decrementInventoryForOrder(cart, transaction);
+          await decrementInventoryForOrder(lines, transaction);
 
           const paymentProvider = getCheckoutPaymentProvider(input.payload.paymentMethod);
           const payment = paymentProvider.authorize({
@@ -586,7 +758,7 @@ export async function placeOrderFromCheckout(input: PlaceOrderInput): Promise<Pl
               subtotal: totals.subtotal,
               shipping: totals.shipping,
               tax: 0,
-              discount: 0,
+              discount,
               total: totals.total,
               paymentMethod: input.payload.paymentMethod,
               paymentProvider: payment.provider,
@@ -598,18 +770,18 @@ export async function placeOrderFromCheckout(input: PlaceOrderInput): Promise<Pl
                 confirmationAccessToken,
                 invoiceNumber,
                 cartId: cart.id,
-                itemCount: cart.items.length,
+                itemCount: lines.length,
                 notes: input.payload.notes ?? null,
               },
               items: {
-                create: cart.items.map((item) => ({
-                  productId: item.productVariant.productId,
-                  productName: item.productVariant.product.name,
-                  variantTitle: item.productVariant.title,
-                  sku: item.productVariant.sku,
-                  unitPrice: item.unitPrice,
-                  quantity: item.quantity,
-                  subtotal: item.quantity * item.unitPrice,
+                create: lines.map((line) => ({
+                  productId: line.productId,
+                  productName: line.productName,
+                  variantTitle: line.variantTitle,
+                  sku: line.sku,
+                  unitPrice: line.unitPrice,
+                  quantity: line.quantity,
+                  subtotal: line.quantity * line.unitPrice,
                   tax: 0,
                 })),
               },
