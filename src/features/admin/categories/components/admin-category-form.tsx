@@ -41,6 +41,7 @@ function buildCategoryFormData(values: AdminCategoryFormValues, input: { returnT
   formData.set("seoOgTitle", values.seoOgTitle ?? "");
   formData.set("seoOgDescription", values.seoOgDescription ?? "");
   formData.set("seoImageUrl", values.seoImageUrl ?? "");
+  formData.set("seoKeywords", values.seoKeywords ?? "");
   formData.set("seoSchemaNotes", values.seoSchemaNotes ?? "");
 
   if (values.seoNoIndex) {
@@ -72,6 +73,7 @@ export function AdminCategoryForm({
       seoOgTitle: initialValues?.seoOgTitle ?? "",
       seoOgDescription: initialValues?.seoOgDescription ?? "",
       seoImageUrl: initialValues?.seoImageUrl ?? "",
+      seoKeywords: initialValues?.seoKeywords ?? "",
       seoNoIndex: initialValues?.seoNoIndex ?? false,
       seoSchemaNotes: initialValues?.seoSchemaNotes ?? "",
     },
@@ -180,6 +182,7 @@ export function AdminCategoryForm({
         seoCanonicalUrlField="seoCanonicalUrl"
         seoOgTitleField="seoOgTitle"
         seoOgDescriptionField="seoOgDescription"
+        seoKeywordsField="seoKeywords"
         seoImageUrlField="seoImageUrl"
         seoNoIndexField="seoNoIndex"
         seoSchemaNotesField="seoSchemaNotes"

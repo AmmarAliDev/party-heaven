@@ -63,6 +63,7 @@ function readBlogPayload(formData: FormData) {
     seoOgTitle: `${formData.get("seoOgTitle") ?? ""}`,
     seoOgDescription: `${formData.get("seoOgDescription") ?? ""}`,
     seoImageUrl: `${formData.get("seoImageUrl") ?? ""}`,
+    seoKeywords: `${formData.get("seoKeywords") ?? ""}`,
     seoNoIndex: formData.get("seoNoIndex") !== null,
     seoSchemaNotes: `${formData.get("seoSchemaNotes") ?? ""}`,
   };

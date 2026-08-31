@@ -58,6 +58,7 @@ export async function generateMetadata({ params }: BlogPostPageProps): Promise<M
         ? { openGraphDescription: metadataInput.openGraphDescription }
         : {}),
       ...(metadataInput.openGraphImage ? { openGraphImage: metadataInput.openGraphImage } : {}),
+      ...(metadataInput.keywords ? { keywords: metadataInput.keywords } : {}),
       ...(typeof metadataInput.noIndex === "boolean" ? { noIndex: metadataInput.noIndex } : {}),
     });
   } catch {

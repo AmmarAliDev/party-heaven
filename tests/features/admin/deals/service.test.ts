@@ -141,6 +141,7 @@ function buildDealFormInput(overrides: Partial<AdminDealCreateInput> = {}): Admi
     seoOgTitle: undefined,
     seoOgDescription: undefined,
     seoImageUrl: undefined,
+    seoKeywords: undefined,
     seoNoIndex: false,
     seoSchemaNotes: undefined,
     ...overrides,

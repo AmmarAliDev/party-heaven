@@ -87,6 +87,7 @@ function buildDefaultValues(categories: AdminProductCategoryOption[], product?: 
       seoOgTitle: "",
       seoOgDescription: "",
       seoImageUrl: "",
+      seoKeywords: "",
       seoNoIndex: false,
       seoSchemaNotes: "",
     };
@@ -131,6 +132,7 @@ function buildDefaultValues(categories: AdminProductCategoryOption[], product?: 
     seoOgTitle: product.seoOgTitle,
     seoOgDescription: product.seoOgDescription,
     seoImageUrl: product.seoImageUrl,
+    seoKeywords: product.seoKeywords,
     seoNoIndex: product.seoNoIndex,
     seoSchemaNotes: product.seoSchemaNotes,
   };
@@ -193,6 +195,7 @@ function buildProductFormData(values: AdminProductFormValues, input: { returnTo:
   formData.set("seoOgTitle", values.seoOgTitle ?? "");
   formData.set("seoOgDescription", values.seoOgDescription ?? "");
   formData.set("seoImageUrl", values.seoImageUrl ?? "");
+  formData.set("seoKeywords", values.seoKeywords ?? "");
   formData.set("seoSchemaNotes", values.seoSchemaNotes ?? "");
 
   if (values.seoNoIndex) {
@@ -840,6 +843,7 @@ export function AdminProductForm({ mode, action, returnTo, submitLabel, categori
           seoCanonicalUrlField="seoCanonicalUrl"
           seoOgTitleField="seoOgTitle"
           seoOgDescriptionField="seoOgDescription"
+          seoKeywordsField="seoKeywords"
           seoImageUrlField="seoImageUrl"
           seoNoIndexField="seoNoIndex"
           seoSchemaNotesField="seoSchemaNotes"

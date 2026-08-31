@@ -107,6 +107,7 @@ export type AdminDealFormRecord = {
   seoOgTitle: string;
   seoOgDescription: string;
   seoImageUrl: string;
+  seoKeywords: string;
   seoNoIndex: boolean;
   seoSchemaNotes: string;
   /** Available stock on the least-available included product. */
@@ -192,6 +193,7 @@ const adminDealFormSelect = {
   seoOgTitle: true,
   seoOgDescription: true,
   seoImageUrl: true,
+  seoKeywords: true,
   seoNoIndex: true,
   seoSchemaNotes: true,
   createdAt: true,
@@ -390,6 +392,7 @@ function mapAdminDealFormRecord(record: SelectedAdminDealForm): AdminDealFormRec
     seoOgTitle: record.seoOgTitle ?? "",
     seoOgDescription: record.seoOgDescription ?? "",
     seoImageUrl: record.seoImageUrl ?? "",
+    seoKeywords: record.seoKeywords ?? "",
     seoNoIndex: record.seoNoIndex ?? false,
     seoSchemaNotes: record.seoSchemaNotes ?? "",
     availableStock,
@@ -903,6 +906,7 @@ function buildDealMutationData(data: AdminDealCreateInput) {
     seoOgTitle: data.seoOgTitle ?? null,
     seoOgDescription: data.seoOgDescription ?? null,
     seoImageUrl: data.seoImageUrl ?? null,
+    seoKeywords: data.seoKeywords ?? null,
     seoNoIndex: data.seoNoIndex ?? false,
     seoSchemaNotes: data.seoSchemaNotes ?? null,
   };

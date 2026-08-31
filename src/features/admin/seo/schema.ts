@@ -6,6 +6,7 @@ export const SEO_CHARACTER_LIMITS = {
   description: 160,
   ogTitle: 95,
   ogDescription: 200,
+  keywords: 200,
   schemaNotes: 2000,
 } as const;
 
@@ -96,6 +97,10 @@ export const adminSeoFieldsSchema = z.object({
       message: "OG image must be a valid full URL or start with /.",
     })
     .transform((value) => normalizeOptionalText(value)),
+  seoKeywords: optionalTextField(
+    SEO_CHARACTER_LIMITS.keywords,
+    `Keywords must be ${SEO_CHARACTER_LIMITS.keywords} characters or fewer.`,
+  ),
   seoNoIndex: z.preprocess(parseBooleanish, z.boolean()).default(false),
   seoSchemaNotes: optionalTextField(SEO_CHARACTER_LIMITS.schemaNotes, "Schema notes must be 2000 characters or fewer."),
 });

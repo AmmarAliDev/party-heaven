@@ -63,6 +63,7 @@ export async function generateMetadata({ params }: DealPageProps): Promise<Metad
     ...(deal.seo?.ogTitle ? { openGraphTitle: deal.seo.ogTitle } : {}),
     ...(deal.seo?.ogDescription ? { openGraphDescription: deal.seo.ogDescription } : {}),
     ...(deal.seo?.imageUrl ? { openGraphImage: deal.seo.imageUrl } : {}),
+    ...(deal.seo?.keywords ? { keywords: deal.seo.keywords } : {}),
     ...(deal.seo?.noIndex ? { noIndex: true } : {}),
   });
 }

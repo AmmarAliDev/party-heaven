@@ -84,6 +84,7 @@ export type AdminProductFormRecord = {
   seoOgTitle: string;
   seoOgDescription: string;
   seoImageUrl: string;
+  seoKeywords: string;
   seoNoIndex: boolean;
   seoSchemaNotes: string;
   createdAt: Date;
@@ -126,6 +127,7 @@ const adminProductSelect = {
   seoOgTitle: true,
   seoOgDescription: true,
   seoImageUrl: true,
+  seoKeywords: true,
   seoNoIndex: true,
   seoSchemaNotes: true,
   metadata: true,
@@ -350,6 +352,7 @@ function mapAdminProduct(record: SelectedAdminProduct): AdminProductFormRecord {
     seoOgTitle: record.seoOgTitle ?? "",
     seoOgDescription: record.seoOgDescription ?? "",
     seoImageUrl: record.seoImageUrl ?? "",
+    seoKeywords: record.seoKeywords ?? "",
     seoNoIndex: record.seoNoIndex ?? false,
     seoSchemaNotes: record.seoSchemaNotes ?? "",
     createdAt: record.createdAt,
@@ -964,6 +967,7 @@ export async function createAdminProduct(input: {
           seoOgTitle: input.data.seoOgTitle ?? null,
           seoOgDescription: input.data.seoOgDescription ?? null,
           seoImageUrl: input.data.seoImageUrl ?? null,
+          seoKeywords: input.data.seoKeywords ?? null,
           seoNoIndex: input.data.seoNoIndex,
           seoSchemaNotes: input.data.seoSchemaNotes ?? null,
           metadata: {
@@ -1034,6 +1038,7 @@ export async function createAdminProduct(input: {
           seoOgTitle: input.data.seoOgTitle ?? "",
           seoOgDescription: input.data.seoOgDescription ?? "",
           seoImageUrl: input.data.seoImageUrl ?? "",
+          seoKeywords: input.data.seoKeywords ?? "",
           seoNoIndex: input.data.seoNoIndex,
           seoSchemaNotes: input.data.seoSchemaNotes ?? "",
           createdAt: new Date(),
@@ -1095,6 +1100,7 @@ export async function updateAdminProduct(input: {
           seoOgTitle: input.data.seoOgTitle ?? null,
           seoOgDescription: input.data.seoOgDescription ?? null,
           seoImageUrl: input.data.seoImageUrl ?? null,
+          seoKeywords: input.data.seoKeywords ?? null,
           seoNoIndex: input.data.seoNoIndex,
           seoSchemaNotes: input.data.seoSchemaNotes ?? null,
           metadata: {

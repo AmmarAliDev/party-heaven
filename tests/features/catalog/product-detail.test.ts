@@ -612,6 +612,14 @@ describe("product detail service", () => {
       slug: "hydra-care-face-wash",
       name: "Hydra Care Face Wash",
       shortDescription: "Gentle daily cleanser.",
+      seoTitle: null,
+      seoDescription: null,
+      seoCanonicalUrl: null,
+      seoOgTitle: null,
+      seoOgDescription: null,
+      seoImageUrl: null,
+      seoKeywords: null,
+      seoNoIndex: false,
       metadata: null,
       category: { slug: "personal-care" },
     });
@@ -622,6 +630,14 @@ describe("product detail service", () => {
       name: "Hydra Care Face Wash",
       shortDescription: "Gentle daily cleanser.",
       categorySlug: "personal-care",
+      seoTitle: null,
+      seoDescription: null,
+      seoCanonicalUrl: null,
+      seoOgTitle: null,
+      seoOgDescription: null,
+      seoImageUrl: null,
+      seoKeywords: null,
+      seoNoIndex: false,
     });
   });
 

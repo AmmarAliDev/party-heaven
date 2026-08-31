@@ -41,6 +41,12 @@ export async function generateMetadata({
     title: category.seoTitle ?? category.name,
     path: `/categories/${category.slug}`,
     description: category.seoDescription ?? category.description,
+    ...(category.seoCanonicalUrl ? { canonicalUrl: category.seoCanonicalUrl } : {}),
+    ...(category.seoOgTitle ? { openGraphTitle: category.seoOgTitle } : {}),
+    ...(category.seoOgDescription ? { openGraphDescription: category.seoOgDescription } : {}),
+    ...(category.seoImageUrl ? { openGraphImage: category.seoImageUrl } : {}),
+    ...(category.seoKeywords ? { keywords: category.seoKeywords } : {}),
+    ...(category.seoNoIndex ? { noIndex: true } : {}),
   });
 }
 

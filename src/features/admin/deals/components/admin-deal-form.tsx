@@ -65,6 +65,7 @@ function buildDefaultValues(
       seoOgTitle: undefined,
       seoOgDescription: undefined,
       seoImageUrl: undefined,
+      seoKeywords: undefined,
       seoNoIndex: false,
       seoSchemaNotes: undefined,
     };
@@ -100,6 +101,7 @@ function buildDefaultValues(
     seoOgTitle: deal.seoOgTitle || undefined,
     seoOgDescription: deal.seoOgDescription || undefined,
     seoImageUrl: deal.seoImageUrl || undefined,
+    seoKeywords: deal.seoKeywords || undefined,
     seoNoIndex: deal.seoNoIndex,
     seoSchemaNotes: deal.seoSchemaNotes || undefined,
   };
@@ -148,6 +150,7 @@ function buildDealFormData(values: AdminDealFormValues, input: { returnTo: strin
   formData.set("seoOgTitle", values.seoOgTitle ?? "");
   formData.set("seoOgDescription", values.seoOgDescription ?? "");
   formData.set("seoImageUrl", values.seoImageUrl ?? "");
+  formData.set("seoKeywords", values.seoKeywords ?? "");
   formData.set("seoSchemaNotes", values.seoSchemaNotes ?? "");
 
   if (values.seoNoIndex) {
@@ -663,6 +666,7 @@ export function AdminDealForm({ mode, action, returnTo, submitLabel, categories,
           seoCanonicalUrlField="seoCanonicalUrl"
           seoOgTitleField="seoOgTitle"
           seoOgDescriptionField="seoOgDescription"
+          seoKeywordsField="seoKeywords"
           seoImageUrlField="seoImageUrl"
           seoNoIndexField="seoNoIndex"
           seoSchemaNotesField="seoSchemaNotes"
