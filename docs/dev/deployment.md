@@ -183,6 +183,7 @@ Mark secrets as "Sensitive" (encrypted at rest, masked in logs).
 | Variable | Example | Notes |
 |---|---|---|
 | `NEXT_PUBLIC_GA_ID` | `G-XXXXXXXXXX` | Google Analytics 4. |
+| `NEXT_PUBLIC_GTM_ID` | `GTM-XXXXXXX` | Google Tag Manager container (loaded via `@next/third-parties`). |
 | `NEXT_PUBLIC_META_PIXEL_ID` | `123456789012345` | Meta Pixel. |
 
 ### Security / misc

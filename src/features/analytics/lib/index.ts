@@ -1,9 +1,10 @@
+import { sendGTMEvent } from "@next/third-parties/google";
+
 import type { AnalyticsEvent, ProductInfo } from '../types';
 
 declare global {
   interface Window {
     gtag?: (...args: unknown[]) => void;
-    dataLayer?: unknown[];
     fbq?: (...args: unknown[]) => void;
   }
 }
@@ -23,7 +24,8 @@ const mapToG4Items = (items: ProductInfo[]) => {
 };
 
 /**
- * Track an analytics event dispatching to all configured providers (GA4, Meta).
+ * Track an analytics event dispatching to all configured providers
+ * (Google Tag Manager via sendGTMEvent, GA4, Meta).
  * Fails gracefully and silently if providers are not loaded (e.g., ad blocker, disabled).
  */
 export const trackEvent = (event: AnalyticsEvent) => {
@@ -36,6 +38,11 @@ export const trackEvent = (event: AnalyticsEvent) => {
             page_title: event.payload.title,
           });
         }
+        sendGTMEvent({
+          event: 'page_view',
+          page_location: event.payload.url,
+          page_title: event.payload.title,
+        });
         if (typeof window.fbq === 'function') {
           window.fbq('track', 'PageView');
         }
@@ -49,6 +56,14 @@ export const trackEvent = (event: AnalyticsEvent) => {
             items: mapToG4Items([event.payload.product]),
           });
         }
+        sendGTMEvent({
+          event: 'view_item',
+          ecommerce: {
+            currency: event.payload.product.currency || 'PKR',
+            value: event.payload.product.price,
+            items: mapToG4Items([event.payload.product]),
+          },
+        });
         if (typeof window.fbq === 'function') {
           window.fbq('track', 'ViewContent', {
             content_type: 'product',
@@ -68,6 +83,14 @@ export const trackEvent = (event: AnalyticsEvent) => {
             items: mapToG4Items([event.payload.product]),
           });
         }
+        sendGTMEvent({
+          event: 'add_to_cart',
+          ecommerce: {
+            currency: event.payload.currency || 'PKR',
+            value: event.payload.value,
+            items: mapToG4Items([event.payload.product]),
+          },
+        });
         if (typeof window.fbq === 'function') {
           window.fbq('track', 'AddToCart', {
             content_type: 'product',
@@ -85,6 +108,14 @@ export const trackEvent = (event: AnalyticsEvent) => {
             items: mapToG4Items(event.payload.items),
           });
         }
+        sendGTMEvent({
+          event: 'begin_checkout',
+          ecommerce: {
+            currency: event.payload.currency,
+            value: event.payload.value,
+            items: mapToG4Items(event.payload.items),
+          },
+        });
         if (typeof window.fbq === 'function') {
           window.fbq('track', 'InitiateCheckout', {
             content_ids: event.payload.items.map(i => i.id),
@@ -106,6 +137,17 @@ export const trackEvent = (event: AnalyticsEvent) => {
             items: mapToG4Items(event.payload.items),
           });
         }
+        sendGTMEvent({
+          event: 'purchase',
+          ecommerce: {
+            transaction_id: event.payload.transactionId,
+            currency: event.payload.currency,
+            value: event.payload.value,
+            tax: event.payload.tax,
+            shipping: event.payload.shipping,
+            items: mapToG4Items(event.payload.items),
+          },
+        });
         if (typeof window.fbq === 'function') {
           window.fbq('track', 'Purchase', {
             content_type: 'product',

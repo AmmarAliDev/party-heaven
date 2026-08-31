@@ -12,6 +12,7 @@ import { PriceDisplay } from "@/components/ui/price-display";
 import { SectionHeader } from "@/components/ui/section-header";
 import { buildMetadata } from "@/config/metadata";
 import { routes } from "@/config/routes";
+import { PurchaseTracker } from "@/features/analytics/components/purchase-tracker";
 import {
   buildOrderInvoiceUrl,
   formatOrderStatusLabel,
@@ -62,6 +63,19 @@ export default async function OrderConfirmationPage({
 
   return (
     <PageShell className="gap-8" data-testid={testIds.storefront.checkoutConfirmation}>
+      <PurchaseTracker
+        transactionId={order.orderNumber}
+        items={order.items.map((item) => ({
+          id: item.sku ?? item.productName,
+          name: item.productName,
+          price: item.unitPrice,
+          quantity: item.quantity,
+        }))}
+        value={order.total}
+        currency="PKR"
+        tax={0}
+        shipping={order.shipping}
+      />
       <SectionHeader
         eyebrow="Order confirmed"
         title={`Order ${order.orderNumber}`}

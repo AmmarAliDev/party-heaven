@@ -4,6 +4,7 @@ import { useState } from "react";
 import { ShoppingCart } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
+import { trackEvent } from "@/features/analytics/lib";
 import { openCartDrawer } from "@/features/cart/cart-drawer-state";
 import { dispatchCartChanged } from "@/features/cart/client-events";
 import type { CartSummary } from "@/features/cart/types";
@@ -76,6 +77,23 @@ export function ProductCardAddToCart({
 
       dispatchCartChanged(payload.cart ?? null);
       openCartDrawer();
+
+      const addedItem = payload.cart?.items.find((item) => item.productSlug === productSlug);
+
+      trackEvent({
+        type: 'ADD_TO_CART',
+        payload: {
+          product: {
+            id: addedItem?.id ?? productSlug,
+            name: addedItem?.productName ?? productName,
+            price: addedItem?.unitPrice ?? 0,
+            quantity: addedItem?.quantity ?? 1,
+            ...(addedItem?.categorySlug ? { category: addedItem.categorySlug } : {}),
+          },
+          value: addedItem?.lineSubtotal ?? 0,
+          currency: 'PKR',
+        },
+      });
     } catch (error) {
       notify.error("Could not add to cart", toUserMessage(error));
     } finally {

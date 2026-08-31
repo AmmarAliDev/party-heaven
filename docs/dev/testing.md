@@ -101,7 +101,7 @@ Lightweight import-level checks that verify public API contracts without mocking
 
 #### Analytics
 
-`analytics.test.ts` — `trackEvent` for `PAGE_VIEW`, `PRODUCT_VIEW`, `ADD_TO_CART` (jsdom, stubs `window.gtag`/`window.fbq`).
+Analytics events (`trackEvent` for `PAGE_VIEW`, `PRODUCT_VIEW`, `ADD_TO_CART`, `BEGIN_CHECKOUT`, `PURCHASE`) are dispatched to GA4, GTM (`sendGTMEvent`), and Meta Pixel. No unit tests are maintained for the event dispatcher itself.
 
 #### Auth
 

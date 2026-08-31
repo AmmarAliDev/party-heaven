@@ -47,10 +47,10 @@ Included headers:
 
 ### CSP analytics allowlist
 
-Google Analytics 4 loading is enforced through a narrow CSP source allowlist in `src/config/security.ts`:
+Google Analytics 4 and Google Tag Manager loading are enforced through a narrow CSP source allowlist in `src/config/security.ts`:
 
-- `script-src` includes `https://www.googletagmanager.com` only when `NEXT_PUBLIC_GA_ID` is configured.
-- If `NEXT_PUBLIC_GA_ID` is empty or unset, the GA script source is omitted from CSP.
+- `script-src` includes `https://www.googletagmanager.com` only when `NEXT_PUBLIC_GA_ID` or `NEXT_PUBLIC_GTM_ID` is configured.
+- If both env vars are empty or unset, the Google script source is omitted from CSP.
 - No wildcard analytics domains were added to `script-src`.
 
 Why this matters:
