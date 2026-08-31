@@ -59,7 +59,6 @@ export function FeaturedProductsSectionBlock({ section }: FeaturedProductsSectio
                       <Link
                         href={product.href}
                         className="focus-visible:ring-ring block h-full rounded-lg focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:outline-none"
-                        aria-label={`View ${product.name}`}
                       >
                         <Card className="h-full transition-transform duration-200 group-hover:-translate-y-0.5">
                           <CardHeader className="space-y-1 p-0">

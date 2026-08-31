@@ -15,6 +15,9 @@
 /playwright-report
 /test-results
 
+# lighthouse audit output
+/lighthouse-report.json
+
 # next.js
 /.next/
 /out/

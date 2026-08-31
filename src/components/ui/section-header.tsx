@@ -39,7 +39,7 @@ export function SectionHeader({
             </TitleTag>
             {actions ? <div className="flex shrink-0 flex-wrap gap-2 justify-end">{actions}</div> : null}
           </div>
-          {description ? <p className="text-primary text-sm sm:text-base">{description}</p> : null}
+          {description ? <p className="text-primary-strong text-sm sm:text-base">{description}</p> : null}
         </div>
       </div>
 

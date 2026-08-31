@@ -1,5 +1,3 @@
-import { ZodError } from "zod";
-
 import { AppError } from "./app-error";
 
 const DEFAULT_ERROR_MESSAGE = "Something went wrong on our side. Please try again in a moment.";
@@ -23,6 +21,25 @@ function dedupeMessages(messages: string[]) {
   return [...new Set(messages.map((message) => message.trim()).filter(Boolean))];
 }
 
+/**
+ * Structural check for Zod 4 errors.
+ *
+ * Deliberately avoids importing `zod` here: `error-messages.ts` is pulled into
+ * client bundles (cart drawer, forms), and bundling zod on the client adds a
+ * large chunk of JS and triggers zod 4's internal `Function("")` CSP probe
+ * (a harmless-but-noisy Content-Security-Policy violation). Real zod errors
+ * always expose `name === "ZodError"` plus an `issues` array, so this matches
+ * both live instances and server-serialized errors.
+ */
+function isZodError(input: unknown): input is { issues: Array<{ message: string }> } {
+  if (typeof input !== "object" || input === null) {
+    return false;
+  }
+
+  const record = input as { name?: unknown; issues?: unknown };
+  return record.name === "ZodError" && Array.isArray(record.issues);
+}
+
 function collectFormMessages(input: unknown): string[] {
   if (!input) {
     return [];
@@ -36,7 +53,7 @@ function collectFormMessages(input: unknown): string[] {
     return [toUserMessage(input)];
   }
 
-  if (input instanceof ZodError) {
+  if (isZodError(input)) {
     return input.issues.map((issue) => issue.message);
   }
 
@@ -93,7 +110,7 @@ export function toUserMessage(error: unknown) {
     }
   }
 
-  if (error instanceof ZodError) {
+  if (isZodError(error)) {
     return VALIDATION_ERROR_MESSAGE;
   }
 

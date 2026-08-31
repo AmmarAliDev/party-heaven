@@ -17,7 +17,7 @@ export function BlogPostCard({ post }: BlogPostCardProps) {
   return (
     <article>
       <Card className="overflow-hidden">
-        <Link href={blogPostHref} className="group block" aria-label={`Read article: ${post.title}`}>
+        <Link href={blogPostHref} className="group block">
           <Image
             src={post.coverImage.src}
             alt={post.coverImage.alt}

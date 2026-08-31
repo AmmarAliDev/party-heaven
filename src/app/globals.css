@@ -23,6 +23,8 @@
 
   --primary: #b88a24;
   --primary-foreground: #ffffff;
+  /* Accessible darker gold for text on light backgrounds (4.5:1+ on white). */
+  --primary-strong: #8a641a;
 
   --secondary: #eee9dd;
   --secondary-foreground: #171717;
@@ -32,6 +34,8 @@
   --placeholder: #17171769;
 
   --success: #15803d;
+  /* Accessible darker green for small text on light backgrounds (4.5:1+). */
+  --success-strong: #166534;
   --warning: #b45309;
   --destructive: #dc2626;
   --info: #2563eb;
@@ -62,12 +66,14 @@
   --color-accent-foreground: var(--accent-foreground);
   --color-primary: var(--primary);
   --color-primary-foreground: var(--primary-foreground);
+  --color-primary-strong: var(--primary-strong);
   --color-secondary: var(--secondary);
   --color-secondary-foreground: var(--secondary-foreground);
   --color-border: var(--border);
   --color-input: var(--input);
   --color-ring: var(--ring);
   --color-success: var(--success);
+  --color-success-strong: var(--success-strong);
   --color-warning: var(--warning);
   --color-destructive: var(--destructive);
   --color-info: var(--info);
