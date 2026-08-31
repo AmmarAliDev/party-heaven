@@ -1,0 +1,11 @@
+-- Fix missing seo_keywords on blog_post
+--
+-- The 20260831120000_seo_keywords migration referenced the table as
+-- "BlogPost", but the BlogPost model maps to the physical table
+-- "blog_post" (see schema.prisma: @@map("blog_post")). Because that
+-- migration used "ALTER TABLE IF EXISTS", PostgreSQL silently skipped the
+-- non-existent table and the column was never added to blog_post.
+--
+-- This follow-up is idempotent (ADD COLUMN IF NOT EXISTS) and safe to run
+-- whether or not the column already exists in a given environment.
+ALTER TABLE "blog_post" ADD COLUMN IF NOT EXISTS seo_keywords text;
