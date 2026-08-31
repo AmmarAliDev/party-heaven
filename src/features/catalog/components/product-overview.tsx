@@ -1,7 +1,8 @@
 "use client";
 
-import { useCallback, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 
+import { trackEvent } from "@/features/analytics/lib";
 import { testIds } from "@/lib/test-selectors";
 
 import {
@@ -33,6 +34,24 @@ export function ProductOverview({ product }: ProductOverviewProps) {
 
   const activeVariant = resolveActiveOption(product, selectedOptionIds);
   const activeVariantId = activeVariant?.id;
+
+  // Fire the GTM/GA4 "view_item" event once per product page view.
+  useEffect(() => {
+    trackEvent({
+      type: 'PRODUCT_VIEW',
+      payload: {
+        product: {
+          id: product.id,
+          name: product.name,
+          price: activeVariant?.price ?? product.price,
+          category: product.categorySlug,
+          quantity: 1,
+        },
+      },
+    });
+    // Re-fire only when the underlying product changes (SPA navigation).
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [product.id]);
 
   const handleSelectVariant = useCallback(
     (variantId: string) => {

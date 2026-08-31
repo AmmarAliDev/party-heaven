@@ -336,7 +336,8 @@ Create a scalable foundation for a single-vendor e-commerce app using one shared
 
 - Client analytics wiring is centralized in `src/features/analytics/components/analytics-provider.tsx` and mounted once in `src/app/layout.tsx`.
 - GA4 script loading uses the standard gtag loader (`https://www.googletagmanager.com/gtag/js?id=...`) and is enabled only when `NEXT_PUBLIC_GA_ID` is present.
-- CSP generation in `src/config/security.ts` keeps analytics script policy narrow by adding `https://www.googletagmanager.com` to `script-src` only when GA is configured.
+- Google Tag Manager is loaded via `@next/third-parties` (`GoogleTagManager` in the root layout) when `NEXT_PUBLIC_GTM_ID` is set; `trackEvent` dispatches every analytics event to GTM through `sendGTMEvent`.
+- CSP generation in `src/config/security.ts` keeps analytics script policy narrow by adding `https://www.googletagmanager.com` to `script-src` only when GA or GTM is configured.
 - This avoids broad script-source weakening while keeping analytics opt-in per environment.
 
 ## Admin Dashboard Metrics Strategy

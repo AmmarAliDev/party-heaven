@@ -7,7 +7,6 @@ type SecurityHeader = {
 
 const LOCAL_DEV_ORIGINS = ["http://localhost:3000", "http://127.0.0.1:3000"] as const;
 const GA_SCRIPT_SOURCES = ["https://www.googletagmanager.com"] as const;
-
 function normalizeOrigin(value: string | undefined | null): string | null {
   if (!value) {
     return null;
@@ -36,8 +35,8 @@ function buildDirective(name: string, values: Array<string | undefined | null>):
   return `${name} ${tokens.join(" ")}`.trim();
 }
 
-function hasGoogleAnalyticsConfig(rawEnv: EnvSource): boolean {
-  return Boolean(rawEnv.NEXT_PUBLIC_GA_ID?.trim());
+function hasGoogleTaggingConfig(rawEnv: EnvSource): boolean {
+  return Boolean(rawEnv.NEXT_PUBLIC_GA_ID?.trim() || rawEnv.NEXT_PUBLIC_GTM_ID?.trim());
 }
 
 export function getTrustedOrigins(rawEnv: EnvSource = process.env): string[] {
@@ -74,15 +73,15 @@ export function getServerActionAllowedOrigins(rawEnv: EnvSource = process.env): 
 export function buildContentSecurityPolicy(rawEnv: EnvSource = process.env): string {
   const isDevelopment = rawEnv.NODE_ENV !== "production";
   const trustedOrigins = getTrustedOrigins(rawEnv);
-  const isGoogleAnalyticsEnabled = hasGoogleAnalyticsConfig(rawEnv);
+  const isGoogleTaggingEnabled = hasGoogleTaggingConfig(rawEnv);
 
   const directives = [
     "default-src 'self'",
     buildDirective("script-src", [
       "'self'",
       "'unsafe-inline'",
-      // Allow GA4 loader script only when GA is configured.
-      ...(isGoogleAnalyticsEnabled ? GA_SCRIPT_SOURCES : []),
+      // Allow Google Tag Manager loader script only when GA or GTM is configured.
+      ...(isGoogleTaggingEnabled ? GA_SCRIPT_SOURCES : []),
       isDevelopment ? "'unsafe-eval'" : undefined,
     ]),
     buildDirective("style-src", ["'self'", "'unsafe-inline'"]),

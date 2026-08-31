@@ -1,8 +1,10 @@
 import { Geist, Geist_Mono } from "next/font/google";
+import { GoogleTagManager } from "@next/third-parties/google";
 import type { ReactNode } from "react";
 
 import { AppToaster } from "@/components/providers/app-toaster";
 import { AuthProvider } from "@/components/providers/auth-provider";
+import { env } from "@/config/env";
 import { buildMetadata } from "@/config/metadata";
 import { appViewport } from "@/config/viewport";
 import { AnalyticsProvider } from "@/features/analytics/components/analytics-provider";
@@ -25,6 +27,7 @@ export const viewport = appViewport;
 export default function RootLayout({ children }: Readonly<{ children: ReactNode }>) {
   return (
     <html lang="en" data-scroll-behavior="smooth" className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}>
+      {env.gtmId ? <GoogleTagManager gtmId={env.gtmId} /> : null}
       <body className="bg-background text-foreground min-h-full font-sans antialiased">
         <AuthProvider>
           {children}

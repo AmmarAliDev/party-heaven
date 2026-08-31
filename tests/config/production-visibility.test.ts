@@ -18,6 +18,7 @@ const baseRuntimeEnv = {
   enableAdminPreview: true,
   enableAuthPreview: true,
   gaId: undefined,
+  gtmId: undefined,
   metaPixelId: undefined,
 } as const;
 

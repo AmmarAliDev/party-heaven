@@ -48,6 +48,7 @@ export const publicEnvSchema = z.object({
   NEXT_PUBLIC_ENABLE_ADMIN: booleanFromEnv(true),
   NEXT_PUBLIC_ENABLE_AUTH: booleanFromEnv(true),
   NEXT_PUBLIC_GA_ID: z.string().trim().optional(),
+  NEXT_PUBLIC_GTM_ID: z.string().trim().optional(),
   NEXT_PUBLIC_META_PIXEL_ID: z.string().trim().optional(),
 });
 
@@ -208,6 +209,7 @@ export type RuntimeEnv = Readonly<{
   enableAdminPreview: PublicEnvValues["NEXT_PUBLIC_ENABLE_ADMIN"];
   enableAuthPreview: PublicEnvValues["NEXT_PUBLIC_ENABLE_AUTH"];
   gaId: PublicEnvValues["NEXT_PUBLIC_GA_ID"];
+  gtmId: PublicEnvValues["NEXT_PUBLIC_GTM_ID"];
   metaPixelId: PublicEnvValues["NEXT_PUBLIC_META_PIXEL_ID"];
 }>;
 
@@ -238,6 +240,7 @@ export function loadRuntimeEnv(rawEnv: EnvSource = process.env): RuntimeEnv {
     NEXT_PUBLIC_ENABLE_ADMIN,
     NEXT_PUBLIC_ENABLE_AUTH,
     NEXT_PUBLIC_GA_ID,
+    NEXT_PUBLIC_GTM_ID,
     NEXT_PUBLIC_META_PIXEL_ID,
   } = result.data;
 
@@ -248,6 +251,7 @@ export function loadRuntimeEnv(rawEnv: EnvSource = process.env): RuntimeEnv {
     enableAdminPreview: NEXT_PUBLIC_ENABLE_ADMIN,
     enableAuthPreview: NEXT_PUBLIC_ENABLE_AUTH,
     gaId: NEXT_PUBLIC_GA_ID,
+    gtmId: NEXT_PUBLIC_GTM_ID,
     metaPixelId: NEXT_PUBLIC_META_PIXEL_ID,
   };
 }

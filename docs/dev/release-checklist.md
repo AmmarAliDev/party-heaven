@@ -56,8 +56,9 @@ Complete this once before the first production deployment and revisit before any
 ### Analytics
 
 - [ ] GA4 Measurement ID configured (`NEXT_PUBLIC_GA_ID`)
+- [ ] GTM container ID configured (`NEXT_PUBLIC_GTM_ID`) if using Google Tag Manager
 - [ ] Meta Pixel ID configured if applicable (`NEXT_PUBLIC_META_PIXEL_ID`)
-- [ ] Test purchase event visible in GA4 DebugView
+- [ ] Test purchase event visible in GA4 DebugView / GTM Preview mode
 - [ ] Meta Pixel Helper browser extension confirms events fire correctly
 
 ### Health & Monitoring

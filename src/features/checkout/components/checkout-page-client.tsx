@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { Controller } from "react-hook-form";
@@ -25,6 +25,7 @@ import {
 } from "@/components/ui/tooltip";
 import { routes } from "@/config/routes";
 import { upsertSavedAddressRequest } from "@/features/addresses";
+import { trackEvent } from "@/features/analytics/lib";
 import type { CartSummary } from "@/features/cart/types";
 import {
   CHECKOUT_FIXED_PROVINCE,
@@ -99,6 +100,37 @@ export function CheckoutPageClient({
   const [saveAddressPending, setSaveAddressPending] = useState(false);
 
   const isPending = form.formState.isSubmitting || retryPending;
+
+  // Fire the GTM/GA4 "begin_checkout" event once when the checkout page loads
+  // with a non-empty cart.
+  useEffect(() => {
+    const items = [
+      ...cart.items.map((item) => ({
+        id: item.productSlug,
+        name: item.productName,
+        price: item.unitPrice,
+        category: item.categorySlug,
+        quantity: item.quantity,
+      })),
+      ...cart.dealItems.map((item) => ({
+        id: item.dealSlug,
+        name: item.title,
+        price: item.unitPrice,
+        quantity: item.quantity,
+      })),
+    ];
+
+    trackEvent({
+      type: 'BEGIN_CHECKOUT',
+      payload: {
+        items,
+        value: cart.subtotal,
+        currency: 'PKR',
+      },
+    });
+    // Fire once per checkout page load (cart contents are static here).
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   async function handleSaveAddress() {
     if (saveAddressPending || isPending || submitted) {
