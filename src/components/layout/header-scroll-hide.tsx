@@ -19,7 +19,7 @@ export function HeaderScrollHide({ children }: HeaderScrollHideProps) {
   return (
     <header
       className={cn(
-        "border-border/70 bg-background-header-footer/95 sticky top-0 z-40 border-b backdrop-blur",
+        "flex justify-center border-border/70 bg-background-header-footer/95 sticky top-0 z-40 border-b backdrop-blur",
         "transition-transform duration-600 ease-in-out motion-reduce:transition-none",
         hidden ? "-translate-y-full" : "translate-y-0",
       )}

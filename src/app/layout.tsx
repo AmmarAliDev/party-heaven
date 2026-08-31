@@ -26,7 +26,12 @@ export const viewport = appViewport;
 
 export default function RootLayout({ children }: Readonly<{ children: ReactNode }>) {
   return (
-    <html lang="en" data-scroll-behavior="smooth" className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}>
+    <html
+      lang="en"
+      data-scroll-behavior="smooth"
+      className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
+      suppressHydrationWarning
+    >
       {env.gtmId ? <GoogleTagManager gtmId={env.gtmId} /> : null}
       <body className="bg-background text-foreground min-h-full font-sans antialiased">
         <AuthProvider>

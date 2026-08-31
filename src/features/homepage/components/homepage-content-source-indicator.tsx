@@ -17,7 +17,9 @@ export function HomepageContentSourceIndicator({ source }: HomepageContentSource
 
   return (
     <PageContainer as="section" className="pt-6">
-      <Badge variant="outline">Using fallback homepage content until CMS data is available.</Badge>
+      <Badge variant="outline" className="max-w-full whitespace-normal text-left">
+        Using fallback homepage content until CMS data is available.
+      </Badge>
     </PageContainer>
   );
 }
