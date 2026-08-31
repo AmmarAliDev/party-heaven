@@ -42,7 +42,7 @@ export async function AppFooter() {
   );
 
   return (
-    <footer className="border-border/70 bg-background-header-footer border-t pb-24 text-footer-text md:pb-0">
+    <footer className="flex justify-center border-border/70 bg-background-header-footer border-t pb-24 text-footer-text md:pb-0">
       <PageContainer>
         <div className="grid gap-0 py-8 md:grid-cols-4 md:gap-8">
           <FooterColumn

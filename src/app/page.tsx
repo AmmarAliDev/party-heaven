@@ -20,7 +20,7 @@ export default async function HomePage() {
     <div className="flex min-h-screen flex-col">
       <AppHeader />
 
-      <main id="main-content" className="flex-1">
+      <main id="main-content" className="flex-1 flex flex-col items-center">
         <HomepageContentSourceIndicator source={homepageContent.source} />
         {homepageContent.sections.map(renderHomepageSection)}
       </main>
