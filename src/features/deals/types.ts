@@ -46,6 +46,7 @@ export type StorefrontDealSeo = {
   ogTitle?: string;
   ogDescription?: string;
   imageUrl?: string;
+  keywords?: string;
   noIndex: boolean;
 };
 

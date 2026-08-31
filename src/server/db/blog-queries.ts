@@ -21,6 +21,7 @@ const blogPostSelect = {
   seoOgTitle: true,
   seoOgDescription: true,
   seoImageUrl: true,
+  seoKeywords: true,
   seoNoIndex: true,
   seoSchemaNotes: true,
   createdAt: true,
@@ -64,5 +65,31 @@ export async function getAllBlogPostSlugsByLocale(locale: string) {
       slug: true,
     },
     orderBy: [{ publishedAt: "desc" }, { createdAt: "desc" }],
+  });
+}
+
+/**
+ * Lightweight published blog post rows for sitemap generation. Filters to
+ * posts that have actually gone live (publishedAt in the past) and includes
+ * the canonical override + noindex flag so the sitemap lists canonical URLs
+ * and skips noindexed articles.
+ */
+export async function getBlogPostSitemapEntries(locale: string) {
+  const db = getPrismaClient();
+
+  return db.blogPost.findMany({
+    where: {
+      locale,
+      status: "PUBLISHED",
+      publishedAt: { lte: new Date() },
+    },
+    orderBy: [{ publishedAt: "desc" }, { createdAt: "desc" }],
+    select: {
+      slug: true,
+      seoCanonicalUrl: true,
+      seoNoIndex: true,
+      publishedAt: true,
+      updatedAt: true,
+    },
   });
 }

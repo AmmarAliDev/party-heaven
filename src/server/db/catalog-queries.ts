@@ -278,6 +278,12 @@ async function _listPublishedCategoriesImpl() {
       cardImageUrl: true,
       seoTitle: true,
       seoDescription: true,
+      seoCanonicalUrl: true,
+      seoOgTitle: true,
+      seoOgDescription: true,
+      seoImageUrl: true,
+      seoKeywords: true,
+      seoNoIndex: true,
       _count: {
         select: {
           products: {
@@ -331,6 +337,12 @@ async function _getPublishedCategoryBySlugImpl(slug: string) {
         cardImageUrl: true,
         seoTitle: true,
         seoDescription: true,
+        seoCanonicalUrl: true,
+        seoOgTitle: true,
+        seoOgDescription: true,
+        seoImageUrl: true,
+        seoKeywords: true,
+        seoNoIndex: true,
         _count: {
           select: {
             products: {
@@ -443,6 +455,14 @@ async function _getPublishedProductContextBySlugImpl(slug: string) {
         slug: true,
         name: true,
         shortDescription: true,
+        seoTitle: true,
+        seoDescription: true,
+        seoCanonicalUrl: true,
+        seoOgTitle: true,
+        seoOgDescription: true,
+        seoImageUrl: true,
+        seoKeywords: true,
+        seoNoIndex: true,
         metadata: true,
         category: {
           select: {
@@ -627,6 +647,51 @@ export async function getAllPublishedProductSlugsWithCategories() {
     },
     select: {
       slug: true,
+      category: { select: { slug: true } },
+    },
+  });
+}
+
+// ---------------------------------------------------------------------------
+// Sitemap queries
+// ---------------------------------------------------------------------------
+
+/**
+ * Lightweight published-category rows for sitemap generation. Includes the
+ * canonical override and noindex flag so the sitemap lists the exact URL each
+ * category canonicalizes to and skips noindexed pages.
+ */
+export async function getPublishedCategorySitemapEntries() {
+  const db = getPrismaClient();
+  return db.category.findMany({
+    where: { status: "PUBLISHED" },
+    orderBy: { name: "asc" },
+    select: {
+      slug: true,
+      seoCanonicalUrl: true,
+      seoNoIndex: true,
+      updatedAt: true,
+    },
+  });
+}
+
+/**
+ * Lightweight published-product rows (with their category slug) for sitemap
+ * generation. Only products whose category is also PUBLISHED are returned.
+ */
+export async function getPublishedProductSitemapEntries() {
+  const db = getPrismaClient();
+  return db.product.findMany({
+    where: {
+      status: "PUBLISHED",
+      category: { status: "PUBLISHED" },
+    },
+    orderBy: { createdAt: "desc" },
+    select: {
+      slug: true,
+      seoCanonicalUrl: true,
+      seoNoIndex: true,
+      updatedAt: true,
       category: { select: { slug: true } },
     },
   });

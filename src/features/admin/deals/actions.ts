@@ -92,6 +92,7 @@ function readDealPayload(formData: FormData) {
     seoOgTitle: `${formData.get("seoOgTitle") ?? ""}`,
     seoOgDescription: `${formData.get("seoOgDescription") ?? ""}`,
     seoImageUrl: `${formData.get("seoImageUrl") ?? ""}`,
+    seoKeywords: `${formData.get("seoKeywords") ?? ""}`,
     seoSchemaNotes: `${formData.get("seoSchemaNotes") ?? ""}`,
     seoNoIndex: formData.get("seoNoIndex") !== null,
   };

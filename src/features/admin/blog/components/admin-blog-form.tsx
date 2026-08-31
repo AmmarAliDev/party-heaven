@@ -47,6 +47,7 @@ function buildDefaultValues(post?: AdminBlogRecord | null): AdminBlogFormValues 
       seoOgTitle: "",
       seoOgDescription: "",
       seoImageUrl: "",
+      seoKeywords: "",
       seoNoIndex: false,
       seoSchemaNotes: "",
     };
@@ -70,6 +71,7 @@ function buildDefaultValues(post?: AdminBlogRecord | null): AdminBlogFormValues 
     seoOgTitle: post.seoOgTitle ?? "",
     seoOgDescription: post.seoOgDescription ?? "",
     seoImageUrl: post.seoImageUrl ?? "",
+    seoKeywords: post.seoKeywords ?? "",
     seoNoIndex: post.seoNoIndex,
     seoSchemaNotes: post.seoSchemaNotes ?? "",
   };
@@ -100,6 +102,7 @@ function buildBlogFormData(values: AdminBlogFormValues, input: { returnTo: strin
   formData.set("seoOgTitle", values.seoOgTitle ?? "");
   formData.set("seoOgDescription", values.seoOgDescription ?? "");
   formData.set("seoImageUrl", values.seoImageUrl ?? "");
+  formData.set("seoKeywords", values.seoKeywords ?? "");
   formData.set("seoSchemaNotes", values.seoSchemaNotes ?? "");
 
   if (values.seoNoIndex) {
@@ -315,6 +318,7 @@ export function AdminBlogForm({ mode, action, returnTo, submitLabel, post }: Adm
         seoCanonicalUrlField="seoCanonicalUrl"
         seoOgTitleField="seoOgTitle"
         seoOgDescriptionField="seoOgDescription"
+        seoKeywordsField="seoKeywords"
         seoImageUrlField="seoImageUrl"
         seoNoIndexField="seoNoIndex"
         seoSchemaNotesField="seoSchemaNotes"

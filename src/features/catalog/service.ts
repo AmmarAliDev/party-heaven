@@ -456,6 +456,12 @@ function mapCategoryRecord(record: StorefrontCategoryRecord): CatalogCategory {
     ...(cardImageUrl ? { cardImageUrl } : {}),
     ...(record.seoTitle != null && { seoTitle: record.seoTitle }),
     ...(record.seoDescription != null && { seoDescription: record.seoDescription }),
+    ...(record.seoCanonicalUrl != null && { seoCanonicalUrl: record.seoCanonicalUrl }),
+    ...(record.seoOgTitle != null && { seoOgTitle: record.seoOgTitle }),
+    ...(record.seoOgDescription != null && { seoOgDescription: record.seoOgDescription }),
+    ...(record.seoImageUrl != null && { seoImageUrl: record.seoImageUrl }),
+    ...(record.seoKeywords != null && { seoKeywords: record.seoKeywords }),
+    ...(record.seoNoIndex ? { seoNoIndex: true } : {}),
     productCount: record._count.products,
     href: routes.storefront.category(record.slug),
   };
@@ -748,6 +754,14 @@ export type CatalogProductMetadata = {
   name: string;
   shortDescription: string;
   categorySlug: string;
+  seoTitle: string | null;
+  seoDescription: string | null;
+  seoCanonicalUrl: string | null;
+  seoOgTitle: string | null;
+  seoOgDescription: string | null;
+  seoImageUrl: string | null;
+  seoKeywords: string | null;
+  seoNoIndex: boolean;
 };
 
 export async function getProductMetadataBySlug(
@@ -763,6 +777,14 @@ export async function getProductMetadataBySlug(
     name: record.name,
     shortDescription: record.shortDescription ?? "",
     categorySlug: record.category?.slug ?? "",
+    seoTitle: record.seoTitle ?? null,
+    seoDescription: record.seoDescription ?? null,
+    seoCanonicalUrl: record.seoCanonicalUrl ?? null,
+    seoOgTitle: record.seoOgTitle ?? null,
+    seoOgDescription: record.seoOgDescription ?? null,
+    seoImageUrl: record.seoImageUrl ?? null,
+    seoKeywords: record.seoKeywords ?? null,
+    seoNoIndex: record.seoNoIndex ?? false,
   };
 }
 

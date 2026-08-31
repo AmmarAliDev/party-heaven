@@ -35,6 +35,7 @@ export type AdminBlogRecord = {
   seoOgTitle: string | null;
   seoOgDescription: string | null;
   seoImageUrl: string | null;
+  seoKeywords: string | null;
   seoNoIndex: boolean;
   seoSchemaNotes: string | null;
   createdAt: Date;
@@ -176,6 +177,7 @@ export async function getAdminBlogPostById(id: string): Promise<AdminBlogRecord 
       seoOgTitle: true,
       seoOgDescription: true,
       seoImageUrl: true,
+      seoKeywords: true,
       seoNoIndex: true,
       seoSchemaNotes: true,
       createdAt: true,
@@ -207,6 +209,7 @@ export async function createAdminBlogPost(input: { data: AdminBlogCreateInput; a
         seoOgTitle: input.data.seoOgTitle ?? null,
         seoOgDescription: input.data.seoOgDescription ?? null,
         seoImageUrl: input.data.seoImageUrl ?? null,
+        seoKeywords: input.data.seoKeywords ?? null,
         seoNoIndex: input.data.seoNoIndex,
         seoSchemaNotes: input.data.seoSchemaNotes ?? null,
       },
@@ -229,6 +232,7 @@ export async function createAdminBlogPost(input: { data: AdminBlogCreateInput; a
         seoOgTitle: true,
         seoOgDescription: true,
         seoImageUrl: true,
+        seoKeywords: true,
         seoNoIndex: true,
         seoSchemaNotes: true,
         createdAt: true,
@@ -304,6 +308,7 @@ export async function updateAdminBlogPost(input: { data: AdminBlogUpdateInput; a
         seoOgTitle: input.data.seoOgTitle ?? null,
         seoOgDescription: input.data.seoOgDescription ?? null,
         seoImageUrl: input.data.seoImageUrl ?? null,
+        seoKeywords: input.data.seoKeywords ?? null,
         seoNoIndex: input.data.seoNoIndex,
         seoSchemaNotes: input.data.seoSchemaNotes ?? null,
       },
@@ -326,6 +331,7 @@ export async function updateAdminBlogPost(input: { data: AdminBlogUpdateInput; a
         seoOgTitle: true,
         seoOgDescription: true,
         seoImageUrl: true,
+        seoKeywords: true,
         seoNoIndex: true,
         seoSchemaNotes: true,
         createdAt: true,

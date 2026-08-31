@@ -20,6 +20,7 @@ export type BlogSeoFields = {
   ogTitle?: string;
   ogDescription?: string;
   ogImage?: string;
+  keywords?: string;
   noIndex?: boolean;
   structuredDataNotes?: string;
 };
@@ -77,5 +78,6 @@ export type BlogMetadataInput = {
   openGraphTitle?: string;
   openGraphDescription?: string;
   openGraphImage?: string;
+  keywords?: string;
   noIndex?: boolean;
 };

@@ -32,6 +32,7 @@ const dealWithProductsSelect = {
   seoOgTitle: true,
   seoOgDescription: true,
   seoImageUrl: true,
+  seoKeywords: true,
   seoNoIndex: true,
   images: {
     orderBy: { position: "asc" as const },
@@ -188,6 +189,7 @@ function mapDealRecord(record: DealWithProductsRow): StorefrontDeal {
     ...(record.seoOgTitle?.trim() ? { ogTitle: record.seoOgTitle } : {}),
     ...(record.seoOgDescription?.trim() ? { ogDescription: record.seoOgDescription } : {}),
     ...(record.seoImageUrl?.trim() ? { imageUrl: record.seoImageUrl } : {}),
+    ...(record.seoKeywords?.trim() ? { keywords: record.seoKeywords } : {}),
     noIndex: record.seoNoIndex,
   };
 

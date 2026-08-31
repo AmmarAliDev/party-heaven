@@ -29,6 +29,7 @@ export type AdminCategoryRecord = {
   seoOgTitle: string | null;
   seoOgDescription: string | null;
   seoImageUrl: string | null;
+  seoKeywords: string | null;
   seoNoIndex: boolean;
   seoSchemaNotes: string | null;
   createdAt: Date;
@@ -163,6 +164,7 @@ export async function getAdminCategoryById(categoryId: string): Promise<AdminCat
       seoOgTitle: true,
       seoOgDescription: true,
       seoImageUrl: true,
+      seoKeywords: true,
       seoNoIndex: true,
       seoSchemaNotes: true,
       createdAt: true,
@@ -188,6 +190,7 @@ export async function createAdminCategory(input: {
     seoOgTitle: input.data.seoOgTitle ?? null,
     seoOgDescription: input.data.seoOgDescription ?? null,
     seoImageUrl: input.data.seoImageUrl ?? null,
+    seoKeywords: input.data.seoKeywords ?? null,
     seoNoIndex: input.data.seoNoIndex,
     seoSchemaNotes: input.data.seoSchemaNotes ?? null,
     parentId: null,
@@ -209,6 +212,7 @@ export async function createAdminCategory(input: {
         seoOgTitle: true,
         seoOgDescription: true,
         seoImageUrl: true,
+        seoKeywords: true,
         seoNoIndex: true,
         seoSchemaNotes: true,
         createdAt: true,
@@ -259,6 +263,7 @@ export async function updateAdminCategory(input: {
     seoOgTitle: input.data.seoOgTitle ?? null,
     seoOgDescription: input.data.seoOgDescription ?? null,
     seoImageUrl: input.data.seoImageUrl ?? null,
+    seoKeywords: input.data.seoKeywords ?? null,
     seoNoIndex: input.data.seoNoIndex,
     seoSchemaNotes: input.data.seoSchemaNotes ?? null,
     ...(parentInput.parentId === undefined ? {} : { parentId: parentInput.parentId }),
@@ -303,6 +308,7 @@ export async function updateAdminCategory(input: {
         seoOgTitle: true,
         seoOgDescription: true,
         seoImageUrl: true,
+        seoKeywords: true,
         seoNoIndex: true,
         seoSchemaNotes: true,
         createdAt: true,

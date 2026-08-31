@@ -10,6 +10,7 @@ export type BuildMetadataOptions = {
   description?: string | undefined;
   path?: string | undefined;
   canonicalUrl?: string | undefined;
+  keywords?: string | string[] | undefined;
   openGraphTitle?: string | undefined;
   openGraphDescription?: string | undefined;
   openGraphImage?: string | undefined;
@@ -41,6 +42,7 @@ export function buildMetadata(options: BuildMetadataOptions = {}): Metadata {
     alternates: {
       canonical,
     },
+    ...(options.keywords ? { keywords: options.keywords } : {}),
     openGraph: {
       title: openGraphTitle,
       description: openGraphDescription,
@@ -95,12 +97,16 @@ export function buildProductMetadata({
   description,
   path,
   imageUrl,
+  canonicalUrl,
+  keywords,
   noIndex,
 }: {
   name: string;
   description: string;
   path: string;
   imageUrl?: string;
+  canonicalUrl?: string;
+  keywords?: string;
   noIndex?: boolean;
 }): Metadata {
   return buildMetadata({
@@ -108,6 +114,8 @@ export function buildProductMetadata({
     description,
     path,
     noIndex,
+    ...(canonicalUrl ? { canonicalUrl } : {}),
+    ...(keywords ? { keywords } : {}),
     openGraphTitle: name,
     openGraphDescription: description,
     openGraphImage: imageUrl,
@@ -120,12 +128,16 @@ export function buildCategoryMetadata({
   description,
   path,
   imageUrl,
+  canonicalUrl,
+  keywords,
   noIndex,
 }: {
   name: string;
   description: string;
   path: string;
   imageUrl?: string;
+  canonicalUrl?: string;
+  keywords?: string;
   noIndex?: boolean;
 }): Metadata {
   return buildMetadata({
@@ -133,6 +145,8 @@ export function buildCategoryMetadata({
     description,
     path,
     noIndex,
+    ...(canonicalUrl ? { canonicalUrl } : {}),
+    ...(keywords ? { keywords } : {}),
     openGraphImage: imageUrl,
   });
 }
@@ -145,6 +159,8 @@ export function buildArticleMetadata({
   modifiedAt,
   authors,
   imageUrl,
+  canonicalUrl,
+  keywords,
   noIndex,
 }: {
   title: string;
@@ -154,6 +170,8 @@ export function buildArticleMetadata({
   modifiedAt?: string;
   authors?: string[];
   imageUrl?: string;
+  canonicalUrl?: string;
+  keywords?: string;
   noIndex?: boolean;
 }): Metadata {
   return buildMetadata({
@@ -161,6 +179,8 @@ export function buildArticleMetadata({
     description,
     path,
     noIndex,
+    ...(canonicalUrl ? { canonicalUrl } : {}),
+    ...(keywords ? { keywords } : {}),
     openGraphType: "article",
     openGraphPublishedTime: publishedAt,
     openGraphModifiedTime: modifiedAt,

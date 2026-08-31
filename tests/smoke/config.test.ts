@@ -15,6 +15,21 @@ describe("architecture scaffold", () => {
     expect(metadata.applicationName).toBe("PARTY HEAVEN");
   });
 
+  it("omits keywords metadata when none are provided", () => {
+    const metadata = buildMetadata({ title: "Admin" });
+
+    expect(metadata.keywords).toBeUndefined();
+  });
+
+  it("includes keywords metadata when provided", () => {
+    const metadata = buildMetadata({
+      title: "Daily Face Wash",
+      keywords: "face wash, skincare, daily cleanser",
+    });
+
+    expect(metadata.keywords).toBe("face wash, skincare, daily cleanser");
+  });
+
   it("exposes shared placeholder routes", () => {
     expect(routes.storefront.home).toBe("/");
     expect(routes.admin.dashboard).toBe("/admin");

@@ -131,6 +131,12 @@ export type CatalogCategory = {
   cardImageUrl?: string;
   seoTitle?: string;
   seoDescription?: string;
+  seoCanonicalUrl?: string;
+  seoOgTitle?: string;
+  seoOgDescription?: string;
+  seoImageUrl?: string;
+  seoKeywords?: string;
+  seoNoIndex?: boolean;
   productCount: number;
   href: string;
 };

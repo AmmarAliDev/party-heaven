@@ -25,6 +25,7 @@ type AdminSeoSectionProps<TFieldValues extends FieldValues> = {
   seoCanonicalUrlField?: FieldPath<TFieldValues>;
   seoOgTitleField?: FieldPath<TFieldValues>;
   seoOgDescriptionField?: FieldPath<TFieldValues>;
+  seoKeywordsField?: FieldPath<TFieldValues>;
   seoImageUrlField?: FieldPath<TFieldValues>;
   seoNoIndexField?: FieldPath<TFieldValues>;
   seoSchemaNotesField?: FieldPath<TFieldValues>;
@@ -70,6 +71,7 @@ export function AdminSeoSection<TFieldValues extends FieldValues>({
   seoCanonicalUrlField,
   seoOgTitleField,
   seoOgDescriptionField,
+  seoKeywordsField,
   seoImageUrlField,
   seoNoIndexField,
   seoSchemaNotesField,
@@ -208,6 +210,24 @@ export function AdminSeoSection<TFieldValues extends FieldValues>({
                   label: "OG title",
                   placeholder: "Social share title",
                   description: "Optional social-sharing headline. Leave blank to reuse the meta title.",
+                }}
+              />
+            </div>
+          ) : null}
+
+          {seoKeywordsField ? (
+            <div className="md:col-span-2">
+              <DynamicFormField
+                control={form.control}
+                disabled={disabled}
+                fieldConfig={{
+                  id: `${entityLabel.toLowerCase().replace(/\s+/g, "-")}-seo-keywords`,
+                  name: seoKeywordsField,
+                  type: "textarea",
+                  label: "Meta keywords",
+                  placeholder: "party supplies, birthday decorations, balloons",
+                  rows: 2,
+                  description: `Optional. Comma-separated keywords that summarize this page. Keep under ${SEO_CHARACTER_LIMITS.keywords} characters; avoid keyword stuffing.`,
                 }}
               />
             </div>

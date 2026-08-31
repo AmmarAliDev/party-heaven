@@ -120,6 +120,7 @@ function mapBlogPost(record: StorefrontBlogPostRecord): BlogPost {
       ...(record.seoOgTitle ? { ogTitle: record.seoOgTitle } : {}),
       ...(record.seoOgDescription ? { ogDescription: record.seoOgDescription } : {}),
       ...(record.seoImageUrl ? { ogImage: record.seoImageUrl } : {}),
+      ...(record.seoKeywords ? { keywords: record.seoKeywords } : {}),
       ...(record.seoNoIndex ? { noIndex: true } : {}),
       ...(record.seoSchemaNotes ? { structuredDataNotes: record.seoSchemaNotes } : {}),
     },
@@ -245,6 +246,7 @@ export function toBlogMetadataInput(post: BlogPost): BlogMetadataInput {
     ...((post.seo.ogImage ?? post.coverImage.src)
       ? { openGraphImage: post.seo.ogImage ?? post.coverImage.src }
       : {}),
+    ...(post.seo.keywords ? { keywords: post.seo.keywords } : {}),
     noIndex: post.seo.noIndex ?? false,
   };
 }

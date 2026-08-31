@@ -4,7 +4,7 @@ import { notFound } from "next/navigation";
 import { ChevronRight, Home } from "lucide-react";
 
 import { PageShell } from "@/components/layout/page-shell";
-import { buildMetadata } from "@/config/metadata";
+import { buildMetadata, buildProductMetadata } from "@/config/metadata";
 import { routes } from "@/config/routes";
 import {
   getCatalogCategory,
@@ -55,10 +55,16 @@ export async function generateMetadata({ params }: ProductPageProps): Promise<Me
     return buildMetadata({ title: "Product", path: `/categories/${slug}/${productSlug}` });
   }
 
-  return buildMetadata({
-    title: product.name,
-    path: routes.storefront.product(slug, productSlug),
-    description: product.shortDescription,
+  const productPath = routes.storefront.product(slug, productSlug);
+
+  return buildProductMetadata({
+    name: product.seoTitle ?? product.name,
+    description: product.seoDescription ?? product.shortDescription,
+    path: productPath,
+    ...(product.seoImageUrl ? { imageUrl: product.seoImageUrl } : {}),
+    ...(product.seoCanonicalUrl ? { canonicalUrl: product.seoCanonicalUrl } : {}),
+    ...(product.seoKeywords ? { keywords: product.seoKeywords } : {}),
+    ...(product.seoNoIndex ? { noIndex: true } : {}),
   });
 }
 

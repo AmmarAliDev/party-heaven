@@ -86,6 +86,7 @@ export default async function EditAdminCategoryPage({ params, searchParams }: Ed
               seoOgTitle: category.seoOgTitle ?? "",
               seoOgDescription: category.seoOgDescription ?? "",
               seoImageUrl: category.seoImageUrl ?? "",
+              seoKeywords: category.seoKeywords ?? "",
               seoNoIndex: category.seoNoIndex,
               seoSchemaNotes: category.seoSchemaNotes ?? "",
             }}
