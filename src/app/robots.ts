@@ -15,9 +15,16 @@ export default function robots(): MetadataRoute.Robots {
       //   "/*?*query=", // Search results
       //   "/checkout/",
       //   "/account/",
+      //   "/auth/",
+      //   "/wishlist",
+      //   "/preview",
+      //   "/unauthorized",
+      //   "/forbidden",
       // ],
-      disallow: "/",
+      disallow: "/"
     },
     sitemap: `${baseUrl}/sitemap.xml`,
   };
 }
+
+// Intentionally disallowing all pages from being indexed by search engines. This is a temporary measure until the site is ready for public indexing.

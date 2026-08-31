@@ -12,6 +12,7 @@ export const metadata = buildMetadata({
   title: "Account Profile",
   path: routes.storefront.accountProfile,
   description: "Manage your profile details.",
+  noIndex: true,
 });
 
 export default async function AccountProfilePage() {

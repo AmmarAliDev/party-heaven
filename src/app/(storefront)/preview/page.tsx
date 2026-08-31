@@ -24,6 +24,7 @@ export const metadata = buildMetadata({
   title: "Storefront Preview",
   path: "/preview",
   description: "Customer-facing placeholder shell for the Karachi-first storefront architecture.",
+  noIndex: true,
 });
 
 export default function StorefrontPreviewPage() {

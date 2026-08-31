@@ -11,6 +11,7 @@ export const metadata = buildMetadata({
   title: "Unauthorized",
   path: "/unauthorized",
   description: "Sign in is required before accessing protected admin routes.",
+  noIndex: true,
 });
 
 export default function UnauthorizedPage() {

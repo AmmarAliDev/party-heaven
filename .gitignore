@@ -17,6 +17,7 @@
 
 # lighthouse audit output
 /lighthouse-report.json
+/lighthouse-reports/
 
 # next.js
 /.next/

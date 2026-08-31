@@ -15,6 +15,7 @@ export const metadata = buildMetadata({
   title: "Cart",
   path: "/cart",
   description: "Review your selected items and get ready for checkout.",
+  noIndex: true,
 });
 
 export default async function CartPage() {

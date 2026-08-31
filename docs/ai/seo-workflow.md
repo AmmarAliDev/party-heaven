@@ -51,6 +51,13 @@ The storefront blog foundation is now live with metadata and JSON-LD wiring, but
 
 Reuse the same SEO field contract when admin blog editing is introduced.
 
+## Storefront SEO operations (2026-09-01)
+
+- `src/app/robots.ts` must keep `allow: "/"` first. A prior commit "cleaned up" the rules by commenting out the allow/disallow blocks and leaving `disallow: "/"`, which blocked ALL indexing. Verify `GET /robots.txt` serves `Allow: /`.
+- Transactional/user pages (cart, checkout, checkout/confirmation, wishlist, preview, `/account/*`, `/auth/*`, `/unauthorized`, `/forbidden`) are marked `noIndex: true` via `buildMetadata`. Do not remove this — it matches the robots disallow list.
+- Brand rename data migration: `prisma/migrations/20260901000000_rename_brand_in_catalog_seo` replaced remaining `One Dollar` in catalog `seo_title`/`seo_og_title`. Do NOT touch `seo_image_url` (the party-heaven blob key still contains `one-dollar-...`).
+- Lighthouse audit runner + report summarizer: `scripts/lighthouse-audit.mjs` (audit) and `scripts/summarize-lighthouse.mjs` (summarize a report directory, e.g. `node scripts/summarize-lighthouse.mjs seo ./lighthouse-reports`). Reports under `lighthouse-reports/` are gitignored.
+
 ## Category SEO content generator
 
 `src/features/catalog/seo/category-seo-content.ts` provides `generateCategorySeoContent(category, options?)`.

@@ -15,6 +15,7 @@ export const metadata = buildMetadata({
   title: "Create Account",
   path: "/auth/sign-up",
   description: "Create your Party Heaven account to start shopping.",
+  noIndex: true,
 });
 
 export default async function SignUpPage() {

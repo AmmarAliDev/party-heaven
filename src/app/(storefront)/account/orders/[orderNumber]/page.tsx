@@ -31,6 +31,7 @@ export async function generateMetadata({ params }: AccountOrderDetailPageProps):
     title: `Order ${orderNumber}`,
     path: routes.storefront.accountOrderDetail(orderNumber),
     description: "Review order items, delivery details, and invoice download.",
+    noIndex: true,
   });
 }
 

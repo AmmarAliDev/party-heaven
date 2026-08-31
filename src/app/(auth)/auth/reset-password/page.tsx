@@ -10,6 +10,7 @@ export const metadata = buildMetadata({
   title: "Reset Password",
   path: "/auth/reset-password",
   description: "Set a new password for your Party Heaven account.",
+  noIndex: true,
 });
 
 type ResetPasswordPageProps = {

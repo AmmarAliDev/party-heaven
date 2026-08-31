@@ -28,6 +28,7 @@ export const metadata = buildMetadata({
   title: "Order History",
   path: routes.storefront.accountOrders,
   description: "Review your recent orders.",
+  noIndex: true,
 });
 
 export default async function AccountOrdersPage() {
