@@ -33,6 +33,7 @@ export async function generateMetadata({ params }: OrderConfirmationPageProps): 
     title: `Order ${orderNumber}`,
     path: routes.storefront.checkoutConfirmation(orderNumber),
     description: "Review your placed order, delivery details, and invoice.",
+    noIndex: true,
   });
 }
 

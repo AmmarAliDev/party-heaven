@@ -15,6 +15,7 @@ export const metadata = buildMetadata({
   title: "Sign In",
   path: "/auth/sign-in",
   description: "Sign in to your Party Heaven account.",
+  noIndex: true,
 });
 
 type SignInPageProps = {

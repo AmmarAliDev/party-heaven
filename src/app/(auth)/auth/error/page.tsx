@@ -10,6 +10,7 @@ export const metadata = buildMetadata({
   title: "Authentication Error",
   path: "/auth/error",
   description: "An error occurred during sign in.",
+  noIndex: true,
 });
 
 /**

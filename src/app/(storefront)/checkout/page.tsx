@@ -28,6 +28,7 @@ export const metadata = buildMetadata({
   title: "Checkout",
   path: "/checkout",
   description: "Complete your checkout with Karachi delivery and Cash on Delivery.",
+  noIndex: true,
 });
 
 export default async function CheckoutPage() {

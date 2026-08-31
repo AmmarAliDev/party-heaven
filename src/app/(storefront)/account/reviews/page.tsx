@@ -31,6 +31,7 @@ export const metadata = buildMetadata({
   title: "Your Reviews",
   path: routes.storefront.accountReviews,
   description: "Track and manage your product reviews.",
+  noIndex: true,
 });
 
 export default async function AccountReviewsPage({ searchParams }: AccountReviewsPageProps) {

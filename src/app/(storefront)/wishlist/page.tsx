@@ -18,6 +18,7 @@ export const metadata = buildMetadata({
   title: "Wishlist",
   path: "/wishlist",
   description: "Save products to revisit and purchase later.",
+  noIndex: true,
 });
 
 export default async function WishlistPage() {

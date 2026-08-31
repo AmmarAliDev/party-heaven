@@ -11,6 +11,7 @@ export const metadata = buildMetadata({
   title: "Forbidden",
   path: "/forbidden",
   description: "Access is blocked when the signed-in role lacks admin permissions.",
+  noIndex: true,
 });
 
 export default function ForbiddenPage() {

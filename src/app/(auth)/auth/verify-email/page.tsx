@@ -10,6 +10,7 @@ export const metadata = buildMetadata({
   title: "Verify Email",
   path: "/auth/verify-email",
   description: "Verify your Party Heaven account email.",
+  noIndex: true,
 });
 
 type VerifyEmailPageProps = {

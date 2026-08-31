@@ -11,6 +11,7 @@ export const metadata = buildMetadata({
   title: "Account Addresses",
   path: routes.storefront.accountAddresses,
   description: "Manage delivery addresses for checkout.",
+  noIndex: true,
 });
 
 export default async function AccountAddressesPage() {
