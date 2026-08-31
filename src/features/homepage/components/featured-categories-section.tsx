@@ -52,12 +52,11 @@ export function FeaturedCategoriesSectionBlock({ section }: FeaturedCategoriesSe
         <>
           <Carousel opts={FEATURED_CATEGORIES_CAROUSEL_OPTIONS} className="w-full">
             <CarouselContent>
-              {visibleCategories.map((category) => (
+              {visibleCategories.map((category, index) => (
                 <CarouselItem key={category.id} className={FEATURED_CATEGORIES_CAROUSEL_ITEM_CLASS}>
                   <Link
                     href={category.href}
                     className="group focus-visible:ring-ring block h-full rounded-lg focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:outline-none"
-                    aria-label={`Browse ${category.name} category`}
                   >
                     <Card className="h-full transition-transform duration-200 group-hover:-translate-y-0.5">
                       <CardHeader className="p-0">
@@ -71,6 +70,7 @@ export function FeaturedCategoriesSectionBlock({ section }: FeaturedCategoriesSe
                               sizes="(max-width: 639px) 85vw, (max-width: 767px) 50vw, (max-width: 1023px) 33vw, 25vw"
                               className="h-54 w-full object-cover"
                               data-testid={`storefront-category-card-image-${category.slug ?? category.id}`}
+                              priority={index === 0}
                             />
                           ) : (
                             <div

@@ -4,7 +4,7 @@ import { Suspense,useEffect, useRef } from 'react';
 import { usePathname, useSearchParams } from 'next/navigation';
 import Script from 'next/script';
 
-import { env } from '@/config/env';
+import { publicEnv } from '@/config/public-env';
 
 import { trackEvent } from '../lib';
 
@@ -38,10 +38,10 @@ export function AnalyticsProvider() {
       </Suspense>
 
       {/* Google Analytics 4 */}
-      {env.gaId && (
+      {publicEnv.gaId && (
         <>
           <Script
-            src={`https://www.googletagmanager.com/gtag/js?id=${env.gaId}`}
+            src={`https://www.googletagmanager.com/gtag/js?id=${publicEnv.gaId}`}
             strategy="lazyOnload"
           />
           <Script id="google-analytics" strategy="lazyOnload">
@@ -50,14 +50,14 @@ export function AnalyticsProvider() {
               function gtag(){window.dataLayer.push(arguments);}
               gtag('js', new Date());
 
-              gtag('config', '${env.gaId}');
+              gtag('config', '${publicEnv.gaId}');
             `}
           </Script>
         </>
       )}
 
       {/* Meta Pixel */}
-      {env.metaPixelId && (
+      {publicEnv.metaPixelId && (
         <Script id="meta-pixel" strategy="afterInteractive">
           {`
             !function(f,b,e,v,n,t,s)
@@ -68,7 +68,7 @@ export function AnalyticsProvider() {
             t.src=v;s=b.getElementsByTagName(e)[0];
             s.parentNode.insertBefore(t,s)}(window, document,'script',
             'https://connect.facebook.net/en_US/fbevents.js');
-            fbq('init', '${env.metaPixelId}');
+            fbq('init', '${publicEnv.metaPixelId}');
             fbq('track', 'PageView');
           `}
         </Script>

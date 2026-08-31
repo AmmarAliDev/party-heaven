@@ -61,7 +61,7 @@ describe("FeaturedProductsSectionBlock", () => {
       />,
     );
 
-    const link = screen.getByRole("link", { name: "View Product p1" });
+    const link = screen.getByRole("link", { name: /Product p1/i });
     expect(link).toHaveAttribute("href", "/products/p1");
     expect(link).toContainElement(screen.getByText("Product p1"));
   });

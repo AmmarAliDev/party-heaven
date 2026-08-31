@@ -42,7 +42,6 @@ export function DealCard({ deal }: DealCardProps) {
     <Link
       href={`/deals/${deal.slug}`}
       className="focus-visible:ring-ring group block h-full rounded-lg focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:outline-none"
-      aria-label={`View ${deal.title}`}
     >
       <Card className="h-full transition-transform duration-200 group-hover:-translate-y-0.5">
         <CardHeader className="space-y-1 p-0">

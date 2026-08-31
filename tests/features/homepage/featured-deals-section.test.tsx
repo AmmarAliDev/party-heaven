@@ -65,7 +65,7 @@ describe("FeaturedDealsSectionBlock", () => {
   it("renders each deal card as a full clickable link to the deal page", () => {
     render(<FeaturedDealsSectionBlock section={buildSection([buildDeal("d1")])} />);
 
-    const link = screen.getByRole("link", { name: "View Deal d1" });
+    const link = screen.getByRole("link", { name: /Deal d1/i });
     expect(link).toHaveAttribute("href", "/deals/d1");
     expect(link).toContainElement(screen.getByText("Deal d1"));
   });
