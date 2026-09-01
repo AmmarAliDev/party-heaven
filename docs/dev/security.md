@@ -59,6 +59,20 @@ Why this matters:
 - It preserves baseline CSP behavior for environments where analytics is intentionally disabled.
 - It keeps future tightening paths (for example nonce/hash-based script policies) compatible.
 
+### Meta Conversion API (CAPI) security
+
+The server-side Meta Conversion API (`src/features/analytics/meta-capi/`) keeps
+the access token server-only:
+
+- `META_CAPI_ACCESS_TOKEN` is validated through `serverEnvSchema` and read only
+  server-side; it is never exposed via a `NEXT_PUBLIC_*` variable.
+- PII (email, phone, name) is SHA-256 hashed before transmission and is never
+  logged (the sender logs only event counts and non-PII error messages).
+- The optional client bridge `POST /api/analytics/meta-capi` enforces
+  CSRF/trusted-origin validation and per-IP rate limiting (60/min), and accepts
+  **no PII from the client** — identity comes only from `_fbp`/`_fbc` cookies
+  and request headers, read server-side.
+
 > The CSP is intentionally a **baseline-compatible** policy for the current Next.js App Router setup. It allows the app to function cleanly today while leaving room for a stricter nonce-based CSP later.
 
 ### 2. CSRF strategy

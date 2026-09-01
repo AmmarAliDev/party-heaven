@@ -24,6 +24,7 @@ const mockDb = vi.hoisted(() => ({
 const mergeGuestCartIntoUserCart = vi.hoisted(() => vi.fn());
 const notifyOrderPlaced = vi.hoisted(() => vi.fn());
 const notifyOrderConfirmed = vi.hoisted(() => vi.fn());
+const fireMetaCapiPurchaseSafely = vi.hoisted(() => vi.fn());
 
 vi.mock("@/server/db", () => ({
   getPrismaClient: () => mockDb,
@@ -39,6 +40,10 @@ vi.mock("@/features/notifications", () => ({
   notifyOrderConfirmed,
 }));
 
+vi.mock("@/features/analytics/meta-capi", () => ({
+  fireMetaCapiPurchaseSafely,
+}));
+
 import { placeOrderFromCheckout, updateOrderStatus } from "@/features/orders";
 
 describe("order service", () => {
@@ -51,6 +56,7 @@ describe("order service", () => {
     mockDb.auditLog.create.mockResolvedValue({ id: "audit-1" });
     notifyOrderPlaced.mockResolvedValue({ attempted: 0, delivered: 0, failures: [] });
     notifyOrderConfirmed.mockResolvedValue({ attempted: 0, delivered: 0, failures: [] });
+    fireMetaCapiPurchaseSafely.mockResolvedValue(true);
   });
 
   it("places an order transactionally and writes an audit entry", async () => {
@@ -126,6 +132,28 @@ describe("order service", () => {
       }),
     );
     expect(notifyOrderPlaced).toHaveBeenCalledTimes(1);
+    expect(fireMetaCapiPurchaseSafely).toHaveBeenCalledTimes(1);
+    expect(fireMetaCapiPurchaseSafely).toHaveBeenCalledWith(
+      expect.objectContaining({
+        orderNumber: result.orderNumber,
+        externalId: null,
+        customer: {
+          email: "ammar@example.com",
+          phone: "+923001112233",
+          fullName: "Ammar Ali",
+        },
+        totals: { subtotal: 2000, shipping: 150, total: 2150 },
+        paymentMethod: "COD",
+        lines: [
+          expect.objectContaining({
+            productName: "Ultra Wash Detergent",
+            sku: "UWD-2KG-001",
+            quantity: 2,
+            unitPrice: 1000,
+          }),
+        ],
+      }),
+    );
   });
 
   it("does not fail order placement when notifications fail", async () => {
@@ -190,6 +218,74 @@ describe("order service", () => {
       orderId: "order-1",
       status: "PENDING",
     });
+  });
+
+  it("does not fail order placement when Meta CAPI reports a failure", async () => {
+    mockDb.cart.findFirst.mockResolvedValue({
+      id: "cart-1",
+      items: [
+        {
+          id: "cart-item-1",
+          quantity: 1,
+          unitPrice: 1000,
+          productVariant: {
+            id: "variant-1",
+            productId: "product-1",
+            sku: "UWD-2KG-001",
+            title: "2 kg",
+            inventory: {
+              id: "inventory-1",
+              quantity: 10,
+              reserved: 0,
+              safetyStock: 0,
+            },
+            product: {
+              id: "product-1",
+              name: "Ultra Wash Detergent",
+            },
+          },
+        },
+      ],
+      dealItems: [],
+    });
+
+    mockDb.order.create.mockImplementation(async ({ data }: { data: { orderNumber: string } }) => ({
+      id: "order-1",
+      orderNumber: data.orderNumber,
+    }));
+
+    // CAPI send failed (non-throwing contract) — order must still complete.
+    fireMetaCapiPurchaseSafely.mockResolvedValue(false);
+
+    await expect(
+      placeOrderFromCheckout({
+        payload: {
+          cartId: "cart-1",
+          customer: {
+            fullName: "Ammar Ali",
+            email: "ammar@example.com",
+            phone: "+923001112233",
+          },
+          shippingAddress: {
+            addressLine1: "House 1, Street 2",
+            city: "Karachi",
+            province: "Sindh",
+            country: "Pakistan",
+            postcode: "75400",
+          },
+          paymentMethod: "COD",
+        },
+        context: {
+          guestToken: "guest-token-1",
+        },
+      }),
+    ).resolves.toMatchObject({
+      orderId: "order-1",
+      status: "PENDING",
+    });
+
+    expect(fireMetaCapiPurchaseSafely).toHaveBeenCalledTimes(1);
+    expect(notifyOrderPlaced).toHaveBeenCalledTimes(1);
   });
 
   it("rejects order placement when stock is no longer available", async () => {

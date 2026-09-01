@@ -54,6 +54,10 @@ Validation is centralized in `src/config/env.ts`, and the safe shared config sna
 | `NEXT_PUBLIC_ENABLE_ADMIN` | No                              | Enables or disables the admin preview placeholder                                                       |
 | `NEXT_PUBLIC_ENABLE_AUTH`  | No                              | Enables or disables the auth preview placeholder                                                        |
 | `NEXT_PUBLIC_GTM_ID`        | No                              | Google Tag Manager container ID (`GTM-...`); loads GTM via `@next/third-parties` and enables the matching CSP allowlist entry. GA4 + Meta Pixel are configured inside the container — no separate GA4/Meta env vars |
+| `META_PIXEL_ID`             | No (pair)                       | Meta Pixel ID used by the server-side Conversion API. Must be set together with `META_CAPI_ACCESS_TOKEN` |
+| `META_CAPI_ACCESS_TOKEN`    | No (pair)                       | Server-only Meta Conversion API access token (Events Manager → Settings → Conversion API). Never expose via a `NEXT_PUBLIC_*` variable |
+| `META_CAPI_TEST_EVENT_CODE` | No                              | Optional Test Events code from Meta Events Manager for CAPI validation |
+| `META_CAPI_GRAPH_VERSION`   | No                              | Optional Graph API version override (defaults to `v21.0`) |
 | `DATABASE_URL`             | Yes for Prisma workflows        | Main PostgreSQL connection string for local development, Prisma CLI commands, and server-side DB access |
 | `POSTGRES_URL_NON_POOLING` | Recommended for Prisma Migrate  | Direct non-pooling PostgreSQL URL for Prisma migrations; for local Postgres this can match `DATABASE_URL` |
 | `SHADOW_DATABASE_URL`      | Optional                        | Separate shadow database used only when `prisma migrate dev` needs one for a hosted dev setup           |
@@ -71,6 +75,7 @@ Analytics + CSP note:
 - GTM is the single analytics pipeline; GA4 + Meta Pixel are configured inside the GTM container.
 - GTM is loaded through `@next/third-parties` (`GoogleTagManager`) and is enabled only when `NEXT_PUBLIC_GTM_ID` is set.
 - The global CSP allowlist adds `https://www.googletagmanager.com` (GTM loader) and `https://connect.facebook.net` (GTM-injected Meta Pixel) to `script-src` when `NEXT_PUBLIC_GTM_ID` is set.
+- **Meta Conversion API** (optional): with `META_PIXEL_ID` + `META_CAPI_ACCESS_TOKEN`, the app sends a server-side `Purchase` event on order placement, plus an optional guarded bridge at `POST /api/analytics/meta-capi`. See `docs/dev/meta-conversion-api.md`.
 
 The Prisma scripts in this repo read local environment files and fall back to `DATABASE_URL` when `POSTGRES_URL_NON_POOLING` is omitted during local development.
 

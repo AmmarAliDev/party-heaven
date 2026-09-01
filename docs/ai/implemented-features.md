@@ -67,6 +67,7 @@ Use this as the quick implementation map for future AI prompts. Each section des
 - Contact form persistence with non-blocking email/Telegram admin notifications
 - Email subscriber lifecycle foundation and unsubscribe flows
 - Abandoned cart event log foundation for future recovery automation
+- Client analytics is GTM-only (`trackEvent` → GTM `dataLayer`; GA4 + Meta Pixel are configured inside the GTM container). Optional **server-side Meta Conversion API** (`src/features/analytics/meta-capi/`, server-only): automatic `Purchase` on order placement (hashed PII, `event_id` = order number for dedup) plus a guarded bridge `POST /api/analytics/meta-capi` for other events; see `docs/dev/meta-conversion-api.md`
 
 ## Shared Foundations
 

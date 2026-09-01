@@ -98,6 +98,24 @@ export const serverEnvSchema = z
     SMTP_FROM_NAME: z.string().trim().optional(),
     TELEGRAM_BOT_TOKEN: z.string().trim().min(1, "TELEGRAM_BOT_TOKEN cannot be empty.").optional(),
     TELEGRAM_CHAT_ID: z.string().trim().min(1, "TELEGRAM_CHAT_ID cannot be empty.").optional(),
+
+    // Meta Conversion API (server-side events). Both the Pixel ID and the
+    // access token are required to enable CAPI; the token is server-only and
+    // must never be exposed to the browser via a NEXT_PUBLIC_* variable.
+    META_PIXEL_ID: z.string().trim().min(1, "META_PIXEL_ID cannot be empty.").optional(),
+    META_CAPI_ACCESS_TOKEN: z
+      .string()
+      .trim()
+      .min(1, "META_CAPI_ACCESS_TOKEN cannot be empty.")
+      .optional(),
+    // Optional "Test Events" code from Meta Events Manager for validation.
+    META_CAPI_TEST_EVENT_CODE: z.string().trim().optional(),
+    // Optional Graph API version override (defaults to a supported version).
+    META_CAPI_GRAPH_VERSION: z
+      .string()
+      .trim()
+      .regex(/^v\d+\.\d+$/, "META_CAPI_GRAPH_VERSION must look like v21.0.")
+      .optional(),
   })
   .superRefine((value, context) => {
     const hasRedisUrl = Boolean(value.UPSTASH_REDIS_REST_URL);
@@ -170,6 +188,18 @@ export const serverEnvSchema = z
         message:
           "TELEGRAM_BOT_TOKEN and TELEGRAM_CHAT_ID must either both be set or both be omitted.",
         path: [hasTelegramToken ? "TELEGRAM_CHAT_ID" : "TELEGRAM_BOT_TOKEN"],
+      });
+    }
+
+    const hasMetaPixelId = Boolean(value.META_PIXEL_ID);
+    const hasMetaCapiToken = Boolean(value.META_CAPI_ACCESS_TOKEN);
+
+    if (hasMetaPixelId !== hasMetaCapiToken) {
+      context.addIssue({
+        code: "custom",
+        message:
+          "META_PIXEL_ID and META_CAPI_ACCESS_TOKEN must either both be set or both be omitted.",
+        path: [hasMetaPixelId ? "META_CAPI_ACCESS_TOKEN" : "META_PIXEL_ID"],
       });
     }
 
