@@ -53,9 +53,7 @@ Validation is centralized in `src/config/env.ts`, and the safe shared config sna
 | `NEXT_PUBLIC_DEFAULT_CITY` | No                              | Launch-city label for the current Karachi-first storefront scaffold                                     |
 | `NEXT_PUBLIC_ENABLE_ADMIN` | No                              | Enables or disables the admin preview placeholder                                                       |
 | `NEXT_PUBLIC_ENABLE_AUTH`  | No                              | Enables or disables the auth preview placeholder                                                        |
-| `NEXT_PUBLIC_GA_ID`         | No                              | GA4 Measurement ID (`G-...`); enables GA script loading and the matching CSP allowlist entry           |
-| `NEXT_PUBLIC_GTM_ID`        | No                              | Google Tag Manager container ID (`GTM-...`); loads GTM via `@next/third-parties` and enables the matching CSP allowlist entry |
-| `NEXT_PUBLIC_META_PIXEL_ID` | No                              | Meta Pixel ID used by the analytics provider                                                            |
+| `NEXT_PUBLIC_GTM_ID`        | No                              | Google Tag Manager container ID (`GTM-...`); loads GTM via `@next/third-parties` and enables the matching CSP allowlist entry. GA4 + Meta Pixel are configured inside the container — no separate GA4/Meta env vars |
 | `DATABASE_URL`             | Yes for Prisma workflows        | Main PostgreSQL connection string for local development, Prisma CLI commands, and server-side DB access |
 | `POSTGRES_URL_NON_POOLING` | Recommended for Prisma Migrate  | Direct non-pooling PostgreSQL URL for Prisma migrations; for local Postgres this can match `DATABASE_URL` |
 | `SHADOW_DATABASE_URL`      | Optional                        | Separate shadow database used only when `prisma migrate dev` needs one for a hosted dev setup           |
@@ -70,9 +68,9 @@ If a required or invalid value is detected, the app throws a readable `CONFIG_ER
 
 Analytics + CSP note:
 
-- GA script loading is conditional on `NEXT_PUBLIC_GA_ID`.
+- GTM is the single analytics pipeline; GA4 + Meta Pixel are configured inside the GTM container.
 - GTM is loaded through `@next/third-parties` (`GoogleTagManager`) and is enabled only when `NEXT_PUBLIC_GTM_ID` is set.
-- The global CSP allowlist adds `https://www.googletagmanager.com` to `script-src` when either `NEXT_PUBLIC_GA_ID` or `NEXT_PUBLIC_GTM_ID` is set.
+- The global CSP allowlist adds `https://www.googletagmanager.com` (GTM loader) and `https://connect.facebook.net` (GTM-injected Meta Pixel) to `script-src` when `NEXT_PUBLIC_GTM_ID` is set.
 
 The Prisma scripts in this repo read local environment files and fall back to `DATABASE_URL` when `POSTGRES_URL_NON_POOLING` is omitted during local development.
 

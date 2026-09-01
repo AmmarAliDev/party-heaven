@@ -19,7 +19,5 @@ export const publicEnv = {
   defaultCity: process.env.NEXT_PUBLIC_DEFAULT_CITY?.trim() || "Karachi",
   enableAdmin: process.env.NEXT_PUBLIC_ENABLE_ADMIN !== "false",
   enableAuth: process.env.NEXT_PUBLIC_ENABLE_AUTH !== "false",
-  gaId: process.env.NEXT_PUBLIC_GA_ID?.trim() || undefined,
   gtmId: process.env.NEXT_PUBLIC_GTM_ID?.trim() || undefined,
-  metaPixelId: process.env.NEXT_PUBLIC_META_PIXEL_ID?.trim() || undefined,
 } as const;

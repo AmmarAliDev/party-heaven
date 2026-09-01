@@ -1,8 +1,11 @@
+"use client";
+
 import Link from "next/link";
 
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent } from "@/components/ui/card";
 import { PriceDisplay } from "@/components/ui/price-display";
+import { trackEvent } from "@/features/analytics";
 import { testIds } from "@/lib/test-selectors";
 
 import type { CatalogProductCard } from "../types";
@@ -24,9 +27,15 @@ function getInventoryBadge(quantity: number) {
 type ProductGridCardProps = {
   product: CatalogProductCard;
   eagerImage?: boolean;
+  /** Analytics `item_list_name` used for the `select_item` event. */
+  itemListName?: string;
 };
 
-export function ProductGridCard({ product, eagerImage = false }: ProductGridCardProps) {
+export function ProductGridCard({
+  product,
+  eagerImage = false,
+  itemListName = "product_list",
+}: ProductGridCardProps) {
   const stockBadge = getInventoryBadge(product.inventoryQuantity);
   const isAvailable = product.inventoryQuantity > 0;
 
@@ -34,6 +43,21 @@ export function ProductGridCard({ product, eagerImage = false }: ProductGridCard
     <div className="group relative h-full border-2 !bg-card border-border/70 shadow-[var(--shadow-soft)] transition-shadow hover:shadow-md rounded-(--radius-card)">
       <Link
         href={product.href}
+        onClick={() => {
+          trackEvent({
+            type: 'SELECT_ITEM',
+            payload: {
+              itemListName,
+              product: {
+                id: product.id,
+                name: product.name,
+                price: product.price,
+                category: product.categorySlug,
+                quantity: 1,
+              },
+            },
+          });
+        }}
         className="focus-visible:ring-primary block rounded-[var(--radius-card)] focus-visible:ring-2 focus-visible:outline-none"
         data-testid={testIds.storefront.productCard(product.slug)}
       >

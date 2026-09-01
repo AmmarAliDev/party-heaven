@@ -35,7 +35,7 @@ Production-ready **single-vendor e-commerce application** built with **Next.js 1
 | RBAC (role-based access control) | ✅ Live | `src/lib/auth/rbac.ts` |
 | Rate limiting (Redis + in-memory) | ✅ Live | `src/lib/rate-limit/` |
 | SEO (metadata, JSON-LD, sitemap) | ✅ Live | `src/lib/seo/`, `src/app/sitemap.ts` |
-| Analytics (GA4 + Meta Pixel) | ✅ Live | `src/features/analytics/` |
+| Analytics (GTM → GA4 + Meta Pixel) | ✅ Live | `src/features/analytics/` |
 | Audit log | ✅ Live | `AuditLog` table + admin activity feed |
 
 > **Payment gateways, referral/loyalty programmes, and multi-locale (Urdu) support are intentionally deferred.** COD is the only checkout payment method.

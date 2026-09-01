@@ -6,6 +6,7 @@ import InfiniteScroll from "react-infinite-scroll-component";
 import { EmptyState } from "@/components/ui/empty-state";
 import { LoadingState } from "@/components/ui/loading-state";
 import { SectionErrorState } from "@/components/ui/section-error-state";
+import { trackEvent } from "@/features/analytics";
 import { testIds } from "@/lib/test-selectors";
 import type { PaginationMeta } from "@/server/db/pagination";
 
@@ -53,6 +54,29 @@ export function CategoryInfiniteProductGrid({ listing }: CategoryInfiniteProduct
     setIsLoadingMore(false);
     setLoadError(null);
   }, [listing]);
+
+  // Fire the GTM "view_item_list" event whenever the visible product page
+  // changes (initial load, filter/sort changes, and loaded pagination pages).
+  useEffect(() => {
+    if (products.length === 0) {
+      return;
+    }
+
+    trackEvent({
+      type: 'VIEW_ITEM_LIST',
+      payload: {
+        itemListId: `category_${listing.category.slug}`,
+        itemListName: 'Category products',
+        items: products.map((product) => ({
+          id: product.id,
+          name: product.name,
+          price: product.price,
+          category: product.categorySlug,
+          quantity: 1,
+        })),
+      },
+    });
+  }, [products, listing.category.slug]);
 
   const hasProducts = products.length > 0;
   const hasMorePages = pagination.hasNextPage;
@@ -128,7 +152,11 @@ export function CategoryInfiniteProductGrid({ listing }: CategoryInfiniteProduct
           >
             {products.map((product, index) => (
               <li key={product.id} className="list-none">
-                <ProductGridCard product={product} eagerImage={index === 0} />
+                <ProductGridCard
+                  product={product}
+                  eagerImage={index === 0}
+                  itemListName="Category products"
+                />
               </li>
             ))}
           </ul>

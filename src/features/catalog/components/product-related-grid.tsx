@@ -1,7 +1,10 @@
+"use client";
+
 import Link from "next/link";
 
 import { Badge } from "@/components/ui/badge";
 import { PriceDisplay } from "@/components/ui/price-display";
+import { trackEvent } from "@/features/analytics";
 
 import type { CatalogProductCard } from "../types";
 import { ProductCardAddToCart } from "./product-card-add-to-cart";
@@ -31,6 +34,21 @@ export function ProductRelatedGrid({ products }: ProductRelatedGridProps) {
               <div className="group relative h-full">
                 <Link
                   href={product.href}
+                  onClick={() => {
+                    trackEvent({
+                      type: 'SELECT_ITEM',
+                      payload: {
+                        itemListName: 'Related products',
+                        product: {
+                          id: product.id,
+                          name: product.name,
+                          price: product.price,
+                          category: product.categorySlug,
+                          quantity: 1,
+                        },
+                      },
+                    });
+                  }}
                   className="block rounded-(--radius-card) overflow-hidden shadow-(--shadow-soft) hover:shadow-md transition-shadow focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary"
                 >
                   <article>

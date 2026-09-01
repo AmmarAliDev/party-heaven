@@ -51,7 +51,7 @@ PostgreSQL (Supabase / Vercel Postgres)
               │
          Telegram Bot API ←  admin alerts
               │
-        GA4 + Meta Pixel  ←  client-side analytics
+        GTM -> GA4 + Meta Pixel  <-  client-side analytics
 ```
 
 - **No background workers** in the current release. All operations are request-driven.
@@ -182,9 +182,7 @@ Mark secrets as "Sensitive" (encrypted at rest, masked in logs).
 
 | Variable | Example | Notes |
 |---|---|---|
-| `NEXT_PUBLIC_GA_ID` | `G-XXXXXXXXXX` | Google Analytics 4. |
-| `NEXT_PUBLIC_GTM_ID` | `GTM-XXXXXXX` | Google Tag Manager container (loaded via `@next/third-parties`). |
-| `NEXT_PUBLIC_META_PIXEL_ID` | `123456789012345` | Meta Pixel. |
+| `NEXT_PUBLIC_GTM_ID` | `GTM-XXXXXXX` | Google Tag Manager container — the single analytics pipeline (GA4 + Meta Pixel are configured inside the container). |
 
 ### Security / misc
 
@@ -319,26 +317,15 @@ Telegram notifications are admin-only alerts for new orders, contact form submis
 
 ## 9. Analytics
 
-### Google Analytics 4
+Analytics is **GTM-only**: the app pushes GA4-standard events to the GTM `dataLayer`; GA4 and Meta Pixel are configured inside the GTM container.
 
-1. Create a GA4 property at [analytics.google.com](https://analytics.google.com).
-2. Under **Admin → Data Streams**, create a Web stream for your domain.
-3. Copy the **Measurement ID** (format: `G-XXXXXXXXXX`).
-4. Set `NEXT_PUBLIC_GA_ID=G-XXXXXXXXXX`.
+1. Create a Google Tag Manager container at [tagmanager.google.com](https://tagmanager.google.com).
+2. Add your GA4 Measurement ID and Meta Pixel ID as tags **inside** the container, with Custom Event triggers per event (see `docs/dev/analytics.md` for the full event list, names, and Meta mapping).
+3. Set `NEXT_PUBLIC_GTM_ID=GTM-XXXXXXX`.
 
-Events tracked: `page_view`, `view_item`, `add_to_cart`, `begin_checkout`, `purchase`.
+Events pushed to the dataLayer: `page_view`, `view_item`, `view_item_list`, `select_item`, `add_to_cart`, `remove_from_cart`, `view_cart`, `begin_checkout`, `purchase`, `add_to_wishlist`, `search`, `sign_up`.
 
-### Meta Pixel
-
-1. Create a Pixel at [business.facebook.com](https://business.facebook.com) → Events Manager.
-2. Copy the **Pixel ID**.
-3. Set `NEXT_PUBLIC_META_PIXEL_ID=<pixel_id>`.
-
-Events tracked: `PageView`, `ViewContent`, `AddToCart`, `InitiateCheckout`, `Purchase`.
-
-### Both are optional
-
-The app functions normally without either. Analytics failures are isolated and never crash the app.
+Analytics is optional — the app functions normally without it, and failures are isolated so they never crash the app.
 
 ---
 

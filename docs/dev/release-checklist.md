@@ -55,11 +55,10 @@ Complete this once before the first production deployment and revisit before any
 
 ### Analytics
 
-- [ ] GA4 Measurement ID configured (`NEXT_PUBLIC_GA_ID`)
-- [ ] GTM container ID configured (`NEXT_PUBLIC_GTM_ID`) if using Google Tag Manager
-- [ ] Meta Pixel ID configured if applicable (`NEXT_PUBLIC_META_PIXEL_ID`)
-- [ ] Test purchase event visible in GA4 DebugView / GTM Preview mode
-- [ ] Meta Pixel Helper browser extension confirms events fire correctly
+- [ ] GTM container ID configured (`NEXT_PUBLIC_GTM_ID`) — single analytics pipeline (GA4 + Meta Pixel configured inside the container)
+- [ ] Test the funnel events in GTM Preview mode (view_item_list, view_item, add_to_cart, view_cart, remove_from_cart, begin_checkout, purchase)
+- [ ] GA4 DebugView confirms the same events arrive (GA4 event tags/triggers set up in GTM)
+- [ ] Meta Pixel Helper browser extension confirms Meta standard events fire (Meta tags map event names)
 
 ### Health & Monitoring
 
@@ -154,7 +153,7 @@ Complete within 24–72 hours of the first live customer-facing deployment.
 - [ ] Verify at least one real order flows through: checkout → confirmation email → Telegram alert
 - [ ] Confirm inventory is decremented correctly after an order
 - [ ] Review any rate-limit hits in Upstash Redis console
-- [ ] Check GA4 real-time view for page views and events
+- [ ] Check GA4 real-time view (or GTM Preview) for page views and events
 
 ### Day 2–3
 

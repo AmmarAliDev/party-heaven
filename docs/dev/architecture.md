@@ -335,9 +335,8 @@ Create a scalable foundation for a single-vendor e-commerce app using one shared
 ## Analytics Strategy
 
 - Client analytics wiring is centralized in `src/features/analytics/components/analytics-provider.tsx` and mounted once in `src/app/layout.tsx`.
-- GA4 script loading uses the standard gtag loader (`https://www.googletagmanager.com/gtag/js?id=...`) and is enabled only when `NEXT_PUBLIC_GA_ID` is present.
-- Google Tag Manager is loaded via `@next/third-parties` (`GoogleTagManager` in the root layout) when `NEXT_PUBLIC_GTM_ID` is set; `trackEvent` dispatches every analytics event to GTM through `sendGTMEvent`.
-- CSP generation in `src/config/security.ts` keeps analytics script policy narrow by adding `https://www.googletagmanager.com` to `script-src` only when GA or GTM is configured.
+- GTM is the single analytics pipeline: loaded via `@next/third-parties` (`GoogleTagManager` in the root layout) when `NEXT_PUBLIC_GTM_ID` is set; `trackEvent` dispatches every analytics event to the GTM `dataLayer` through `sendGTMEvent`. GA4 + Meta Pixel are configured inside the GTM container (no direct GA4/Meta scripts are loaded by the app).
+- CSP generation in `src/config/security.ts` keeps analytics script policy narrow by adding `https://www.googletagmanager.com` (GTM loader) and `https://connect.facebook.net` (GTM-injected Meta Pixel) to `script-src` only when `NEXT_PUBLIC_GTM_ID` is configured.
 - This avoids broad script-source weakening while keeping analytics opt-in per environment.
 
 ## Admin Dashboard Metrics Strategy
