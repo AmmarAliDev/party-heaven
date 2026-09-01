@@ -4,6 +4,7 @@ import type { Prisma } from "@prisma/client";
 import { CartStatus, City, Country, OrderStatus, ProductStatus } from "@prisma/client";
 import { PrismaClientKnownRequestError } from "@prisma/client/runtime/library";
 
+import { fireMetaCapiPurchaseSafely } from "@/features/analytics/meta-capi";
 import { mergeGuestCartIntoUserCart } from "@/features/cart";
 import type { CheckoutPayload } from "@/features/checkout";
 import { calculateCheckoutTotals, getCheckoutPaymentProvider } from "@/features/checkout";
@@ -714,6 +715,9 @@ export async function placeOrderFromCheckout(input: PlaceOrderInput): Promise<Pl
     const confirmationAccessToken = createConfirmationAccessToken();
     const invoiceNumber = createInvoiceNumber(orderNumber);
     let totalQuantity = 0;
+    // Captured from inside the transaction so the post-commit CAPI purchase
+    // event can send the exact ordered line items (no DB re-read needed).
+    let orderLines: OrderLine[] = [];
 
     try {
       const result = await runWithTransaction(
@@ -721,6 +725,7 @@ export async function placeOrderFromCheckout(input: PlaceOrderInput): Promise<Pl
           const cart = await resolveCartForOrder(input, transaction);
           const { lines, subtotal, discount } = buildOrderLinesFromCart(cart);
           totalQuantity = lines.reduce((sum, line) => sum + line.quantity, 0);
+          orderLines = lines;
           const totals = calculateCheckoutTotals(subtotal);
 
           // Decrement inventory BEFORE payment authorization to avoid orphaned authorizations
@@ -849,6 +854,23 @@ export async function placeOrderFromCheckout(input: PlaceOrderInput): Promise<Pl
           invoiceUrl: result.invoiceUrl,
         }),
       );
+
+      // Fire the Meta Conversion API Purchase event. Non-blocking — failures
+      // are logged and never affect the already-committed order.
+      await fireMetaCapiPurchaseSafely({
+        orderId: result.orderId,
+        orderNumber: result.orderNumber,
+        placedAt: result.placedAt,
+        externalId: input.context.userId ?? null,
+        customer: {
+          email: input.payload.customer.email.trim(),
+          phone: input.payload.customer.phone.trim(),
+          fullName: input.payload.customer.fullName.trim(),
+        },
+        totals: result.totals,
+        paymentMethod: input.payload.paymentMethod,
+        lines: orderLines,
+      });
 
       return result;
     } catch (error) {

@@ -338,6 +338,7 @@ Create a scalable foundation for a single-vendor e-commerce app using one shared
 - GTM is the single analytics pipeline: loaded via `@next/third-parties` (`GoogleTagManager` in the root layout) when `NEXT_PUBLIC_GTM_ID` is set; `trackEvent` dispatches every analytics event to the GTM `dataLayer` through `sendGTMEvent`. GA4 + Meta Pixel are configured inside the GTM container (no direct GA4/Meta scripts are loaded by the app).
 - CSP generation in `src/config/security.ts` keeps analytics script policy narrow by adding `https://www.googletagmanager.com` (GTM loader) and `https://connect.facebook.net` (GTM-injected Meta Pixel) to `script-src` only when `NEXT_PUBLIC_GTM_ID` is configured.
 - This avoids broad script-source weakening while keeping analytics opt-in per environment.
+- **Meta Conversion API (server-side, optional)** lives in `src/features/analytics/meta-capi/` (server-only; never re-exported from the client analytics barrel). With `META_PIXEL_ID` + `META_CAPI_ACCESS_TOKEN`, a `Purchase` event is fired server-side from `placeOrderFromCheckout` (non-blocking, hashed PII, `event_id` = order number for deduplication), and an optional guarded bridge at `POST /api/analytics/meta-capi` can forward other events. See `docs/dev/meta-conversion-api.md`.
 
 ## Admin Dashboard Metrics Strategy
 

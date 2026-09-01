@@ -183,6 +183,10 @@ Mark secrets as "Sensitive" (encrypted at rest, masked in logs).
 | Variable | Example | Notes |
 |---|---|---|
 | `NEXT_PUBLIC_GTM_ID` | `GTM-XXXXXXX` | Google Tag Manager container — the single analytics pipeline (GA4 + Meta Pixel are configured inside the container). |
+| `META_PIXEL_ID` | `123456789012345` | Meta Pixel ID for the server-side Conversion API (optional, pair with `META_CAPI_ACCESS_TOKEN`). |
+| `META_CAPI_ACCESS_TOKEN` | `EAAG...` | Server-only Meta Conversion API access token (optional, pair with `META_PIXEL_ID`). |
+| `META_CAPI_TEST_EVENT_CODE` | `TESTCODE123` | Optional Test Events code for CAPI validation. |
+| `META_CAPI_GRAPH_VERSION` | `v21.0` | Optional Graph API version override. |
 
 ### Security / misc
 
@@ -322,6 +326,8 @@ Analytics is **GTM-only**: the app pushes GA4-standard events to the GTM `dataLa
 1. Create a Google Tag Manager container at [tagmanager.google.com](https://tagmanager.google.com).
 2. Add your GA4 Measurement ID and Meta Pixel ID as tags **inside** the container, with Custom Event triggers per event (see `docs/dev/analytics.md` for the full event list, names, and Meta mapping).
 3. Set `NEXT_PUBLIC_GTM_ID=GTM-XXXXXXX`.
+
+**Meta Conversion API (optional):** on top of GTM, the app can send server-side conversion events. Add `META_PIXEL_ID` + `META_CAPI_ACCESS_TOKEN` (both server-only) to enable an automatic `Purchase` event on order placement, plus the optional guarded bridge `POST /api/analytics/meta-capi` for other events. See `docs/dev/meta-conversion-api.md`. No Vercel config changes are needed — the sender runs inside the app's own serverless functions.
 
 Events pushed to the dataLayer: `page_view`, `view_item`, `view_item_list`, `select_item`, `add_to_cart`, `remove_from_cart`, `view_cart`, `begin_checkout`, `purchase`, `add_to_wishlist`, `search`, `sign_up`.
 

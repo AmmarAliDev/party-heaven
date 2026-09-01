@@ -59,6 +59,7 @@ Complete this once before the first production deployment and revisit before any
 - [ ] Test the funnel events in GTM Preview mode (view_item_list, view_item, add_to_cart, view_cart, remove_from_cart, begin_checkout, purchase)
 - [ ] GA4 DebugView confirms the same events arrive (GA4 event tags/triggers set up in GTM)
 - [ ] Meta Pixel Helper browser extension confirms Meta standard events fire (Meta tags map event names)
+- [ ] Meta Conversion API configured (`META_PIXEL_ID` + `META_CAPI_ACCESS_TOKEN`) and a test order appears as a `Purchase` in Meta Events Manager (use `META_CAPI_TEST_EVENT_CODE` in Test Events); GTM Meta Pixel Purchase tag Event ID set to `ecommerce.transaction_id` for dedup — see `docs/dev/meta-conversion-api.md`
 
 ### Health & Monitoring
 

@@ -36,6 +36,7 @@ Production-ready **single-vendor e-commerce application** built with **Next.js 1
 | Rate limiting (Redis + in-memory) | ✅ Live | `src/lib/rate-limit/` |
 | SEO (metadata, JSON-LD, sitemap) | ✅ Live | `src/lib/seo/`, `src/app/sitemap.ts` |
 | Analytics (GTM → GA4 + Meta Pixel) | ✅ Live | `src/features/analytics/` |
+| Meta Conversion API (server-side) | ✅ Live | `src/features/analytics/meta-capi/` |
 | Audit log | ✅ Live | `AuditLog` table + admin activity feed |
 
 > **Payment gateways, referral/loyalty programmes, and multi-locale (Urdu) support are intentionally deferred.** COD is the only checkout payment method.

@@ -65,6 +65,22 @@ For the `PURCHASE` event, the `value` field represents the **grand total** (subt
 
 The global CSP in `src/config/security.ts` allowlists `https://www.googletagmanager.com` (GTM loader) **and** `https://connect.facebook.net` (Meta Pixel loader injected by GTM) in `script-src` whenever `NEXT_PUBLIC_GTM_ID` is set. Note that the Meta Pixel sets a 3rd-party `fr` cookie, which can slightly lower a Lighthouse "Best Practices" score.
 
+## Meta Conversion API (CAPI)
+
+On top of the browser-side GTM pipeline, the app can send **server-side** Meta
+Conversion API events. This is a separate, server-to-server channel (access
+token stays server-side) used for reliable conversion tracking.
+
+- **Purchase** is fired automatically, server-side, when an order is placed
+  (non-blocking; failures never affect the order).
+- **Other events** (`ViewContent`, `AddToCart`, `InitiateCheckout`, `Search`,
+  `AddToWishlist`, `CompleteRegistration`, `PageView`) can optionally be sent
+  through the guarded bridge route `POST /api/analytics/meta-capi` (opt-in).
+- Enabled with `META_PIXEL_ID` + `META_CAPI_ACCESS_TOKEN`; no-op otherwise.
+
+See **`docs/dev/meta-conversion-api.md`** for setup, event mapping,
+deduplication (`event_id` vs. the Pixel), and testing.
+
 ## How to Test
 
 1. **GTM Preview** — open GTM → Preview, navigate the store, and confirm each event appears in the dataLayer:
