@@ -17,9 +17,7 @@ const baseRuntimeEnv = {
   defaultCity: "Karachi",
   enableAdminPreview: true,
   enableAuthPreview: true,
-  gaId: undefined,
   gtmId: undefined,
-  metaPixelId: undefined,
 } as const;
 
 describe("production visibility guards", () => {

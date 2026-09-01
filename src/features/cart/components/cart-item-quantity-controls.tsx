@@ -5,6 +5,7 @@ import { Minus, Plus, Trash2 } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { trackEvent } from "@/features/analytics";
 import { dispatchCartChanged } from "@/features/cart/client-events";
 import type { CartSummary } from "@/features/cart/types";
 import { AppError } from "@/lib/errors/app-error";
@@ -21,6 +22,10 @@ type CartItemQuantityControlsProps = {
    * product line (PATCH/DELETE use `dealCartItemId` payloads).
    */
   dealCartItemId?: string;
+  /** Unit price used for the analytics `remove_from_cart` event payload. */
+  price?: number;
+  /** Category slug used for the analytics `remove_from_cart` event payload. */
+  category?: string;
 };
 
 type CartMutationPayload = {
@@ -112,6 +117,8 @@ export function CartItemQuantityControls({
   quantity,
   availableQuantity,
   dealCartItemId,
+  price,
+  category,
 }: CartItemQuantityControlsProps) {
   const effectiveAllowedMax = getEffectiveAllowedMax(availableQuantity);
   const dealLine = Boolean(dealCartItemId);
@@ -246,7 +253,23 @@ export function CartItemQuantityControls({
         type="button"
         variant="ghost"
         size="icon"
-        onClick={() => runMutation(() => removeItem(itemId, dealLine), 0)}
+        onClick={() => {
+          trackEvent({
+            type: 'REMOVE_FROM_CART',
+            payload: {
+              product: {
+                id: itemId,
+                name: productName,
+                ...(typeof price === 'number' ? { price } : {}),
+                quantity: displayQuantity,
+                ...(category ? { category } : {}),
+              },
+              value: (price ?? 0) * displayQuantity,
+              currency: 'PKR',
+            },
+          });
+          void runMutation(() => removeItem(itemId, dealLine), 0);
+        }}
         disabled={pending}
         aria-label={`Remove ${productName} from cart`}
       >

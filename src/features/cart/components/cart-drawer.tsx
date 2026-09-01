@@ -19,6 +19,7 @@ import { InlineSpinner } from "@/components/ui/inline-spinner";
 import { PriceDisplay } from "@/components/ui/price-display";
 import { SectionErrorState } from "@/components/ui/section-error-state";
 import { routes } from "@/config/routes";
+import { trackEvent } from "@/features/analytics";
 import { closeCartDrawer, useCartDrawerState } from "@/features/cart/cart-drawer-state";
 import { addCartChangedListener } from "@/features/cart/client-events";
 import type { CartSummary } from "@/features/cart/types";
@@ -93,6 +94,36 @@ export function CartDrawer() {
       void load();
     }
   }, [open, cart]);
+
+  // Fire the GTM "view_cart" event whenever the drawer opens with items.
+  useEffect(() => {
+    if (open && cart && (cart.items.length > 0 || cart.dealItems.length > 0)) {
+      trackEvent({
+        type: 'VIEW_CART',
+        payload: {
+          items: [
+            ...cart.items.map((item) => ({
+              id: item.id,
+              name: item.productName,
+              price: item.unitPrice,
+              category: item.categorySlug,
+              quantity: item.quantity,
+            })),
+            ...cart.dealItems.map((item) => ({
+              id: item.id,
+              name: item.title,
+              price: item.unitPrice,
+              quantity: item.quantity,
+            })),
+          ],
+          value: cart.subtotal,
+          currency: 'PKR',
+        },
+      });
+    }
+    // Fire once per drawer open with the latest cart snapshot.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [open]);
 
   const hasItems = Boolean(cart && (cart.items.length > 0 || cart.dealItems.length > 0));
   const canCheckout =
@@ -207,6 +238,7 @@ export function CartDrawer() {
                             productName={item.title}
                             quantity={item.quantity}
                             availableQuantity={item.availableQuantity}
+                            price={item.unitPrice}
                           />
                         </div>
                       </div>
@@ -257,6 +289,8 @@ export function CartDrawer() {
                             productName={item.productName}
                             quantity={item.quantity}
                             availableQuantity={item.availableQuantity}
+                            price={item.unitPrice}
+                            category={item.categorySlug}
                           />
                         </div>
                       </div>

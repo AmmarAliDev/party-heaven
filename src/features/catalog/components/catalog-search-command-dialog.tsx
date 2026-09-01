@@ -15,6 +15,7 @@ import {
   CommandSeparator,
 } from "@/components/ui/command";
 import { InlineSpinner } from "@/components/ui/inline-spinner";
+import { trackEvent } from "@/features/analytics";
 import { formatPrice } from "@/lib/currency";
 
 import { normalizeCatalogImageUrl } from "../lib/product-image-url";
@@ -207,6 +208,23 @@ export function CatalogSearchCommandDialog() {
 
         setResults(payload.items);
         setResolvedQuery(debouncedQuery);
+
+        if (payload.items.length > 0) {
+          trackEvent({
+            type: 'VIEW_ITEM_LIST',
+            payload: {
+              itemListId: 'search_results',
+              itemListName: 'Search results',
+              items: payload.items.map((item) => ({
+                id: item.id,
+                name: item.name,
+                price: item.price,
+                category: item.categorySlug,
+                quantity: 1,
+              })),
+            },
+          });
+        }
       } catch {
         if (controller.signal.aborted) {
           return;
@@ -259,6 +277,7 @@ export function CatalogSearchCommandDialog() {
         onKeyDown={(event) => {
           if (event.key === "Enter" && canSearch) {
             saveRecentQuery(query);
+            trackEvent({ type: 'SEARCH', payload: { searchTerm: query.trim() } });
           }
         }}
       />
@@ -395,6 +414,20 @@ export function CatalogSearchCommandDialog() {
                     product={product}
                     onSelect={() => {
                       saveRecentQuery(query);
+                      trackEvent({ type: 'SEARCH', payload: { searchTerm: query.trim() } });
+                      trackEvent({
+                        type: 'SELECT_ITEM',
+                        payload: {
+                          itemListName: 'Search results',
+                          product: {
+                            id: product.id,
+                            name: product.name,
+                            price: product.price,
+                            category: product.categorySlug,
+                            quantity: 1,
+                          },
+                        },
+                      });
                       navigateToProduct(product.href);
                     }}
                   />

@@ -6,6 +6,7 @@ import { Heart } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import { routes } from "@/config/routes";
+import { trackEvent } from "@/features/analytics";
 import { AppError } from "@/lib/errors/app-error";
 import { toUserMessage } from "@/lib/errors/error-messages";
 import { notify } from "@/lib/notify";
@@ -16,9 +17,17 @@ type WishlistToggleButtonProps = {
   optionId?: string | undefined;
   sku: string;
   productName: string;
+  /** Selling price used for the analytics `add_to_wishlist` event payload. */
+  price?: number;
 };
 
-export function WishlistToggleButton({ productSlug, optionId, sku, productName }: WishlistToggleButtonProps) {
+export function WishlistToggleButton({
+  productSlug,
+  optionId,
+  sku,
+  productName,
+  price,
+}: WishlistToggleButtonProps) {
   const router = useRouter();
   const pathname = usePathname();
 
@@ -98,6 +107,21 @@ export function WishlistToggleButton({ productSlug, optionId, sku, productName }
 
       const nextValue = !wishlisted;
       setWishlisted(nextValue);
+
+      if (nextValue) {
+        trackEvent({
+          type: 'ADD_TO_WISHLIST',
+          payload: {
+            product: {
+              id: productSlug,
+              name: productName,
+              ...(typeof price === 'number' ? { price } : {}),
+              quantity: 1,
+            },
+          },
+        });
+      }
+
       notify.success(nextValue ? `${productName} saved` : `${productName} removed`, "Wishlist updated.");
       router.refresh();
     } catch (error) {

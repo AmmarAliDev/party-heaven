@@ -47,9 +47,9 @@ export const publicEnvSchema = z.object({
     .default("Karachi"),
   NEXT_PUBLIC_ENABLE_ADMIN: booleanFromEnv(true),
   NEXT_PUBLIC_ENABLE_AUTH: booleanFromEnv(true),
-  NEXT_PUBLIC_GA_ID: z.string().trim().optional(),
+  // GTM is the single tracking pipeline (GA4 + Meta Pixel are configured in
+  // the GTM container), so only the container ID is needed here.
   NEXT_PUBLIC_GTM_ID: z.string().trim().optional(),
-  NEXT_PUBLIC_META_PIXEL_ID: z.string().trim().optional(),
 });
 
 export const serverEnvSchema = z
@@ -208,9 +208,7 @@ export type RuntimeEnv = Readonly<{
   defaultCity: PublicEnvValues["NEXT_PUBLIC_DEFAULT_CITY"];
   enableAdminPreview: PublicEnvValues["NEXT_PUBLIC_ENABLE_ADMIN"];
   enableAuthPreview: PublicEnvValues["NEXT_PUBLIC_ENABLE_AUTH"];
-  gaId: PublicEnvValues["NEXT_PUBLIC_GA_ID"];
   gtmId: PublicEnvValues["NEXT_PUBLIC_GTM_ID"];
-  metaPixelId: PublicEnvValues["NEXT_PUBLIC_META_PIXEL_ID"];
 }>;
 
 function formatEnvErrors(scope: "public" | "server", error: z.ZodError) {
@@ -239,9 +237,7 @@ export function loadRuntimeEnv(rawEnv: EnvSource = process.env): RuntimeEnv {
     NEXT_PUBLIC_DEFAULT_CITY,
     NEXT_PUBLIC_ENABLE_ADMIN,
     NEXT_PUBLIC_ENABLE_AUTH,
-    NEXT_PUBLIC_GA_ID,
     NEXT_PUBLIC_GTM_ID,
-    NEXT_PUBLIC_META_PIXEL_ID,
   } = result.data;
 
   return {
@@ -250,9 +246,7 @@ export function loadRuntimeEnv(rawEnv: EnvSource = process.env): RuntimeEnv {
     defaultCity: NEXT_PUBLIC_DEFAULT_CITY,
     enableAdminPreview: NEXT_PUBLIC_ENABLE_ADMIN,
     enableAuthPreview: NEXT_PUBLIC_ENABLE_AUTH,
-    gaId: NEXT_PUBLIC_GA_ID,
     gtmId: NEXT_PUBLIC_GTM_ID,
-    metaPixelId: NEXT_PUBLIC_META_PIXEL_ID,
   };
 }
 

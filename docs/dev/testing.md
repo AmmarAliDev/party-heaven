@@ -101,7 +101,7 @@ Lightweight import-level checks that verify public API contracts without mocking
 
 #### Analytics
 
-Analytics events (`trackEvent` for `PAGE_VIEW`, `PRODUCT_VIEW`, `ADD_TO_CART`, `BEGIN_CHECKOUT`, `PURCHASE`) are dispatched to GA4, GTM (`sendGTMEvent`), and Meta Pixel. No unit tests are maintained for the event dispatcher itself.
+Analytics events (`trackEvent` for `PAGE_VIEW`, `PRODUCT_VIEW`, `ADD_TO_CART`, `BEGIN_CHECKOUT`, `PURCHASE`, `VIEW_ITEM_LIST`, `SELECT_ITEM`, `VIEW_CART`, `REMOVE_FROM_CART`, `ADD_TO_WISHLIST`, `SEARCH`, `SIGN_UP`) are dispatched to the GTM `dataLayer` via `sendGTMEvent` (GA4 + Meta Pixel are configured inside the GTM container). No unit tests are maintained for the event dispatcher itself.
 
 #### Auth
 

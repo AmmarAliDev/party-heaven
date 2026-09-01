@@ -2,60 +2,45 @@ import { sendGTMEvent } from "@next/third-parties/google";
 
 import type { AnalyticsEvent, ProductInfo } from '../types';
 
-declare global {
-  interface Window {
-    gtag?: (...args: unknown[]) => void;
-    fbq?: (...args: unknown[]) => void;
-  }
-}
-
 /**
- * Normalizes GA4 items payload from internal product info.
+ * Normalizes the GA4 items payload from internal product info. Fields that are
+ * not present (e.g. price on wishlist events) are omitted rather than pushed as
+ * `undefined`, keeping the dataLayer payload clean.
  */
 const mapToG4Items = (items: ProductInfo[]) => {
   return items.map((item) => ({
     item_id: item.id,
     item_name: item.name,
-    price: item.price,
-    item_category: item.category,
-    item_brand: item.brand,
+    ...(typeof item.price === 'number' ? { price: item.price } : {}),
+    ...(item.category ? { item_category: item.category } : {}),
+    ...(item.brand ? { item_brand: item.brand } : {}),
     quantity: item.quantity || 1,
   }));
 };
 
 /**
- * Track an analytics event dispatching to all configured providers
- * (Google Tag Manager via sendGTMEvent, GA4, Meta).
- * Fails gracefully and silently if providers are not loaded (e.g., ad blocker, disabled).
+ * Track an analytics event by pushing it onto the GTM dataLayer
+ * (Google Tag Manager). GA4 and Meta Pixel are configured INSIDE the GTM
+ * container — this app no longer loads or calls GA4/Meta directly.
+ *
+ * Events use GA4-standard names and payloads; the GTM container is responsible
+ * for mapping them to GA4 (as-is) and to Meta's standard events (e.g.
+ * `view_item` → `ViewContent`, `add_to_cart` → `AddToCart`).
+ *
+ * Fails gracefully and silently if the dataLayer is unavailable.
  */
 export const trackEvent = (event: AnalyticsEvent) => {
   try {
     switch (event.type) {
       case 'PAGE_VIEW':
-        if (typeof window.gtag === 'function') {
-          window.gtag('event', 'page_view', {
-            page_location: event.payload.url,
-            page_title: event.payload.title,
-          });
-        }
         sendGTMEvent({
           event: 'page_view',
           page_location: event.payload.url,
           page_title: event.payload.title,
         });
-        if (typeof window.fbq === 'function') {
-          window.fbq('track', 'PageView');
-        }
         break;
 
       case 'PRODUCT_VIEW':
-        if (typeof window.gtag === 'function') {
-          window.gtag('event', 'view_item', {
-            currency: event.payload.product.currency || 'PKR',
-            value: event.payload.product.price,
-            items: mapToG4Items([event.payload.product]),
-          });
-        }
         sendGTMEvent({
           event: 'view_item',
           ecommerce: {
@@ -64,25 +49,9 @@ export const trackEvent = (event: AnalyticsEvent) => {
             items: mapToG4Items([event.payload.product]),
           },
         });
-        if (typeof window.fbq === 'function') {
-          window.fbq('track', 'ViewContent', {
-            content_type: 'product',
-            content_ids: [event.payload.product.id],
-            content_name: event.payload.product.name,
-            value: event.payload.product.price,
-            currency: event.payload.product.currency || 'PKR',
-          });
-        }
         break;
 
       case 'ADD_TO_CART':
-        if (typeof window.gtag === 'function') {
-          window.gtag('event', 'add_to_cart', {
-            currency: event.payload.currency || 'PKR',
-            value: event.payload.value,
-            items: mapToG4Items([event.payload.product]),
-          });
-        }
         sendGTMEvent({
           event: 'add_to_cart',
           ecommerce: {
@@ -91,23 +60,8 @@ export const trackEvent = (event: AnalyticsEvent) => {
             items: mapToG4Items([event.payload.product]),
           },
         });
-        if (typeof window.fbq === 'function') {
-          window.fbq('track', 'AddToCart', {
-            content_type: 'product',
-            content_ids: [event.payload.product.id],
-            value: event.payload.value,
-            currency: event.payload.currency || 'PKR',
-          });
-        }
         break;
       case 'BEGIN_CHECKOUT':
-        if (typeof window.gtag === 'function') {
-          window.gtag('event', 'begin_checkout', {
-            currency: event.payload.currency,
-            value: event.payload.value,
-            items: mapToG4Items(event.payload.items),
-          });
-        }
         sendGTMEvent({
           event: 'begin_checkout',
           ecommerce: {
@@ -116,47 +70,86 @@ export const trackEvent = (event: AnalyticsEvent) => {
             items: mapToG4Items(event.payload.items),
           },
         });
-        if (typeof window.fbq === 'function') {
-          window.fbq('track', 'InitiateCheckout', {
-            content_ids: event.payload.items.map(i => i.id),
-            num_items: event.payload.items.reduce((acc, i) => acc + (i.quantity || 1), 0),
-            value: event.payload.value,
-            currency: event.payload.currency,
-          });
-        }
         break;
 
       case 'PURCHASE':
-        if (typeof window.gtag === 'function') {
-          window.gtag('event', 'purchase', {
-            transaction_id: event.payload.transactionId,
-            currency: event.payload.currency,
-            value: event.payload.value,
-            tax: event.payload.tax,
-            shipping: event.payload.shipping,
-            items: mapToG4Items(event.payload.items),
-          });
-        }
         sendGTMEvent({
           event: 'purchase',
           ecommerce: {
             transaction_id: event.payload.transactionId,
             currency: event.payload.currency,
             value: event.payload.value,
-            tax: event.payload.tax,
-            shipping: event.payload.shipping,
+            ...(typeof event.payload.tax === 'number' ? { tax: event.payload.tax } : {}),
+            ...(typeof event.payload.shipping === 'number' ? { shipping: event.payload.shipping } : {}),
             items: mapToG4Items(event.payload.items),
           },
         });
-        if (typeof window.fbq === 'function') {
-          window.fbq('track', 'Purchase', {
-            content_type: 'product',
-            content_ids: event.payload.items.map(i => i.id),
-            value: event.payload.value,
+        break;
+
+      case 'VIEW_ITEM_LIST':
+        sendGTMEvent({
+          event: 'view_item_list',
+          ecommerce: {
+            item_list_id: event.payload.itemListId,
+            item_list_name: event.payload.itemListName,
+            items: mapToG4Items(event.payload.items),
+          },
+        });
+        break;
+
+      case 'SELECT_ITEM':
+        sendGTMEvent({
+          event: 'select_item',
+          ecommerce: {
+            item_list_name: event.payload.itemListName,
+            items: mapToG4Items([event.payload.product]),
+          },
+        });
+        break;
+
+      case 'VIEW_CART':
+        sendGTMEvent({
+          event: 'view_cart',
+          ecommerce: {
             currency: event.payload.currency,
-            num_items: event.payload.items.reduce((acc, i) => acc + (i.quantity || 1), 0),
-          });
-        }
+            value: event.payload.value,
+            items: mapToG4Items(event.payload.items),
+          },
+        });
+        break;
+
+      case 'REMOVE_FROM_CART':
+        sendGTMEvent({
+          event: 'remove_from_cart',
+          ecommerce: {
+            currency: event.payload.currency,
+            value: event.payload.value,
+            items: mapToG4Items([event.payload.product]),
+          },
+        });
+        break;
+
+      case 'ADD_TO_WISHLIST':
+        sendGTMEvent({
+          event: 'add_to_wishlist',
+          ecommerce: {
+            items: mapToG4Items([event.payload.product]),
+          },
+        });
+        break;
+
+      case 'SEARCH':
+        sendGTMEvent({
+          event: 'search',
+          search_term: event.payload.searchTerm,
+        });
+        break;
+
+      case 'SIGN_UP':
+        sendGTMEvent({
+          event: 'sign_up',
+          method: event.payload.method,
+        });
         break;
     }
   } catch (error) {

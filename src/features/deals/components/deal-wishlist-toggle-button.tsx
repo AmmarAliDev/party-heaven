@@ -6,6 +6,7 @@ import { Heart } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import { routes } from "@/config/routes";
+import { trackEvent } from "@/features/analytics";
 import type { StorefrontDeal } from "@/features/deals/types";
 import { AppError } from "@/lib/errors/app-error";
 import { toUserMessage } from "@/lib/errors/error-messages";
@@ -143,6 +144,22 @@ export function DealWishlistToggleButton({ deal }: DealWishlistToggleButtonProps
               userMessage: errorPayload?.error ?? "Could not update wishlist right now. Please try again.",
             });
           }
+        }
+
+        for (const product of products) {
+          if (!product.sku) {
+            continue;
+          }
+          trackEvent({
+            type: 'ADD_TO_WISHLIST',
+            payload: {
+              product: {
+                id: product.id,
+                name: product.name,
+                quantity: product.quantity,
+              },
+            },
+          });
         }
 
         setSaved(true);

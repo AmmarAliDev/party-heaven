@@ -6,6 +6,7 @@ import { DynamicFormField, useAppForm } from "@/components/forms";
 import { Button } from "@/components/ui/button";
 import { FormErrorSummary } from "@/components/ui/form-error-summary";
 import { InlineSpinner } from "@/components/ui/inline-spinner";
+import { trackEvent } from "@/features/analytics";
 import { signUpAction, type SignUpActionState } from "@/features/auth/actions/sign-up";
 import { type SignUpInput, signUpValidator } from "@/features/auth/validators";
 import { testIds } from "@/lib/test-selectors";
@@ -34,6 +35,7 @@ export function SignUpForm() {
   // The success message remains visible while the form is reset to defaults.
   useEffect(() => {
     if (state?.success) {
+      trackEvent({ type: 'SIGN_UP', payload: { method: 'email' } });
       form.reset();
     }
   }, [state, form]);

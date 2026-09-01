@@ -59,6 +59,7 @@ export function ProductPanel({ product, selectedOptionIds, onSelect }: ProductPa
         {...(effectiveOptionId ? { optionId: effectiveOptionId } : {})}
         sku={effectiveSku}
         productName={product.name}
+        price={effectivePrice}
       />
     </div>
   );

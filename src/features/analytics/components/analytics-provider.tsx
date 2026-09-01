@@ -2,9 +2,6 @@
 
 import { Suspense,useEffect, useRef } from 'react';
 import { usePathname, useSearchParams } from 'next/navigation';
-import Script from 'next/script';
-
-import { publicEnv } from '@/config/public-env';
 
 import { trackEvent } from '../lib';
 
@@ -30,49 +27,17 @@ function PageViewTracker() {
   return null;
 }
 
+/**
+ * Analytics provider. GTM (loaded in the root layout via
+ * `@next/third-parties` `GoogleTagManager`) is the ONLY tracking pipeline:
+ * GA4 and Meta Pixel are configured inside the GTM container, so no GA4 or
+ * Meta Pixel scripts are loaded directly here. This component only tracks
+ * SPA route changes as `page_view` events on the GTM dataLayer.
+ */
 export function AnalyticsProvider() {
   return (
-    <>
-      <Suspense fallback={null}>
-        <PageViewTracker />
-      </Suspense>
-
-      {/* Google Analytics 4 */}
-      {publicEnv.gaId && (
-        <>
-          <Script
-            src={`https://www.googletagmanager.com/gtag/js?id=${publicEnv.gaId}`}
-            strategy="lazyOnload"
-          />
-          <Script id="google-analytics" strategy="lazyOnload">
-            {`
-              window.dataLayer = window.dataLayer || [];
-              function gtag(){window.dataLayer.push(arguments);}
-              gtag('js', new Date());
-
-              gtag('config', '${publicEnv.gaId}');
-            `}
-          </Script>
-        </>
-      )}
-
-      {/* Meta Pixel */}
-      {publicEnv.metaPixelId && (
-        <Script id="meta-pixel" strategy="afterInteractive">
-          {`
-            !function(f,b,e,v,n,t,s)
-            {if(f.fbq)return;n=f.fbq=function(){n.callMethod?
-            n.callMethod.apply(n,arguments):n.queue.push(arguments)};
-            if(!f._fbq)f._fbq=n;n.push=n;n.loaded=!0;n.version='2.0';
-            n.queue=[];t=b.createElement(e);t.async=!0;
-            t.src=v;s=b.getElementsByTagName(e)[0];
-            s.parentNode.insertBefore(t,s)}(window, document,'script',
-            'https://connect.facebook.net/en_US/fbevents.js');
-            fbq('init', '${publicEnv.metaPixelId}');
-            fbq('track', 'PageView');
-          `}
-        </Script>
-      )}
-    </>
+    <Suspense fallback={null}>
+      <PageViewTracker />
+    </Suspense>
   );
 }

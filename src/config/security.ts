@@ -6,7 +6,12 @@ type SecurityHeader = {
 };
 
 const LOCAL_DEV_ORIGINS = ["http://localhost:3000", "http://127.0.0.1:3000"] as const;
-const GA_SCRIPT_SOURCES = ["https://www.googletagmanager.com"] as const;
+// GTM is the single tracking pipeline: the loader lives on googletagmanager.com
+// and the GTM container injects the Meta Pixel loader from connect.facebook.net.
+const TRACKING_SCRIPT_SOURCES = [
+  "https://www.googletagmanager.com",
+  "https://connect.facebook.net",
+] as const;
 function normalizeOrigin(value: string | undefined | null): string | null {
   if (!value) {
     return null;
@@ -36,7 +41,7 @@ function buildDirective(name: string, values: Array<string | undefined | null>):
 }
 
 function hasGoogleTaggingConfig(rawEnv: EnvSource): boolean {
-  return Boolean(rawEnv.NEXT_PUBLIC_GA_ID?.trim() || rawEnv.NEXT_PUBLIC_GTM_ID?.trim());
+  return Boolean(rawEnv.NEXT_PUBLIC_GTM_ID?.trim());
 }
 
 export function getTrustedOrigins(rawEnv: EnvSource = process.env): string[] {
@@ -80,8 +85,8 @@ export function buildContentSecurityPolicy(rawEnv: EnvSource = process.env): str
     buildDirective("script-src", [
       "'self'",
       "'unsafe-inline'",
-      // Allow Google Tag Manager loader script only when GA or GTM is configured.
-      ...(isGoogleTaggingEnabled ? GA_SCRIPT_SOURCES : []),
+      // Allow the GTM loader + GTM-injected Meta Pixel loader when GTM is configured.
+      ...(isGoogleTaggingEnabled ? TRACKING_SCRIPT_SOURCES : []),
       isDevelopment ? "'unsafe-eval'" : undefined,
     ]),
     buildDirective("style-src", ["'self'", "'unsafe-inline'"]),

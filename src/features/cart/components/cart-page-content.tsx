@@ -10,6 +10,7 @@ import { EmptyState } from "@/components/ui/empty-state";
 import { PriceDisplay } from "@/components/ui/price-display";
 import { SectionErrorState } from "@/components/ui/section-error-state";
 import { routes } from "@/config/routes";
+import { trackEvent } from "@/features/analytics";
 import type { CartSummary } from "@/features/cart/types";
 import { validateCartStock } from "@/features/cart/validation";
 import { testIds } from "@/lib/test-selectors";
@@ -32,6 +33,38 @@ export function CartPageContent({ initialCart }: CartPageContentProps) {
         setCart(nextCart ?? null);
       }
     });
+  }, []);
+
+  // Fire the GTM "view_cart" event once per cart page load.
+  useEffect(() => {
+    if (initialCart.items.length === 0 && initialCart.dealItems.length === 0) {
+      return;
+    }
+
+    trackEvent({
+      type: 'VIEW_CART',
+      payload: {
+        items: [
+          ...initialCart.items.map((item) => ({
+            id: item.id,
+            name: item.productName,
+            price: item.unitPrice,
+            category: item.categorySlug,
+            quantity: item.quantity,
+          })),
+          ...initialCart.dealItems.map((item) => ({
+            id: item.id,
+            name: item.title,
+            price: item.unitPrice,
+            quantity: item.quantity,
+          })),
+        ],
+        value: initialCart.subtotal,
+        currency: 'PKR',
+      },
+    });
+    // Fire once per cart page load (cart contents are static here).
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const stockValidation = useMemo(
@@ -135,6 +168,7 @@ export function CartPageContent({ initialCart }: CartPageContentProps) {
                         productName={item.title}
                         quantity={item.quantity}
                         availableQuantity={item.availableQuantity}
+                        price={item.unitPrice}
                       />
 
                       <span className="flex gap-1">Total:{" "} <PriceDisplay amount={item.lineSubtotal} size="sm" /></span>
@@ -199,6 +233,8 @@ export function CartPageContent({ initialCart }: CartPageContentProps) {
                         productName={item.productName}
                         quantity={item.quantity}
                         availableQuantity={item.availableQuantity}
+                        price={item.unitPrice}
+                        category={item.categorySlug}
                       />
 
                       <span className="flex gap-1">Total:{" "} <PriceDisplay amount={item.lineSubtotal} size="sm" /></span>
