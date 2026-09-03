@@ -66,7 +66,7 @@ export function FeaturedDealsSectionBlock({ section }: FeaturedDealsSectionProps
                     href={deal.href}
                     className="focus-visible:ring-ring block h-full rounded-lg focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:outline-none"
                   >
-                    <Card className="h-full transition-transform duration-200 group-hover:-translate-y-0.5">
+                    <Card className="h-full transition-transform duration-500 group-hover:-translate-y-0.5">
                       <CardHeader className="space-y-1 p-0">
                         <div className="relative overflow-hidden rounded-lg mb-4" aria-hidden="true">
                           {deal.imageUrl ? (

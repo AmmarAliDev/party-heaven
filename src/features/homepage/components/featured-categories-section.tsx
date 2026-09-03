@@ -58,7 +58,7 @@ export function FeaturedCategoriesSectionBlock({ section }: FeaturedCategoriesSe
                     href={category.href}
                     className="group focus-visible:ring-ring block h-full rounded-lg focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:outline-none"
                   >
-                    <Card className="h-full transition-transform duration-200 group-hover:-translate-y-0.5">
+                    <Card className="h-full transition-transform duration-500 group-hover:-translate-y-0.5">
                       <CardHeader className="p-0">
                         <div className="relative overflow-hidden rounded-lg mb-4" aria-hidden="true">
                           {category.cardImageUrl ? (
@@ -68,7 +68,7 @@ export function FeaturedCategoriesSectionBlock({ section }: FeaturedCategoriesSe
                               height={214}
                               width={365}
                               sizes="(max-width: 639px) 85vw, (max-width: 767px) 50vw, (max-width: 1023px) 33vw, 25vw"
-                              className="h-54 w-full object-cover transition-transform duration-200 group-hover:scale-105"
+                              className="h-54 w-full object-cover transition-transform duration-500 group-hover:scale-105"
                               data-testid={`storefront-category-card-image-${category.slug ?? category.id}`}
                               priority={index === 0}
                             />

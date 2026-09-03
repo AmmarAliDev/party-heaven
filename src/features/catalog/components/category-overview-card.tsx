@@ -21,7 +21,7 @@ export function CategoryOverviewCard({ category, eagerImage = false }: CategoryO
       data-testid={testIds.storefront.categoryCard(category.slug)}
     >
       <article>
-        <Card className="border-border/70 h-full shadow-(--shadow-soft) transition-transform duration-200 group-hover:-translate-y-0.5">
+        <Card className="border-border/70 h-full shadow-(--shadow-soft) transition-transform duration-500 group-hover:-translate-y-0.5">
           <CardContent className="flex h-full flex-col gap-2 p-3">
             <div className="relative overflow-hidden rounded-lg border border-border/60 mb-2" aria-hidden="true">
               {category.cardImageUrl ? (
