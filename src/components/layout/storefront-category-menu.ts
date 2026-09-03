@@ -33,8 +33,8 @@ export function buildStorefrontCategoryMenu(
 }
 
 /**
- * Number of categories shown directly in the desktop storefront navbar before
- * the remaining categories are folded into the "More" dropdown.
+ * Number of categories shown as text quick links in the storefront footer's
+ * "Quick Links" column before the rest fold into its "More" dropdown.
  */
 export const NAVBAR_DIRECT_CATEGORY_LIMIT = 6;
 
@@ -48,9 +48,11 @@ export type StorefrontNavbarCategoryMenu = {
 };
 
 /**
- * Splits the canonical storefront category menu into a navbar layout:
+ * Splits the canonical storefront category menu into a quick-links layout:
  * a capped set of direct links plus a "More" dropdown that holds the
  * remaining categories and always ends with "All Categories".
+ *
+ * Used by the storefront footer for its "Quick Links" column.
  */
 export function buildStorefrontNavbarCategoryMenu(
   categories: readonly CategoryMenuInput[],

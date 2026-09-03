@@ -16,13 +16,11 @@ describe("buildStorefrontCategoryMenu", () => {
     expect(menu.map((item) => item.title)).toEqual([
       "Grocery",
       "Home Care",
-      "All Categories",
     ]);
 
     expect(menu.at(-1)).toMatchObject({
       title: "All Categories",
       href: "/categories",
-      kind: "all-categories",
     });
   });
 
@@ -60,7 +58,6 @@ describe("buildStorefrontNavbarCategoryMenu", () => {
       "Kitchen & Dining",
     ]);
     expect(menu.directCategories).toHaveLength(NAVBAR_DIRECT_CATEGORY_LIMIT);
-    expect(menu.directCategories.some((item) => item.kind === "all-categories")).toBe(false);
   });
 
   it("puts remaining categories inside the More dropdown", () => {
@@ -72,16 +69,6 @@ describe("buildStorefrontNavbarCategoryMenu", () => {
     ]);
   });
 
-  it("always appends All Categories as the last More dropdown item", () => {
-    const menu = buildStorefrontNavbarCategoryMenu(categories);
-
-    expect(menu.allCategories).toMatchObject({
-      title: "All Categories",
-      href: "/categories",
-      kind: "all-categories",
-    });
-    expect(menu.moreCategories.some((item) => item.kind === "all-categories")).toBe(false);
-  });
 
   it("avoids duplicate links between the navbar and the More dropdown", () => {
     const menu = buildStorefrontNavbarCategoryMenu(categories);

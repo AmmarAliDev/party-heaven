@@ -15,7 +15,7 @@ export function PageContainer({
 }: PageContainerProps) {
   return (
     <Component
-      className={cn("mx-2 lg:mx-auto w-full max-w-full md:max-w-11/12 px-3 md:px-4 lg:px-6 xl:px-8", className)}
+      className={cn("md:mx-2 lg:mx-auto w-full max-w-full md:max-w-11/12 px-3 md:px-4 lg:px-6 xl:px-8", className)}
       {...props}
     >
       {children}
