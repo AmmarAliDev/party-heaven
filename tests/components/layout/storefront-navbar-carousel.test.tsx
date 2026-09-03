@@ -80,14 +80,6 @@ const items: StorefrontNavbarCategory[] = [
     cardImageUrl: null,
     productCount: 3,
   },
-  {
-    kind: "all-categories",
-    slug: "all-categories",
-    title: "All Categories",
-    href: "/categories",
-    cardImageUrl: null,
-    productCount: 0,
-  },
 ];
 
 const emptyProductsResponse = () => ({
