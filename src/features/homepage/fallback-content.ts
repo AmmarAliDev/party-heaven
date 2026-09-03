@@ -82,7 +82,7 @@ export function buildHomepageFallbackSections(): HomepageSection[] {
       id: "fallback-featured-deals",
       kind: "featured-deals",
       title: "Featured Deals",
-      description: "Hand-picked deals curated from the catalog by the team.",
+      description: "Best deals for every occasion.",
       displayOrder: 35,
       deals: [],
       ctaLabel: "View all",

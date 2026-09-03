@@ -38,7 +38,7 @@ export function DealSpotlightSectionBlock({ section }: DealSpotlightSectionProps
               alt={section.image?.alt ?? section.title}
               fill
               sizes="100vw"
-              className="object-cover transition-transform duration-200 group-hover:scale-105"
+              className="object-cover transition-transform duration-500 group-hover:scale-105"
             />
           </div>
         ) : null}
