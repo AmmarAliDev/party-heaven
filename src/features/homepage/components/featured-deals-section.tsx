@@ -53,7 +53,7 @@ export function FeaturedDealsSectionBlock({ section }: FeaturedDealsSectionProps
 
   return (
     <PageContainer as="section" className="space-y-6 py-8">
-      <SectionHeader title={section.title} eyebrow="Deals" {...headerDescription} />
+      <SectionHeader title={section.title} eyebrow="" {...headerDescription} />
 
       <Carousel opts={HOMEPAGE_CAROUSEL_OPTIONS} className="w-full">
         <CarouselContent>
@@ -76,7 +76,7 @@ export function FeaturedDealsSectionBlock({ section }: FeaturedDealsSectionProps
                               height={214}
                               width={365}
                               sizes="(max-width: 639px) 85vw, (max-width: 767px) 50vw, (max-width: 1023px) 33vw, (max-width: 1279px) 25vw, (max-width: 1535px) 20vw, 17vw"
-                              className="h-54 w-full object-cover"
+                              className="h-54 w-full object-cover "
                               data-testid={`storefront-deal-card-image-${dealKey}`}
                             />
                           ) : (

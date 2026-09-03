@@ -41,12 +41,12 @@ export function FeaturedCategoriesSectionBlock({ section }: FeaturedCategoriesSe
 
   // Resolve View All link: prefer admin-supplied href, fall back to category route.
   const viewAllHref = section.viewAllHref ?? routes.storefront.categories;
-  const viewAllLabel = section.viewAllLabel ?? "View all categories";
+  const viewAllLabel = section.viewAllLabel ?? "View all";
   const showViewAll = isCapped || Boolean(section.viewAllHref);
 
   return (
     <PageContainer as="section" className="space-y-6 py-8">
-      <SectionHeader title={section.title} eyebrow="Explore" {...headerDescription} />
+      <SectionHeader title={section.title} eyebrow="" {...headerDescription} />
 
       {hasCategories ? (
         <>
@@ -68,7 +68,7 @@ export function FeaturedCategoriesSectionBlock({ section }: FeaturedCategoriesSe
                               height={214}
                               width={365}
                               sizes="(max-width: 639px) 85vw, (max-width: 767px) 50vw, (max-width: 1023px) 33vw, 25vw"
-                              className="h-54 w-full object-cover"
+                              className="h-54 w-full object-cover transition-transform duration-200 group-hover:scale-105"
                               data-testid={`storefront-category-card-image-${category.slug ?? category.id}`}
                               priority={index === 0}
                             />

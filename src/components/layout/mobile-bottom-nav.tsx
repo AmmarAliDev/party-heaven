@@ -60,7 +60,7 @@ function BottomNavAction({ label, icon, onClick, badge }: BottomNavActionProps) 
       <span className="relative">
         {icon}
         {badge ? (
-          <span className="bg-background border border-border text-primary absolute -right-2.5 -top-2.5 rounded-full px-1.5 py-0.5 text-[10px] leading-none">
+          <span className="bg-primary border border-border text-primary-foreground absolute -right-2.5 -top-2.5 rounded-full px-1.5 py-0.5 text-xxs leading-none">
             {badge}
           </span>
         ) : null}

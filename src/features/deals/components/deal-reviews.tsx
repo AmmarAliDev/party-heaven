@@ -109,7 +109,7 @@ export function DealReviews({ reviews, summary, composer }: DealReviewsProps) {
                     <div className="flex items-center gap-2">
                       <p className="font-semibold text-sm">{review.author}</p>
                       {review.verified ? (
-                        <Badge variant="success" className="text-[10px]">
+                        <Badge variant="success" className="text-xxs">
                           Verified purchase
                         </Badge>
                       ) : null}

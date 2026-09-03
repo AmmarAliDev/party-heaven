@@ -206,7 +206,7 @@ export function DealAddToCart({ deal }: DealAddToCartProps) {
             <ShoppingCart className="size-4" aria-hidden="true" />
             View cart
             <span
-              className="bg-primary text-primary-foreground absolute -top-2 -right-2 flex h-5 min-w-5 items-center justify-center rounded-full border border-border px-1.5 text-[10px] leading-none"
+              className="bg-primary text-primary-foreground absolute -top-2 -right-2 flex h-5 min-w-5 items-center justify-center rounded-full border border-border px-1.5 text-xxs leading-none"
               data-testid="storefront-cart-item-count"
             >
               <span aria-hidden="true">{cartItemCount}</span>

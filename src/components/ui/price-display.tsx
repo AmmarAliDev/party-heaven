@@ -30,8 +30,8 @@ export function PriceDisplay({
       <span className={cn("font-semibold tracking-tight", sizeMap[size])}>{formatPrice(amount)}</span>
       {hasDiscount ? (
         <>
-          <span className="text-muted-foreground text-sm line-through">{formatPrice(compareAt)}</span>
-          {savingsPercent > 0 ? <Badge variant="success">Save {savingsPercent}%</Badge> : null}
+          <span className="text-muted-foreground text-xxs line-through">{formatPrice(compareAt)}</span>
+          {savingsPercent > 0 ? <Badge variant="success" className="p-1 text-xxs">{savingsPercent}% Off</Badge> : null}
         </>
       ) : null}
     </div>

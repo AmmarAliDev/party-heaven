@@ -83,7 +83,7 @@ function SearchResultItem({
             }}
           />
         ) : (
-          <span className="from-muted to-background flex h-full w-full items-center justify-center bg-gradient-to-br px-1 text-center text-[10px] leading-tight font-semibold text-muted-foreground">
+          <span className="from-muted to-background flex h-full w-full items-center justify-center bg-gradient-to-br px-1 text-center text-xxs leading-tight font-semibold text-muted-foreground">
             {product.imageLabel}
           </span>
         )}

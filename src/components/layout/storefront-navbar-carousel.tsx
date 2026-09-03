@@ -16,7 +16,6 @@ import {
     ChevronDown,
     ChevronLeft,
     ChevronRight,
-    LayoutGrid,
     LoaderCircle,
 } from "lucide-react";
 
@@ -49,14 +48,15 @@ export const NAVBAR_CATEGORY_CAROUSEL_OPTIONS = {
 } as const;
 
 /**
- * Responsive per-slide sizing. Mobile shows exactly five pills per view; from
- * the `md` breakpoint the pills use their natural (auto) width so every
- * category that fits is visible and the arrows only appear on overflow.
- * `min-w-0` lets a slide shrink to its fixed mobile basis so a fifth of the
- * viewport really holds five pills (text truncates inside the cell).
+ * Responsive per-slide sizing: every slide is an equal-width slot at every
+ * breakpoint (4 per view on the smallest phones, stepping up to 9 on very wide
+ * screens) so the distance between categories is always the same. Labels wrap
+ * to at most two lines inside the slot instead of truncating, so category
+ * names are never hidden on smaller screens. `min-w-0` lets a slide shrink to
+ * its fixed basis so the per-view count really holds on small viewports.
  */
 export const NAVBAR_CATEGORY_ITEM_CLASS =
-    "min-w-0 shrink-0 grow-0 basis-1/4 sm:basis-1/5 px-0.5 md:basis-auto md:px-1";
+    "min-w-0 shrink-0 grow-0 basis-1/4 sm:basis-1/5 md:basis-1/6 lg:basis-1/7 xl:basis-1/8 2xl:basis-1/9 px-0.5 md:px-1";
 
 /** Delay between auto-slide advances (ms). */
 const NAVBAR_CATEGORY_AUTOPLAY_DELAY = 2000;
@@ -230,9 +230,11 @@ function CategoryDropdownTrigger({
                 onMouseLeave={() => controller.onScheduleClose()}
                 title={item.title}
                 aria-label={`Products in ${item.title}`}
-                className="text-muted-foreground cursor-pointer hover:text-foreground inline-flex min-w-0 max-w-full items-center gap-0.5 rounded-full px-1.5 py-1 text-xs font-medium transition-colors focus-visible:ring-ring focus-visible:outline-none focus-visible:ring-2 md:max-w-none md:text-[13px]"
+                className="text-muted-foreground cursor-pointer hover:text-foreground inline-flex min-w-0 max-w-full items-center gap-0.5 rounded-full px-1.5 py-1 text-center text-xs font-medium transition-colors focus-visible:ring-ring focus-visible:outline-none focus-visible:ring-2 md:text-[13px]"
             >
-                <span className="min-w-0 truncate md:overflow-visible">{item.title}</span>
+                <span className="min-w-0 text-wrap text-center leading-tight line-clamp-2">
+                    {item.title}
+                </span>
                 <ChevronDown
                     aria-hidden="true"
                     className={cn(
@@ -269,8 +271,8 @@ function CategoryNavItem({
     controller: DropdownController;
 }) {
     return (
-        <li className={cn("group", NAVBAR_CATEGORY_ITEM_CLASS)}>
-            <div className="flex w-full flex-col items-center gap-1.5 py-1 md:w-auto">
+        <li className={cn("group flex", NAVBAR_CATEGORY_ITEM_CLASS)}>
+            <div className="flex w-full flex-col items-center justify-start gap-1.5 py-1">
                 <CategoryCircleLink item={item} />
                 <CategoryDropdownTrigger item={item} controller={controller} />
             </div>
@@ -374,7 +376,7 @@ function NavbarCategoryProducts({ item }: { item: CategoryPill }) {
                                 className="flex items-center gap-2.5 px-2 py-1.5 cursor-pointer"
                             >
                                 <ProductThumbnail product={product} />
-                                <span className="min-w-0 flex-1 truncate text-sm">
+                                <span className="min-w-0 flex-1 text-wrap line-clamp-2 text-sm">
                                     {product.name}
                                 </span>
                                 <span className="text-muted-foreground shrink-0 text-xs">
@@ -392,7 +394,7 @@ function NavbarCategoryProducts({ item }: { item: CategoryPill }) {
                     <DropdownMenuItem asChild className="focus:bg-accent rounded-md">
                         <Link
                             href={item.href}
-                            className="text-primary-strong flex items-center justify-center gap-1 px-2 py-2 text-xs font-semibold"
+                            className="text-primary-strong flex items-center justify-center gap-1 px-2 py-2 text-xs font-semibold cursor-pointer"
                         >
                             View all {total} products
                         </Link>
@@ -639,7 +641,7 @@ export function StorefrontNavbarCarousel({
                 className="min-w-0 flex-1 overflow-hidden"
                 data-testid="navbar-category-viewport"
             >
-                <ul className="flex justify-between items-center">
+                <ul className="flex items-stretch justify-between">
                     {items.map((item) => (
                         <CategoryNavItem
                             key={item.slug}

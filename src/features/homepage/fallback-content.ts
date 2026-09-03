@@ -85,7 +85,7 @@ export function buildHomepageFallbackSections(): HomepageSection[] {
       description: "Hand-picked deals curated from the catalog by the team.",
       displayOrder: 35,
       deals: [],
-      ctaLabel: "View all Featured Deals",
+      ctaLabel: "View all",
       ctaHref: routes.storefront.deals,
       placeholderMessage: "No Featured Deals are available right now. Check back soon for fresh picks.",
     },

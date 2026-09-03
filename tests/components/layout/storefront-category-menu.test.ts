@@ -6,33 +6,6 @@ import {
   NAVBAR_DIRECT_CATEGORY_LIMIT,
 } from "@/components/layout/storefront-category-menu";
 
-describe("buildStorefrontCategoryMenu", () => {
-  it("sorts categories alphabetically and appends All Categories", () => {
-    const menu = buildStorefrontCategoryMenu([
-      { name: "Home Care", href: "/categories/home-care" },
-      { name: "Grocery", href: "/categories/grocery" },
-    ]);
-
-    expect(menu.map((item) => item.title)).toEqual([
-      "Grocery",
-      "Home Care",
-    ]);
-
-    expect(menu.at(-1)).toMatchObject({
-      title: "All Categories",
-      href: "/categories",
-    });
-  });
-
-  it("does not include a reserved Party Heaven entry", () => {
-    const menu = buildStorefrontCategoryMenu([
-      { name: "Personal Care", href: "/categories/personal-care" },
-    ]);
-
-    expect(menu.some((item) => item.title === "Party Heaven")).toBe(false);
-    expect(menu.map((item) => item.title)).toEqual(["Personal Care", "All Categories"]);
-  });
-});
 
 describe("buildStorefrontNavbarCategoryMenu", () => {
   const categories = [

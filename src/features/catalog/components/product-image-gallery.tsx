@@ -183,7 +183,7 @@ export function ProductImageGallery({
                 />
               ) : null}
               {hasVariantImages && img.variantLabel ? (
-                <span className="absolute inset-x-0 bottom-0 truncate bg-black/60 px-1 py-0.5 text-center text-[9px] font-medium leading-tight text-white">
+                <span className="absolute inset-x-0 bottom-0 truncate bg-black/60 px-1 py-0.5 text-center text-[9px] font-medium leading-tight text-primary-foreground">
                   {img.variantLabel}
                 </span>
               ) : null}

@@ -75,15 +75,15 @@ export function ProductGridCard({
             <CardContent className="space-y-2 p-3 pb-6">
               <div className="space-y-2">
                 <div className="flex flex-wrap justify-between items-center gap-2">
-                  <Badge variant={stockBadge.variant}>{stockBadge.label}</Badge>
-                  {product.compareAt && product.compareAt > product.price ? (
+                  {/* <Badge variant={stockBadge.variant}>{stockBadge.label}</Badge> */}
+                  {/* {product.compareAt && product.compareAt > product.price ? (
                     <Badge variant="info">Discount available</Badge>
-                  ) : null}
+                  ) : null} */}
                 </div>
                 <h3 className="group-hover:text-primary text-lg font-semibold tracking-tight transition-colors">
                   {product.name}
                 </h3>
-                <p className="text-muted-foreground text-sm line-clamp-2">{product.description}</p>
+                <p className="text-muted-foreground text-xs md:text-sm line-clamp-2">{product.description}</p>
               </div>
 
               <PriceDisplay
