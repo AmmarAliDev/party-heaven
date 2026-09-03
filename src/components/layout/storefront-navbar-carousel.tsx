@@ -230,7 +230,7 @@ function CategoryDropdownTrigger({
                 onMouseLeave={() => controller.onScheduleClose()}
                 title={item.title}
                 aria-label={`Products in ${item.title}`}
-                className="text-muted-foreground hover:text-foreground inline-flex min-w-0 max-w-full items-center gap-0.5 rounded-full px-1.5 py-1 text-xs font-medium transition-colors focus-visible:ring-ring focus-visible:outline-none focus-visible:ring-2 md:max-w-none md:text-[13px]"
+                className="text-muted-foreground cursor-pointer hover:text-foreground inline-flex min-w-0 max-w-full items-center gap-0.5 rounded-full px-1.5 py-1 text-xs font-medium transition-colors focus-visible:ring-ring focus-visible:outline-none focus-visible:ring-2 md:max-w-none md:text-[13px]"
             >
                 <span className="min-w-0 truncate md:overflow-visible">{item.title}</span>
                 <ChevronDown
@@ -371,7 +371,7 @@ function NavbarCategoryProducts({ item }: { item: CategoryPill }) {
                         <DropdownMenuItem asChild className="focus:bg-accent rounded-md">
                             <Link
                                 href={product.href}
-                                className="flex items-center gap-2.5 px-2 py-1.5"
+                                className="flex items-center gap-2.5 px-2 py-1.5 cursor-pointer"
                             >
                                 <ProductThumbnail product={product} />
                                 <span className="min-w-0 flex-1 truncate text-sm">
