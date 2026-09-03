@@ -28,7 +28,7 @@ export function CartDrawerTrigger() {
     >
       <ShoppingCart className="size-4" aria-hidden="true" />
       Cart
-      <span className="bg-primary text-primary-foreground rounded-full px-1.5 py-0.5 text-[10px] leading-none">
+      <span className="bg-primary text-primary-foreground rounded-full px-1.5 py-0.5 text-xxs leading-none">
         <span aria-hidden="true">{itemCount}</span>
         <span className="sr-only">{`${itemCount} ${itemCount === 1 ? "item" : "items"} in cart`}</span>
       </span>

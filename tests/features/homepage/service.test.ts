@@ -668,7 +668,7 @@ describe("homepage CMS service", () => {
         type: "featured-deals",
         content: {
           description: "Hand-picked deals",
-          ctaLabel: "View all Featured Deals",
+          ctaLabel: "View all",
           ctaHref: "/deals",
           placeholderMessage: "No Featured Deals right now.",
         },

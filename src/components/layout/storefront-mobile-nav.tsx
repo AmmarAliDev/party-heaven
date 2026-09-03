@@ -45,13 +45,13 @@ export function StorefrontMobileNav({
       {isOpen ? (
         <div
           id="mobile-navigation-panel"
-          className="border-border/80 bg-card/98 absolute inset-x-0 top-full z-50 border-b px-4 py-4 shadow-(--shadow-soft) backdrop-blur"
+          className="border-border/80 bg-black/90 text-primary-strong absolute inset-x-0 top-full z-50 border-b px-4 py-4 shadow-(--shadow-soft) backdrop-blur"
         >
           <div className="mx-auto flex w-full max-w-(--container-width) flex-col gap-4">
             <div className={cn("grid gap-2 place-items-center", isSignedIn ? "grid-cols-3" : "grid-cols-2")}>
               <Link
                 href={wishlistHref}
-                className={buttonVariants({ variant: "outline", size: "icon" })}
+                className={buttonVariants({ variant: "outline", size: "lg" })}
                 onClick={() => setIsOpen(false)}
                 aria-label="Wishlist"
               >
@@ -59,7 +59,7 @@ export function StorefrontMobileNav({
               </Link>
               <Link
                 href={accountHref}
-                className={buttonVariants({ variant: "outline", size: "icon" })}
+                className={buttonVariants({ variant: "outline", size: "lg" })}
                 onClick={() => setIsOpen(false)}
                 aria-label="Account"
               >
@@ -68,8 +68,8 @@ export function StorefrontMobileNav({
               {isSignedIn && (
                 <SignOutButton
                   variant="outline"
-                  size="icon"
-                  className="px-2 w-max"
+                  size="lg"
+                  className="px-6 w-max"
                   formClassName="w-max"
                   fullWidth
                   showText={false}
@@ -83,7 +83,7 @@ export function StorefrontMobileNav({
                   key={item.href}
                   href={item.href}
                   onClick={() => setIsOpen(false)}
-                  className="text-foreground hover:bg-accent hover:text-accent-foreground rounded-md px-3 py-2 text-sm font-medium transition-colors"
+                  className="text-primary-foreground hover:bg-accent hover:text-accent-foreground rounded-md px-3 py-2 text-sm font-medium transition-colors"
                 >
                   {item.title}
                 </Link>
@@ -96,7 +96,7 @@ export function StorefrontMobileNav({
                     <Link
                       href={routes.admin.dashboard}
                       onClick={() => setIsOpen(false)}
-                      className="text-foreground hover:bg-accent hover:text-accent-foreground rounded-md px-3 py-2 text-sm font-medium transition-colors"
+                      className="text-primary-foreground hover:bg-accent hover:text-accent-foreground rounded-md px-3 py-2 text-sm font-medium transition-colors"
                     >
                       Admin Panel
                     </Link>
@@ -105,7 +105,7 @@ export function StorefrontMobileNav({
                     <Link
                       href={routes.storefront.accountOrders}
                       onClick={() => setIsOpen(false)}
-                      className="text-foreground hover:bg-accent hover:text-accent-foreground rounded-md px-3 py-2 text-sm font-medium transition-colors"
+                      className="text-primary-foreground hover:bg-accent hover:text-accent-foreground rounded-md px-3 py-2 text-sm font-medium transition-colors"
                     >
                       Your Orders
                     </Link>

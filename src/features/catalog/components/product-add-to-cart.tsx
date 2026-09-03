@@ -207,7 +207,7 @@ export function ProductAddToCart({
             <span className="inline-flex items-center gap-2 text-sm font-medium ">
               <ShoppingCart className="size-4" aria-hidden="true" />
             </span>
-            <span className="bg-primary text-primary-foreground rounded-full px-1.5 py-0.5 text-[10px] leading-none border border-border absolute -right-2 -top-2" data-testid="storefront-cart-item-count">
+            <span className="bg-primary text-primary-foreground rounded-full px-1.5 py-0.5 text-xxs leading-none border border-border absolute -right-2 -top-2" data-testid="storefront-cart-item-count">
               <span aria-hidden="true">{cartItemCount}</span>
               <span className="sr-only">{`${cartItemCount} ${cartItemLabel} in cart`}</span>
             </span>

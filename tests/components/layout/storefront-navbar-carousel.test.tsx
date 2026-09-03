@@ -136,7 +136,7 @@ describe("StorefrontNavbarCarousel rendering", () => {
     expect(screen.getByRole("button", { name: "Products in Grocery" })).toBeInTheDocument();
   });
 
-  it("sizes each slide per breakpoint (4 under sm, 5 from sm, auto on md+)", () => {
+  it("sizes each slide as an equal-width slot (4 under sm, 5 from sm, 6 from md, 7 from lg, 8 from xl, 9 from 2xl)", () => {
     render(<StorefrontNavbarCarousel items={items} />);
 
     const viewport = screen.getByTestId("navbar-category-viewport");
@@ -144,7 +144,10 @@ describe("StorefrontNavbarCarousel rendering", () => {
 
     expect(firstSlide).toHaveClass("basis-1/4");
     expect(firstSlide).toHaveClass("sm:basis-1/5");
-    expect(firstSlide).toHaveClass("md:basis-auto");
+    expect(firstSlide).toHaveClass("md:basis-1/6");
+    expect(firstSlide).toHaveClass("lg:basis-1/7");
+    expect(firstSlide).toHaveClass("xl:basis-1/8");
+    expect(firstSlide).toHaveClass("2xl:basis-1/9");
   });
 
   it("returns nothing when there are no items", () => {

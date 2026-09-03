@@ -7,9 +7,11 @@ import { buildStorefrontNavbarCategories } from "./storefront-navbar-categories"
 
 /**
  * Storefront category navbar. Fetches the live published catalog categories
- * and renders them as a swipeable pill carousel (5 per view on mobile, arrows
- * on overflow). Each category title opens a scrollable dropdown listing that
- * category's products; the circular image links to the category listing page.
+ * and renders them as a swipeable pill carousel where every category is an
+ * equal-width slot (4–9 per view depending on breakpoint) so spacing is
+ * uniform; arrows/auto-slide only appear when the row overflows. Each
+ * category title opens a dropdown listing that category's products; the
+ * circular image links to the category listing page.
  *
  * The navbar renders on a plain (page) background — it deliberately sits on
  * its own full-width band below the dark header strip, not inside it.

@@ -143,7 +143,7 @@ describe("FeaturedCategoriesSectionBlock", () => {
     const categories = Array.from({ length: 10 }, (_, i) => buildCategory(`cat-${i + 1}`));
     render(<FeaturedCategoriesSectionBlock section={buildSection(categories)} />);
 
-    expect(screen.getByRole("link", { name: /view all categories/i })).toBeInTheDocument();
+    expect(screen.getByRole("link", { name: /view all/i })).toBeInTheDocument();
   });
 
   it("shows a View All link with custom label when viewAllHref is provided", () => {

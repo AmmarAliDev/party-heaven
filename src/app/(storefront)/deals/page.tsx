@@ -26,7 +26,7 @@ export default async function DealsPage() {
       <PageContainer as="section" className="space-y-6 py-8">
         <SectionHeader
           title="Featured Deals"
-          eyebrow="Deals"
+          eyebrow=""
           description="Hand-picked deals curated from the catalog by the team."
         />
 

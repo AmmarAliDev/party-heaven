@@ -305,7 +305,7 @@ const dealSpotlightContentSchema = z
  */
 const featuredDealsContentSchema = z.object({
   description: optionalText,
-  ctaLabel: z.string().trim().min(1, "CTA label is required.").max(80, "CTA label is too long.").default("View all Featured Deals"),
+  ctaLabel: z.string().trim().min(1, "CTA label is required.").max(80, "CTA label is too long.").default("View all"),
   ctaHref: z
     .string()
     .trim()
@@ -471,7 +471,7 @@ const homepageSectionContentTemplates: Record<AdminHomepageSectionType, Record<s
   },
   "featured-deals": {
     description: "Deals are loaded from the admin Deals list. This shell configures the section heading and CTA.",
-    ctaLabel: "View all Featured Deals",
+    ctaLabel: "View all",
     ctaHref: "/deals",
     placeholderMessage: "No Featured Deals are available right now. Check back soon.",
   },

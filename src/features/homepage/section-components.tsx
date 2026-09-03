@@ -17,17 +17,17 @@ import type {
 
 type SectionComponentMap = {
   "announcement-bar": ComponentType<{ section: AnnouncementBarSection }>;
-  "featured-categories": ComponentType<{ section: FeaturedCategoriesSection }>;
-  "featured-deals": ComponentType<{ section: FeaturedDealsSection }>;
   "featured-products": ComponentType<{ section: FeaturedProductsSection }>;
+  "featured-deals": ComponentType<{ section: FeaturedDealsSection }>;
+  "featured-categories": ComponentType<{ section: FeaturedCategoriesSection }>;
   "deal-spotlight": ComponentType<{ section: DealSpotlightSection }>;
 };
 
 export const SECTION_COMPONENTS: SectionComponentMap = {
   "announcement-bar": AnnouncementBarSectionBlock,
-  "featured-categories": FeaturedCategoriesSectionBlock,
-  "featured-deals": FeaturedDealsSectionBlock,
   "featured-products": FeaturedProductsSectionBlock,
+  "featured-deals": FeaturedDealsSectionBlock,
+  "featured-categories": FeaturedCategoriesSectionBlock,
   "deal-spotlight": DealSpotlightSectionBlock,
 };
 

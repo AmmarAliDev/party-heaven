@@ -44,7 +44,7 @@ export function FeaturedProductsSectionBlock({ section }: FeaturedProductsSectio
 
   return (
     <PageContainer as="section" className="space-y-6 py-8">
-      <SectionHeader title={section.title} eyebrow="Top picks" {...headerDescription} />
+      <SectionHeader title={section.title} eyebrow="" {...headerDescription} />
 
       {hasProducts ? (
         <>
@@ -70,7 +70,7 @@ export function FeaturedProductsSectionBlock({ section }: FeaturedProductsSectio
                                   height={214}
                                   width={365}
                                   sizes="(max-width: 639px) 85vw, (max-width: 767px) 50vw, (max-width: 1023px) 33vw, (max-width: 1279px) 25vw, (max-width: 1535px) 20vw, 17vw"
-                                  className="h-54 w-full object-cover"
+                                  className="h-54 w-full object-cover transition-transform duration-200 group-hover:scale-105"
                                   data-testid={`storefront-product-card-image-${productKey}`}
                                 />
                               ) : (
