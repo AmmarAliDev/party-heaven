@@ -113,7 +113,11 @@ Analytics events (`trackEvent` for `PAGE_VIEW`, `PRODUCT_VIEW`, `ADD_TO_CART`, `
 
 #### Layout components
 
-`app-header.test.tsx` — `AppHeader` storefront navbar (direct categories, `More` dropdown, `All Categories`, no duplicate links).  
+`app-header.test.tsx` — `AppHeader` upper section (logo, actions, skip link) and the dark-strip / page-background band split (navbar is outside the dark strip).  
+`app-navbar.test.tsx` — server `AppNavbar` builds the sorted navbar pills, hides itself when there are no categories, and logs + hides on load error.  
+`storefront-navbar-carousel.test.tsx` — carousel pill rendering, per-slide sizing (5-per-view / `md` auto), arrows, hover + click product dropdowns with lazy fetch and per-category caching, and drag safety (drag never opens a dropdown).  
+`storefront-navbar-categories.test.ts` — `buildStorefrontNavbarCategories` ordering, image normalization, and the trailing `All Categories` tile.  
+`storefront-category-menu.test.ts` — footer quick-links menu builder (`buildStorefrontNavbarCategoryMenu`) contract.  
 `user-menu.test.tsx` — shared `<UserMenu />` page links, account/admin/sign-out controls, and `Your Orders` visibility (signed-in vs signed-out).  
 `storefront-mobile-nav.test.tsx` — mobile drawer page links, wishlist/account actions, `Your Orders` (signed-in) and `Admin Panel` (admin) options; catalog categories absent.  
 `mobile-bottom-nav.test.tsx` — five primary mobile actions, hrefs, shared overlays, active-route highlighting.
