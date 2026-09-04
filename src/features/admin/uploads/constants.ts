@@ -1,4 +1,4 @@
-export const adminImageUploadPurposes = ["product", "category", "seo", "blog", "banner", "content"] as const;
+export const adminImageUploadPurposes = ["product", "category", "seo", "blog", "banner", "content", "occasion"] as const;
 
 export type AdminImageUploadPurpose = (typeof adminImageUploadPurposes)[number];
 

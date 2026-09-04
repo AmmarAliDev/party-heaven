@@ -46,6 +46,12 @@ export const adminNavigationItems: readonly AdminNavigationItem[] = [
     requiredPermission: rbacPermissions.catalogRead,
   },
   {
+    label: "Occasions",
+    href: routes.admin.occasions,
+    description: "Curate themed collections (Birthday, Wedding, Baby Shower) of products and deals.",
+    requiredPermission: rbacPermissions.catalogRead,
+  },
+  {
     label: "Orders",
     href: routes.admin.orders,
     description: "Track order intake and fulfillment status.",

@@ -26,7 +26,7 @@ export {
 } from "./search-dialog-state";
 export type { CategoryFaqItem, CategoryInternalLink, CategorySeoContent, CategorySeoContentOptions } from "./seo/category-seo-content";
 export { generateCategorySeoContent } from "./seo/category-seo-content";
-export { getCatalogCategories, getCatalogCategory, getCatalogCategoryListing, getCatalogCategorySlugs, getProductBySlug, getProductMetadataBySlug, getProductSlugsWithCategory, getRelatedProducts, searchCatalogProducts } from "./service";
+export { getCatalogCategories, getCatalogCategory, getCatalogCategoryListing, getCatalogCategorySlugs, getProductBySlug, getProductMetadataBySlug, getProductSlugsWithCategory, getRelatedProducts, listCatalogProductsByIds, searchCatalogProducts } from "./service";
 export type { CatalogCategory, CatalogCategoryListing, CatalogListingFilters, CatalogProductCard, CatalogProductDetail, CatalogSearchResponse, ProductImage, ProductReview, ProductReviewSummary, ProductSpec, ProductVariantGroup, ProductVariantOption } from "./types";
 export {
   availabilityFilterOptions,
