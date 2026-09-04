@@ -14,6 +14,7 @@ describe("admin navigation visibility", () => {
       "Reviews",
       "Blog",
       "Categories",
+      "Occasions",
       "Orders",
       "Homepage",
       "Revenue",

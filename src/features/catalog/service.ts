@@ -850,6 +850,39 @@ export async function getRelatedProducts(
 }
 
 /**
+ * Returns published catalog products for the given ids as `CatalogProductCard`s,
+ * preserving the requested order (products that are no longer published — or
+ * sit under an unpublished category — are skipped).
+ *
+ * Used by curated collections (e.g. Special Occasions) that want to render the
+ * exact same product card grid as the category listing pages.
+ */
+export async function listCatalogProductsByIds(productIds: string[]): Promise<CatalogProductCard[]> {
+  const uniqueIds = [...new Set(productIds.map((id) => id.trim()).filter(Boolean))];
+
+  if (uniqueIds.length === 0) {
+    return [];
+  }
+
+  try {
+    const records = await listPublishedProductsByIds(uniqueIds);
+    const recordById = new Map(records.map((record) => [record.id, record]));
+
+    return uniqueIds
+      .map((id) => recordById.get(id))
+      .filter((record): record is NonNullable<typeof record> => Boolean(record))
+      .map(mapProductToCard);
+  } catch (error) {
+    catalogServiceLogger.error("catalog products by ids lookup failed", {
+      productIds: uniqueIds,
+      error,
+    });
+
+    return [];
+  }
+}
+
+/**
  * Returns slug + categorySlug pairs for all published products.
  * Used by `generateStaticParams` in the product detail route.
  */

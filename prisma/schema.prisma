@@ -74,6 +74,16 @@ enum CategoryStatus {
   ARCHIVED
 }
 
+// Occasion lifecycle mirrors Product/Deal so admins can stage collections
+// (Birthday, Wedding, Baby Shower, ...) before publishing them.
+enum OccasionStatus {
+  DRAFT
+  PUBLISHED
+  ARCHIVED
+
+  @@map("occasion_status")
+}
+
 enum BlogPostStatus {
   DRAFT
   PUBLISHED
@@ -337,6 +347,7 @@ model Product {
   reviews          Review[]
   dealCampaigns    DealCampaignProduct[]
   dealProducts     DealProduct[]
+  occasionProducts OccasionProduct[]
   metadata         Json?
   seoTitle         String?                @map("seo_title")
   seoDescription   String?                @map("seo_description")
@@ -432,6 +443,7 @@ model Deal {
   specifications   DealSpecification[]
   cartItems        DealCartItem[]
   reviews          Review[]
+  occasionDeals    OccasionDeal[]
   // Stores related deal ids (`relatedDealIds: string[]`) for the "Related
   // deals" cross-sell on the deal detail page.
   metadata         Json?
@@ -500,6 +512,80 @@ model DealImage {
   createdAt DateTime @default(now()) @map("created_at")
 
   @@index([dealId, position])
+}
+
+// ---------------------------------------------------------------------------
+// Occasions (themed collections)
+// ---------------------------------------------------------------------------
+// An Occasion is an editorial collection that curates existing catalog
+// products AND/OR deals around a theme (e.g. "Birthday", "Wedding",
+// "Baby Shower"). It is intentionally NOT a category: occasions re-surface
+// catalog items that keep living in their own categories/deals, and they are
+// displayed on the storefront with the same product/deal card grids used by
+// the category listing pages.
+//
+// `isSpecial` flags occasions that should be treated as seasonal/hero content
+// (e.g. high-visibility storefront surfaces); normal occasions are everyday
+// collections. The flag is surfaced as a badge on storefront occasion cards
+// and the occasion detail page.
+model Occasion {
+  id               String         @id @default(uuid())
+  name             String
+  slug             String         @unique
+  shortDescription String?        @map("short_description")
+  description      String?
+  coverImageUrl    String?        @map("cover_image_url")
+  coverImageAlt    String?        @map("cover_image_alt")
+  status           OccasionStatus @default(DRAFT)
+  isSpecial        Boolean        @default(false) @map("is_special")
+  products         OccasionProduct[]
+  deals            OccasionDeal[]
+  seoTitle         String?        @map("seo_title")
+  seoDescription   String?        @map("seo_description")
+  seoCanonicalUrl  String?        @map("seo_canonical_url")
+  seoOgTitle       String?        @map("seo_og_title")
+  seoOgDescription String?        @map("seo_og_description")
+  seoImageUrl      String?        @map("seo_image_url")
+  seoKeywords      String?        @map("seo_keywords")
+  seoNoIndex       Boolean        @default(false) @map("seo_no_index")
+  seoSchemaNotes   String?        @map("seo_schema_notes")
+  createdAt        DateTime       @default(now()) @map("created_at")
+  updatedAt        DateTime       @updatedAt @map("updated_at")
+
+  @@index([slug])
+  @@index([status])
+  @@index([status, isSpecial])
+}
+
+// A single catalog product curated into an occasion. Products keep their own
+// category/status — only the position within the occasion is stored here.
+model OccasionProduct {
+  id         String   @id @default(uuid())
+  occasion   Occasion @relation(fields: [occasionId], references: [id], onDelete: Cascade)
+  occasionId String   @map("occasion_id")
+  product    Product  @relation(fields: [productId], references: [id], onDelete: Cascade)
+  productId  String   @map("product_id")
+  position   Int      @default(0)
+  createdAt  DateTime @default(now()) @map("created_at")
+
+  @@unique([occasionId, productId])
+  @@index([occasionId])
+  @@index([productId])
+}
+
+// A single deal curated into an occasion. Deals keep their own status.
+model OccasionDeal {
+  id         String   @id @default(uuid())
+  occasion   Occasion @relation(fields: [occasionId], references: [id], onDelete: Cascade)
+  occasionId String   @map("occasion_id")
+  deal       Deal     @relation(fields: [dealId], references: [id], onDelete: Cascade)
+  dealId     String   @map("deal_id")
+  position   Int      @default(0)
+  createdAt  DateTime @default(now()) @map("created_at")
+
+  @@unique([occasionId, dealId])
+  @@index([occasionId])
+  @@index([dealId])
 }
 
 model ProductSpecification {
